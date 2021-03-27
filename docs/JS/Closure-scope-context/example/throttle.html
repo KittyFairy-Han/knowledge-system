@@ -1,0 +1,86 @@
+<!--
+ * @Author: 鱼小柔
+ * @Date: 2020-03-07 22:34:27
+ * @LastEditors: your name
+ * @LastEditTime: 2020-06-14 19:56:10
+ * @Description: file content
+--> 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <title>防抖</title>
+</head>
+<style>
+    .show-number {
+        color: white;
+        font-size: 30px;
+        background: green;
+        width: 80%;
+        height: 100px;
+        margin: auto;
+        text-align: center;
+        line-height: 100px;
+    }
+</style>
+
+<body>
+    <main>
+        <div class="show-number"></div>
+    </main>
+    <script>
+
+        //节流
+        let denounce = function (fn, delay) {
+            let timer = null;
+            let context = this
+            return function(){
+                args = arguments
+                //每次一调用函数时，取消上一次的定时
+                timer && clearTimeout(timer);
+                timer = setTimeout(() => {
+                    fn.apply(context, args)
+                }, delay);
+            }
+        }
+
+
+        //防抖
+        let throttle = function (cb, delay, wait) {
+            let start;
+            let timer;
+            const context = this
+            return function(){
+                args = arguments
+                let current = new Date()
+                timer && clearTimeout(timer)
+                if (current - start < wait) {   
+                    timer = setTimeout(() => {
+                        cb.apply(context, args)
+                    }, delay)
+                } else {
+                    cb.apply(context, args);
+                    start = current
+                }
+            }
+        }
+
+        // for example
+
+        let count = 1;
+
+        let changeCount = function (e) {
+            console.log(e)
+            $('.show-number').text(count)
+            count++
+        }
+
+        $('.show-number').mousemove(throttle(changeCount, 500,1000))
+    </script>
+</body>
+
+</html>

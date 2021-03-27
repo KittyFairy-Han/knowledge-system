@@ -1,0 +1,15 @@
+{
+  "name": "web-front-knowledge-system",
+  "version": "1.0.0",
+  "description": "梳理前端知识体系，方便回顾",
+  "main": "index.js",
+  "author": "鱼小柔",
+  "license": "MIT",
+  "devDependencies": {
+    "vuepress": "^1.7.1"
+  },
+  "scripts": {
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
+  }
+}

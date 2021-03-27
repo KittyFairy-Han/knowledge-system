@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>自己写jq和zepto</title>
+  </head>
+  <body>
+    <p>jq test 1</p>
+    <p>jq test 2</p>
+    <p>jq test 3</p>
+    <p>jq test 4</p>
+
+    <div id="mydiv">
+      <p>jq test in div</p>
+    </div>
+    <script src="../../../common/jquery-3.2.1.js"></script>
+    <!-- <script src="./my-zepto.js"></script> -->
+    <script src="./my-jq.js"></script>
+
+    <script>
+      let $p = $("p");
+      $p.css("font-size", "40px");
+      alert($p.html());
+
+      let $div = $("#mydiv");
+      $div.css("color", "blue");
+      alert($div.html());
+    </script>
+  </body>
+</html>
