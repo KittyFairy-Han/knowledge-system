@@ -2,11 +2,11 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-15 21:35:29
  * @LastEditors: your name
- * @LastEditTime: 2020-11-21 23:05:32
+ * @LastEditTime: 2021-03-28 12:06:01
  * @Description: file content
 -->
 
-## 原型链
+# 原型链
 
 ## 什么是原型链
 

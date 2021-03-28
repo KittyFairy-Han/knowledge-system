@@ -2,9 +2,11 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 21:02:07
  * @LastEditors: your name
- * @LastEditTime: 2020-11-21 20:39:48
+ * @LastEditTime: 2021-03-28 11:21:12
  * @Description: file content
 -->
+
+# this 关键字
 
 ## this 难在哪里
 
@@ -85,10 +87,10 @@ o.f(); //o
 const g = o.f;
 g(); //window
 ```
-  可以这样理解，JavaScript 引擎内部，o 和 o.f 储存在两个内存地址，称为地址一和地址二。o.f()这样调用时，是从地址一调用地址二，因此地址二的运行环境是地址一，this 指向 o。但是，上面第二种情况，是直接取出地址二进行调用，这样的话，运行环境就是全局环境，因此 this 指向全局环境。
 
-``` js
+可以这样理解，JavaScript 引擎内部，o 和 o.f 储存在两个内存地址，称为地址一和地址二。o.f()这样调用时，是从地址一调用地址二，因此地址二的运行环境是地址一，this 指向 o。但是，上面第二种情况，是直接取出地址二进行调用，这样的话，运行环境就是全局环境，因此 this 指向全局环境。
 
+```js
 const o = {
   p: 1,
   mid: {
@@ -130,7 +132,6 @@ o.child4(); //window
 })();
 // window,window,window
 ```
-
 
 ## 使用时需要注意(非箭头函数)
 

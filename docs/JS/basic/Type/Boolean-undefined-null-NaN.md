@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-22 11:00:29
  * @LastEditors: your name
- * @LastEditTime: 2020-11-22 11:03:43
+ * @LastEditTime: 2021-03-27 18:44:34
  * @Description: file content
 -->
 # Boolean 类型
@@ -44,7 +44,10 @@ Boolean(NaN);
 | 转换为 Number  | NaN       | 0      |
 | 用 typeof      | undefined | object |
 | 转换为 Boolean | false     | false  |
-| 计算 ===       | true      | true   |
+``` js
+undefined == null //true
+undefined === null //false
+```
 
 ## NaN 出现的场景
 

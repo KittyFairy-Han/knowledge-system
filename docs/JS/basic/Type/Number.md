@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 18:17:26
  * @LastEditors: your name
- * @LastEditTime: 2020-11-21 14:23:12
+ * @LastEditTime: 2021-03-27 18:53:04
  * @Description: file content
 -->
 
@@ -37,7 +37,7 @@ Number.isFinite(Infinity); //false
 Number.isFinite(NaN); //false
 ```
 
-### parseInt 和 Number
+### parseInt(any,10) 和 Number(any)
 
 | 值        | parseInt | Number |
 | --------- | -------- | ------ |
@@ -57,7 +57,7 @@ Number.isFinite(NaN); //false
 | {}        | NaN      | NaN    |
 | 其他      | NaN      | NaN    |
 
-### toString(进制) 把十进制数转换为相应的进制数 返回字符串
+### toString(radix) 把十进制数转换为相应的进制数 返回字符串
 
 ```js
 const number = 8;
@@ -69,7 +69,7 @@ number.toString(2);
 // "1000"
 ```
 
-### toFixed(小数点保留位数) 把数字转换为保留相应位数的小数 返回字符串
+### toFixed(num) 把数字转换为保留相应位数的小数 返回字符串
 
 > 参数为 0 ~ 20 之间,不传则为 0 ,转换法则是直接抹去非四舍五入
 

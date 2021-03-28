@@ -6,7 +6,6 @@
 
 - name
 - length(**参数列表**的长度)
-- arguments(参数对象)
 
 ## 实例方法
 
@@ -37,7 +36,7 @@ copyF(); //o.a=300
 - 省略性
 - 覆盖性
 
-### arguments
+### 特殊的局部变量 arguments
 
 - arguments 是 js 内置对象，类数组对象，本质是对象而非数组。
 - arguments key 值是 '0','1','2',...

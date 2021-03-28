@@ -56,16 +56,16 @@ b.__proto__.__proto__ === A.prototype;
 function A(name) {
   this.name = name;
 }
-function B(year) {
-  this.year = year;
+function B(age) {
+  this.age = age;
 }
 ```
 
 1. 借助构造函数
    ```js
-   function B(name, year) {
+   function B(name, age) {
      A.call(this, name);
-     this.year = year;
+     this.age = age;
    }
    const b1 = new B("lily", 18);
    const b2 = new B("ze", 20);

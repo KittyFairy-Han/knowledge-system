@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 17:37:37
  * @LastEditors: your name
- * @LastEditTime: 2020-11-22 13:44:05
+ * @LastEditTime: 2021-03-27 22:18:30
  * @Description: file content
 -->
 
@@ -51,7 +51,7 @@ f(1, 2, 3);
 
 VUE3.0 使用 proxy 了。
 
-Proxy 用于修改某些操作的默认行为，等同于在语言层面做出修改，所以属于一种“元编程”（meta programming），即对编程语言进行编程。
+Proxy 在语言层面修改某些操作的默认行为，所以属于一种“元编程”（meta programming），即对编程语言进行编程。
 
 需要注意的是， 在 IE 下， 这个特性**永远**都**不会**被支持， 包括 VUE 3.0 也是单独开发一套 API 来适应 IE11， 故而在需要支持 IE 的环境下禁止使用 Proxy。
 ```js

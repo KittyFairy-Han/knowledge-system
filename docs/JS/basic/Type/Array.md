@@ -32,7 +32,7 @@ Array.of(1, 2, 3); //[1,2,3]
 ## 实例方法 Array.prototy.
 
 - push,pop,unshift,shift,sort,revert,forEach 改变 arr
-> forEach 不能跳出，for of 可以
+  > forEach 不能跳出，for of 可以
 
 | type | how to use                                     | return                                                                    |
 | ---- | ---------------------------------------------- | ------------------------------------------------------------------------- |
@@ -155,14 +155,21 @@ arrUndefineds.forEach((item) => {
 
 ### 生成数组值不为 empty 的固定长度的可遍历的数组
 
+- 先生成 empty x 3 然后再转换成 [undeifned,undeifined,undefined]
+
 ```js
-// 把有length属性的对象转换成数组，数组元素是 undefined
-Array.apply(null,{length:3})
-Array.from({length: 3})
+[...new Array(3)];
+new Array(3).fill(1); //[1,1,1] 类似forEach、map等遍历的方法会跳过empty，但是fill可以生效。
+Array.from(new Array(3));
+```
+
+- 把有 length 属性的对象转换成数组，数组元素是 undefined
+
+```js
+Array.apply(null, { length: 3 });
+Array.from({ length: 3 });
+Array.from(new Array(3));
 // !!Array.prototype.slice.call 不行
-// 先生成 empty x 3 然后再转换成 [undeifned,undeifined,undefined]
-Array.from(new Array(3))
-[...new Array(3)]
 ```
 
 ### 生成一个元素为 0-100 的数组
@@ -177,18 +184,21 @@ Array.from({ length: 100 }).map((v, i) => i);
 
 ```js
 let testVal = [1, 2, 3];
-Array.isArray(testVal); //
-testVal instanceof Array; // 实例与构造函数的关系
-testVal.__proto__ === Array.prototype; //实例与原型
+/* 最简洁的方法 */
+Array.isArray(testVal);
+/* 实例与构造函数的关系 */
+testVal instanceof Array;
+/* 实例与原型 */
+testVal.__proto__ === Array.prototype;
+Object.getProtoTypeOf(testVal) === Array.prototype; //Object.getProtoOf(testVal) 是 testVal.__proto__ 的显式写法
+Array.prototype.isPrototypeOf(testVal);
+/* 类型判断通用方法 */
 Object.prototype.toString.call(testVal) === "[Object Array]"; //"[Object Array]"
-Object.getProtoTypeOf(testVal) === Array.prototype; // 实例与原型
-Array.prototype.isPrototypeOf(testVal); // 实例与原型
-//Object.getProtoOf(testVal) 是 testVal.__proto__ 的显式写法
 ```
 
 ### like-array to array
 
-- 类数组对象：arguments、HTMLCollection、NodeList 等
+- 类数组对象(arguments、HTMLCollection、NodeList 等) -> Array
 
 ```js
 //1 数组的方法如slice、splice等 结合 call
@@ -196,16 +206,17 @@ const arr1 = Array.prototype.slice.call(likeArr); //Array.prototype.splice.call(
 //2 es6新增Array静态方法 Array.from
 const arr2 = Array.from(likeArr);
 //3 扩展运算符
-const arr2 = [...likeArr];
+const arr3 = [...likeArr];
 ```
 
-- Set Map 对象
+- Set -> Array
 
 ```js
-const set = new Set([1, 2, 3]);
+//1 Array.prototype.slice.call 不行
+//2 es6新增Array静态方法 Array.from
 const arr1 = Array.from(set);
+//3 扩展运算符
 const arr2 = [...set];
-//Array.prototype.slice.call 不行
 ```
 
 ### 数组去重
@@ -251,21 +262,16 @@ let orignArr = [1, 5, 3, 3, 4, 5];
 ### 拍平数组
 
 ```js
-function linearizeArray(orgArr) {
-  let linearArray = [];
-
-  linearStep(orgArr);
-  function linearStep(current) {
-    if (current instanceof Array) {
-      for (let i = 0; i < current.length; ++i) {
-        linearStep(current[i]);
-      }
-    } else {
-      linearArray.push(current);
+function linearizeArray(current) {
+  let arr = [];
+  if (current instanceof Array) {
+    for (let i = 0; i < current.length; ++i) {
+      arr.push(...linearizeArray(current[i]));
     }
+  } else {
+    arr.push(current);
   }
-
-  return linearArray;
+  return arr;
 }
 let testArray = [1, 2, [[3, 4], 5], [6, 7, 8]];
 linearArray = linearizeArray(testArray);

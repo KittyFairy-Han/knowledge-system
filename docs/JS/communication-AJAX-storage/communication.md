@@ -197,7 +197,8 @@ Awindow.addEventListener(
 
 ### 简单请求
 
-- 简单请求：GET POST HEAD
+- 简单请求：方法仅限于 ：GET POST HEAD、http头信息仅限于：Accept、Accept-Language、Content-Language、Last-Event-ID、Content-Type(只限于三个值application/x-www-form-urlencoded、multipart/form-data、text/plain)
+>HEAD请求一般可以用在很多并不真正需要资源的场景，避免传输 body 数据造成不必要的资源浪费。如检查一个文件是否存在可以用 HEAD 请求，没有必要用 GET 把整个文件都取下来。
 - 请求头关键字段：Orign
 - 返回头关键字段：Access-Control-Allow-Origin
 
@@ -206,4 +207,4 @@ Awindow.addEventListener(
 - 非简单请求：PUT DELETE 等
 - 发出预检请求 Option
 - 预检请求请求头关键字段：Orign 、Access-Control-Request-Method 、Access-Control-Request-Headers
-- 返回头关键字段：Access-Control-Allow-Methods、Access-Control-Allow-Headers
+- 返回头关键字段：Access-Control-Allow-Origin、Access-Control-Allow-Methods、Access-Control-Allow-Headers

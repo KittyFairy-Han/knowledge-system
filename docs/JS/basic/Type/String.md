@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 18:17:26
  * @LastEditors: your name
- * @LastEditTime: 2020-11-16 20:17:45
+ * @LastEditTime: 2021-03-27 19:30:43
  * @Description: file content
 -->
 
@@ -16,16 +16,16 @@
 
 ### String
 
-| 转换前                | 转换后                               |
-| --------------------- | ------------------------------------ |
-| undefined             | "undefined"                          |
-| null                  | "null"                               |
-| Boolean               | "true"/"false"                       |
-| Number(NaN,±Infinity) | "原来的值"                           |
-| []                    | ""                                   |
-| Array                 | 脱掉方括号披上引号即"数组拍平后的值" |
-| Function              | "函数代码"                           |
-| Object                | "[Object,Object]"                    |
+| 转换前                      | 转换后                               |
+| --------------------------- | ------------------------------------ |
+| undefined                   | "undefined"                          |
+| null                        | "null"                               |
+| Boolean                     | "true"/"false"                       |
+| Number(包括 NaN、±Infinity) | "原来的值"                           |
+| []                          | ""                                   |
+| Array                       | 脱掉方括号披上引号即"数组拍平后的值" |
+| Function                    | "函数代码"                           |
+| Object                      | "[Object,Object]"                    |
 
 ### 静态方法 String.
 
@@ -75,14 +75,14 @@ for (let i = 8000; i < 10000; i++) {
 
 ```js
 const str = "my name is yu xiao rou , you can call me xiao rou yu or xiao rou";
+const reg = /rou/
+str.search(reg) //19
+reg.test(str) //true
+str.match(reg);//["rou", index: 19, input: "my name is yu xiao rou , you can call me xiao rou yu or xiao rou", groups: undefined]
+reg.exec(str)//["rou", index: 19, input: "my name is yu xiao rou , you can call me xiao rou yu or xiao rou", groups: undefined]
+str.matchAll(reg); //返回一个迭代器
+
 str.match(/rou/g); // ['rou','rou','rou']
-str.match(/rou/);
-/* [0: "rou"
-index: 19
-input: "my name is yu xiao rou , you can call me xiao rou yu or xiao rou"
-groups: undefined
-length: 1] */
-str.matchAll(); //返回一个迭代器
 ```
 
 ### slice

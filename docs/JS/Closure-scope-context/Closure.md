@@ -159,7 +159,7 @@ curringAdd(1)(2)(3);
 
 ```js
 //节流
-let denounce = function(fn, delay) {
+let debounce = function(fn, delay) {
   let timer = null;
   let context = this;
   return function() {

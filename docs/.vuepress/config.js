@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 17:36:39
  * @LastEditors: your name
- * @LastEditTime: 2021-01-25 00:14:09
+ * @LastEditTime: 2021-03-29 00:41:40
  * @Description: file content
  */
 
@@ -58,7 +58,6 @@ module.exports = {
           collapsable: false, // 可选的, 默认值是 true,
           children: [
             "/JS/communication-AJAX-storage/communication",
-            // "/JS/communication-AJAX-storage/AJAX",
             "/JS/communication-AJAX-storage/storage",
           ],
         },
@@ -101,6 +100,13 @@ module.exports = {
             "/engineering/webpack/app-demo",
           ],
         },
+      ],
+      "/CSS/":[
+        ["/CSS/layout","页面布局"],
+      ],
+      "/broswer/":[
+        ["/broswer/http","http"],
+        ["/broswer/cache","浏览器缓存"]
       ]
     },
   },

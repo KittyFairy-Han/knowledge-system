@@ -310,7 +310,18 @@ this.$router.params.id;
 
 - 传统组件，静态渲染，更新要依赖于 DOM
 - vue、react 组件，数据驱动视图
+### vue vs react
+#### vue 本身是 MVVM 框架，由 MVC 发展而来
 
+- vue 使用 模板 是从 angular 引入，模版语法双引号中是 JS 变量有点不习惯，还有各种指令学习成本比较高。
+- MVVM 数据视图分离更明显，数据双向绑定。
+- 组件化是由 MVVM 扩展的
+
+#### React 本质是前端组件化框架，由后端组件化发展而来
+
+- React 使用 JSX, JSX 逐渐趋向标准化，学习成本低（只要记住大括号中式 JS 表达式就行，不用学习指令）
+- 视图分离不够清晰，视图代码写在 render 函数中，和 JS 逻辑有融合
+- 组件化更彻底和清晰
 ### Vue 和 Jq 比的特点，特点好在哪里？
 
 - 数据视图分离，解耦、符合开放封闭原则
@@ -322,7 +333,7 @@ this.$router.params.id;
 - Model(M)-ViewModel(VM)-View(V)
 
 ```vue
-//
+
 <!--> View <-->
 <template></template>
 <script>

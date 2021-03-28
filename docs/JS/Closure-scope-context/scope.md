@@ -5,7 +5,10 @@
  * @LastEditTime: 2020-11-21 19:33:05
  * @Description: file content
 -->
-# 局部代码块作用域
+
+# 作用域
+
+## 局部代码块作用域
 
 > 块级作用域使广泛应用的 IIFE 不在必要了
 
@@ -14,10 +17,10 @@
 ```js
 var a = "通过 var 声明的 a";
 const d = "通过 const 声明的 d";
-a//'通过 var 声明的 a'
+a; //'通过 var 声明的 a'
 this.a; //'通过 var 声明的 a'
 window.a; //'通过 var 声明的 a'
-d//'通过 const 声明的 d'
+d; //'通过 const 声明的 d'
 this.d; //undefind
 window.d; //undefind
 window === this; //true
@@ -56,7 +59,7 @@ for (let i = 0; i < 10; i++) {
 }
 ```
 
-# 改变作用域
+## 改变作用域
 
 - with 和 catch 会将对象中标识符的解析添加到作用域链的最前端，标识符的解析就是 with（）和 catch（）括号中的对象。
 - eval 如果字符串中有新定义函数，那么它就有可能再建一个执行环境。

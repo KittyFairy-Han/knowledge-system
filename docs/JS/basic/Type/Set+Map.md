@@ -2,11 +2,11 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 18:17:26
  * @LastEditors: your name
- * @LastEditTime: 2020-11-21 16:21:07
+ * @LastEditTime: 2021-03-28 11:12:05
  * @Description: file content
 -->
 
-# Set Map
+# Set Map 数据类型
 
 - Set 类似数组，内部没有重复的成员
 - Set 内部用 === 判断， NaN 看做相等
@@ -16,8 +16,8 @@
 ## 构造
 
 ```js
-const s = new Set(`类似数组的结构`);
-const m = new Map(`对象|双元素的二维数组`); //  参数：[[a,1],[b,2],[c,3]] 映射结果： a=>1 b=>2 c=>3
+const s = new Set(likeArray);
+const m = new Map(Object | `双元素的二维数组`); //  参数：[[a,1],[b,2],[c,3]] 映射结果： a=>1 b=>2 c=>3
 ```
 
 ## 实例属性和方法
@@ -69,4 +69,3 @@ for (let [key, value] of map) {
 ## 应用
 
 > 利用 Set 为数组去重，章节：Array-考点-去重
-

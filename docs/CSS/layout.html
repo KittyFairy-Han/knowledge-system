@@ -1,0 +1,217 @@
+<!--
+ * @Author: 鱼小柔
+ * @Date: 2021-03-28 10:33:25
+ * @LastEditors: your name
+ * @LastEditTime: 2021-03-28 10:33:34
+ * @Description: file content
+-->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Layout-三栏布局</title>
+    <style media="screen">
+      html *{
+        padding: 0;
+        margin: 0;
+      }
+      
+      .layout article div{
+        min-height: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>三栏布局</h1>
+    <!--浮动布局  -->
+    <h1>----</h1>
+    <section class="layout float">
+      <style media="screen">
+      .layout.float .left{
+        float:left;
+        width:300px;
+        background: red;
+      }
+      .layout.float .center{
+        margin: 0 300px;
+        width: auto;
+        background: yellow;
+      }
+      .layout.float .right{
+        float:right;
+        width:300px;
+        background: blue;
+      }
+      </style>
+      
+      <article class="left-right-center">
+        <div class="left"></div>
+        <div class="right"></div>
+        <div class="center">
+          <h2>浮动解决方案</h2>
+          优点：
+          兼容性好
+          <br>
+          隐患：
+          清除浮动，
+        </div>
+      </article>
+    </section>
+
+    <!-- 绝对布局 -->
+    <h1>----</h1>
+    <section class="layout absolute">
+      <style>
+        .layout.absolute .left{
+          position: absolute;
+          left:0;
+          width: 300px;
+          background: red;
+        }
+        .layout.absolute .center{
+          position: absolute;
+          left: 300px;
+          right: 300px;
+          /* 或者 */
+          /* width:auto;
+          margin:0 300px; */
+          background: yellow;
+        }
+        .layout.absolute .right{
+          position: absolute;
+          right:0;
+          width: 300px;
+          background: blue;
+        }
+      </style>
+      
+      <article class="left-center-right">
+        <div class="left"></div>
+        <div class="center">
+          <h2>绝对定位解决方案</h2>
+          优点：
+          灵活、便捷
+          <br>
+          隐患：
+          脱离文档流，会有一些隐藏问题
+        </div>
+        <div class="right"></div>
+      </article>
+    </section>
+
+
+    <!-- flexbox布局 -->
+    <h1>----</h1>
+    <section class="layout flexbox">
+      <style>
+        .layout.flexbox{
+          margin-top: 110px;
+        }
+        .layout.flexbox .left-center-right{
+          display: flex;
+        }
+        .layout.flexbox .left{
+          width: 300px;
+          background: red;
+        }
+        .layout.flexbox .center{
+          flex:1;
+          background: yellow;
+        }
+        .layout.flexbox .right{
+          width: 300px;
+          background: blue;
+        }
+      </style>
+      
+      <article class="left-center-right">
+        <div class="left"></div>
+        <div class="center">
+          <h2>flexbox解决方案</h2>
+          比较完美的解决方案
+        </div>
+        <div class="right"></div>
+      </article>
+    </section> 
+    
+
+    <!-- 表格布局 -->
+    <h1>----</h1>
+    <section class="layout table">
+      <style>
+        .layout.table .left-center-right{
+          width:100%;
+          height: 100px;
+          display: table;
+        }
+        .layout.table .left-center-right>div{
+          display: table-cell;
+        }
+        .layout.table .left{
+          width: 300px;
+          background: red;
+        }
+        .layout.table .center{
+          background: yellow;
+        }
+        .layout.table .right{
+          width: 300px;
+          background: blue;
+        }
+      </style>
+      
+      <article class="left-center-right">
+        <div class="left"></div>
+        <div class="center">
+          <h2>表格布局解决方案</h2>
+          优点：
+          兼容性最好，甚至可以兼容 IE8
+          <br>
+          缺点：
+          性能差，不灵活
+          其它html标记占更多的字节，会阻挡浏览器渲染引擎的渲染顺序，会影响其内部的某些布局属性的生效
+        </div>
+        <div class="right"></div>
+      </article>
+    </section>
+
+    <!-- 网格布局 -->
+    <h1>----</h1>
+    <section class="layout grid">
+      <style>
+        .layout.grid .left-center-right{
+          width:100%;
+          display: grid;
+          grid-template-rows: 100px;
+          grid-template-columns: 300px auto 300px;
+        }
+     
+        .layout.grid .left{
+          width: 300px;
+          background: red;
+        }
+        .layout.grid .center{
+          background: yellow;
+        }
+        .layout.grid .right{
+
+          background: blue;
+        }
+      </style>
+      
+      <article class="left-center-right">
+        <div class="left"></div>
+        <div class="center">
+          <h2>网格布局解决方案</h2>
+          优点：
+          二维弹性布局
+          不常用的技术方案，体现知识面系统
+          <br>
+          缺点：
+          兼容性差
+        </div>
+        <div class="right"></div>
+      </article>
+    </section>
+  </body>
+</html>
