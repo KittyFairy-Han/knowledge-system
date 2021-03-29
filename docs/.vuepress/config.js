@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 17:36:39
  * @LastEditors: your name
- * @LastEditTime: 2021-03-29 00:41:40
+ * @LastEditTime: 2021-03-29 18:19:05
  * @Description: file content
  */
 
@@ -106,7 +106,8 @@ module.exports = {
       ],
       "/broswer/":[
         ["/broswer/http","http"],
-        ["/broswer/cache","浏览器缓存"]
+        ["/broswer/cache","浏览器缓存"],
+        ["/broswer/render","网页渲染"]
       ]
     },
   },

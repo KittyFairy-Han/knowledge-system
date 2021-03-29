@@ -1,42 +1,20 @@
 # 模块化
 
+# 模块化
+
+## 为什么要用模块
+
+网站逐渐发展成网页应用程序 webApp，从 0 到 1 效率太低而且代码太长不好管理，有了模块，我们就可以更方便地使用别人的代码（复用性），想要什么功能，就加载什么模块（逻辑分离、按需加载），也提高了维护性。
+
 ## 发展
 
-1. 函数封装
-2. 对象封装
-3. 立即执行函数
-4. commonJs 规范(node、webpack)
+| 顺序 | 规范名称 | 特点       | 实现的库   | 关键用法                 |
+| ---- | -------- | ---------- | ---------- | ------------------------ |
+| 1    | CommonJs | 不能异步   |            | exports、require         |
+| 2    | AMD      | 实现了异步 | require.js | define、require          |
+| 3    | ES6      | 整合了     | 原生语法   | export、import、import() |
 
-- 一个文件就是一个模块，拥有单独的作用域。普通方式定义的变量、函数、对象都属于该模块内；
-- 通过 require 来加载模块，通过 exports 和 modul.exports 来暴露模块中的内容；
-- 同步加载模块，当所有模块加载完毕才执行下一步
-  > 不适合浏览器端，因为 node 的性能较好取决于磁盘，而前端浏览器还受制于网络。所以出现了 AMD CMD.
-- 动态导入
-- 值是拷贝的
-
-5. AMD(require.js、webpack)
-
-- 依赖前置，对于那些“条件依赖”就会显得浪费。
-- 只有一个 API define(<模块名称>, [依赖数组], 回调函数)
-- 异步加载模块，
-
-6. CMD(sea.js)
-
-- 依赖就近，用到的时候再加载（会做缓存），防止浪费。
-- define(function (require, exports, module) {})
-- 异步加载模块
-
-6. ES6 规范(原生 js、webpack)
-
-- import 导入 export 导出
-- 异步加载模块
-- 静态导入
-- 值是引用的
-
-7. webpack 打包 commonJs 和 es6 一起使用 构成前端模块化
-   > 前端打包工具，使得 nodejs 模块化(基于 commonJs)可以被使用,nodejs 积极支持 ES6 语法，浏览器部分支持 ES6，所以 babel 作用在于此
-
-# CommonJs 和 Es6 模块化
+# webpack 中的 CommonJs 和 Es6 模块化
 
 弄懂 moudle.exports、require、export、import 关系和区别
 
