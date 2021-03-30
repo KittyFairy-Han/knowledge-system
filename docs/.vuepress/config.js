@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 17:36:39
  * @LastEditors: your name
- * @LastEditTime: 2021-03-29 18:19:05
+ * @LastEditTime: 2021-03-29 20:36:59
  * @Description: file content
  */
 
@@ -79,16 +79,12 @@ module.exports = {
           title: "Vue", 
           collapsable: false, 
           children: [
-            "/engineering/Vue/",
+            "/engineering/Vue/use",
+            "/engineering/Vue/principle",
+            "/engineering/Vue/Vue3",
           ],
         },
-        {
-          title: "虚拟 dom", 
-          collapsable: false, 
-          children: [
-            "/engineering/vdom/",
-          ],
-        },
+        ["/engineering/vdom/","vdom"],
         {
           title: "webpack", 
           collapsable: true, 
