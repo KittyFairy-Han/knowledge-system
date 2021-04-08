@@ -2,7 +2,7 @@
  * @Author: hanqing5
  * @Date: 2021-03-29 09:43:17
  * @LastEditors: your name
- * @LastEditTime: 2021-03-29 18:36:29
+ * @LastEditTime: 2021-04-08 14:17:28
  * @Description: 文件描述
 -->
 
@@ -21,13 +21,18 @@ memory cache 机制保证了一个页面中如果有两个相同的请求 (例�
 
 ## disk cache (硬盘缓存、开发者可控)
 
-1-2 为强缓存 1-3-4 为协商缓存 1-3-5 为重新请求
+![alt text](./static/disk-cache.png "强缓存与协商缓存")
 
-1. Cache-Control: max-age 和 Expires 字段去判断是否过期
+1. (Cache-Control: max-age) 和 Expires 字段去判断是否过期
+   > Expires 是 http1.0 字段。现在不咋用了
 2. 没有过期则直接到 disk 去取,此时状态吗为 200(from disk)
 3. 过期了携带着 If-None-Match、If-Modified-Since 字段发起一个协商请求
-4. 服务器说没有变更，则还是去 disk 取,此时状态吗为 304
-5. 服务器说变更了,重新请求数据,此时状态吗为 200
+4. 服务器说没有变更，此时状态吗为 304，只返回 header 不返回 body，浏览器去 disk 取,
+5. 服务器说变更了,返回 header 包含 Etag、last-modified 字段并且是新的值，也返回 body,此时状态吗为 200
+   
+   (1-2 为强缓存 1-3-4 为协商缓存 1-3-5 为重新请求)
+   > [【Cache-Control 所有字段】](https://juejin.cn/post/6844903751493369870)
+   > no-cache（不使用本地缓存，走协商缓存），no-store（禁止浏览器缓存数据，每次都是重新获取数据），public（可以被客户端和中间商 CDN 做缓存），private（只能客户端缓存，CDN 不能缓存）
 
 ## CDN 缓存
 

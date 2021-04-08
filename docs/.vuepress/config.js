@@ -2,14 +2,18 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 17:36:39
  * @LastEditors: your name
- * @LastEditTime: 2021-03-29 20:36:59
+ * @LastEditTime: 2021-04-08 13:57:09
  * @Description: file content
  */
 
 module.exports = {
   themeConfig: {
-    sidebarDepth: 2,//提取到 h3
+    sidebarDepth: 2, //提取到 h3
     sidebar: {
+      // "/CSS/": [
+      //   ["/CSS/selector", "选择器"],
+      //   ["/CSS/base", "经典题目"],
+      // ],
       "/JS/": [
         {
           title: "数据类型", // 必要的
@@ -25,7 +29,7 @@ module.exports = {
             "/JS/basic/Type/Set+Map",
           ],
         },
-        ["/JS/basic/ES6","ES6"],
+        ["/JS/basic/ES6", "ES6"],
         {
           title: "闭包、作用域和 this 关键字", // 必要的
           collapsable: false, // 可选的, 默认值是 true,
@@ -56,10 +60,7 @@ module.exports = {
         {
           title: "通信(跨域)、Ajax 和存储", // 必要的
           collapsable: false, // 可选的, 默认值是 true,
-          children: [
-            "/JS/communication-AJAX-storage/communication",
-            "/JS/communication-AJAX-storage/storage",
-          ],
+          children: ["/JS/communication-AJAX-storage/communication", "/JS/communication-AJAX-storage/storage"],
         },
         {
           title: "模块化、组件化和设计模式", // 必要的
@@ -72,22 +73,18 @@ module.exports = {
         },
         // ["/JS/BOM","浏览器对象"],
         // ["/JS/DOM","文档对象"],
-        // ["/JS/monitor","错误监控"],
+        // ["/JS/monitor-security","错误监控"],
       ],
-      "/engineering/":[
+      "/engineering/": [
         {
-          title: "Vue", 
-          collapsable: false, 
-          children: [
-            "/engineering/Vue/use",
-            "/engineering/Vue/principle",
-            "/engineering/Vue/Vue3",
-          ],
+          title: "Vue",
+          collapsable: false,
+          children: ["/engineering/Vue/use", "/engineering/Vue/principle", "/engineering/Vue/Vue3"],
         },
-        ["/engineering/vdom/","vdom"],
+        ["/engineering/vdom/", "vdom"],
         {
-          title: "webpack", 
-          collapsable: true, 
+          title: "webpack",
+          collapsable: true,
           children: [
             "/engineering/webpack/",
             "/engineering/webpack/chunk",
@@ -97,21 +94,20 @@ module.exports = {
           ],
         },
       ],
-      "/CSS/":[
-        ["/CSS/layout","页面布局"],
+
+      "/broswer/": [
+        ["/broswer/http", "http"],
+        ["/broswer/cache", "浏览器缓存"],
+        ["/broswer/memory", "内存"],
+        ["/broswer/render", "网页渲染"],
       ],
-      "/broswer/":[
-        ["/broswer/http","http"],
-        ["/broswer/cache","浏览器缓存"],
-        ["/broswer/render","网页渲染"]
-      ]
     },
   },
 };
- 
+
 // let person = {
 //   family:{
-    
+
 //   }
 // }
 // function test(familyOFperson){

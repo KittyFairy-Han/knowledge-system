@@ -2,7 +2,7 @@
  * @Author: hanqing5
  * @Date: 2021-03-29 08:57:45
  * @LastEditors: your name
- * @LastEditTime: 2021-03-29 18:18:16
+ * @LastEditTime: 2021-04-08 13:52:52
  * @Description: 文件描述
 -->
 
@@ -59,4 +59,4 @@ div.style.top = top + 10 + 'px'
 
 ## 四、提高性能的九个技巧
 
-vdom、离线 dom、display=none、用 class 而不是一条一条改变、position=absolute||fixed 对 reflow 耗能小、visibility 只 repaint、js 动画使用 window.r
+vdom、离线 dom、display=none、用 class 而不是一条一条改变、position=absolute||fixed 对 reflow 耗能小、visibility 只 repaint、js 动画使用 window.requestAnimation
