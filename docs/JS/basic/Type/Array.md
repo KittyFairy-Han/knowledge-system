@@ -260,7 +260,25 @@ let orignArr = [1, 5, 3, 3, 4, 5];
 ```
 
 ### 拍平数组
-
+- 利用String
+```js
+function linearizeArray(arr){
+  const arrStr = String(arr) //arr里面的元素不能是Object
+  const targetArr = arrStr.split(",")
+  return targetArr
+}
+//test
+linearizeArray([['a','b','c'],1,2,[3,4,[5]]]) //["a", "b", "c", "1", "2", "3", "4", "5"]
+```
+- 利用 JSON.striingfy
+``` js
+function linearizeArray(arr){
+  const arrStr = JSON.stringify(arr).replace(/\[|\]/g,",")
+  const targetArr = arrStr.split(",").filter(item=>item)
+  return targetArr
+}
+```
+- 利用递归
 ```js
 function linearizeArray(current) {
   let arr = [];
