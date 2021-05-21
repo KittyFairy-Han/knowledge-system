@@ -7,6 +7,12 @@
  */
 
 module.exports = {
+  head:[
+    [
+      'link',
+      {rel:'icon',href:'image/logo.png'}
+    ]
+  ],
   themeConfig: {
     sidebarDepth: 2,//提取到 h3
     sidebar: {
