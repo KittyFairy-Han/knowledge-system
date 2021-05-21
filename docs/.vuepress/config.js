@@ -15,6 +15,13 @@ module.exports = {
   ],
   themeConfig: {
     sidebarDepth: 2,//提取到 h3
+    nav: [
+      { text: 'Home', link: '/' },
+      { text: 'CSS', link: '/CSS/' },
+      { text: 'JS', link: '/JS/' },
+      { text: '浏览器', link: '/broswer/' },
+      { text: '工程化', link: '/engineering/' },
+    ],
     sidebar: {
       "/JS/": [
         {
