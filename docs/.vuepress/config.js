@@ -7,6 +7,7 @@
  */
 
 module.exports = {
+  base:'/knowledeg-system/',
   head:[
     [
       'link',
