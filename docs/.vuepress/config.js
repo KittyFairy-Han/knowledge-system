@@ -8,6 +8,7 @@
 
 module.exports = {
   base:'/knowledeg-system/',
+  dest: './dist',   // 设置输出目录
   head:[
     [
       'link',
@@ -120,6 +121,21 @@ module.exports = {
         ["/broswer/render","网页渲染"]
       ]
     },
+    // configureWebpack: (config, isServer) => {
+    //   console.log(config)
+    //   config.build = {
+    //     // Template for index.html
+    //     index: path.resolve(__dirname, '../docs/index.html'),  //之前是'../dist/index.html'
+    
+    //     // Paths
+    //     assetsRoot: path.resolve(__dirname, '../docs'),  // 之前是 '../dist'
+    //     assetsSubDirectory: 'static',
+    //     assetsPublicPath: './',    // 之前是 '/'
+    //   }
+    //   if (!isServer) {
+    //     console.log(config)
+    //   }
+    // }
   },
 };
  
