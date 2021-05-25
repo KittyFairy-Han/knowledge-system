@@ -123,17 +123,3 @@ module.exports = {
     },
   },
 };
- 
-// let person = {
-//   family:{
-    
-//   }
-// }
-// function test(familyOFperson){
-//   familyOFperson = {
-//     mom:'li',
-//     dad:'zhang'
-//   }
-// }
-// test(person.family)
-// console.log(person)
