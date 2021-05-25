@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 21:02:07
  * @LastEditors: your name
- * @LastEditTime: 2021-03-28 11:21:12
+ * @LastEditTime: 2021-04-05 17:03:40
  * @Description: file content
 -->
 
@@ -131,6 +131,83 @@ o.child4(); //window
   a();
 })();
 // window,window,window
+```
+
+```js
+function test(arg) {
+  this.x = arg;
+  return this;
+}
+var x = test(5); //此时 x = window.x = this.x = window, y = undefined
+var y = test(6); //此时 x = window.x = this.x = 6,  y = window
+console.log(x.x); //undefined,
+console.log(y.x); //6
+```
+
+```js
+var length = 10;
+
+function fn() {
+  console.log(this.length);
+}
+var obj = {
+  length: 5,
+  method: function(fn) {
+    fn(); //10
+    arguments[0](); //2 这样代码等效于 arguments.0() 所以上下文是 arguments 返回的就是 argumens.length
+  },
+};
+obj.method(fn, 1);
+```
+
+```js
+function foo() {
+  this.baz = "baz";
+  console.log(this.bar + " " + baz); //undefined undefiend 如果严格模式下会直接报错
+}
+var bar = "bar";
+var baz = new foo();
+```
+
+```js
+var name = "the window";
+var object = {
+  name: "My Object",
+  getName: function() {
+    return this.name;
+  },
+};
+object.getName(); // <=> (object.getName)() // "My Object"
+(object.getName = object.getName)(); // <=> var fn = (object.getName = object.getName);fn();  //"the window"
+```
+
+```js
+function foo(something) {
+  this.a = something;
+}
+var obj1 = {};
+var bar = foo.bind(obj1);
+var baz = new bar(3);
+console.log(obj1.a); // undefined
+console.log(baz.a); // 3 new的优先级比显式绑定要高
+```
+
+```js
+function foo() {
+  // 返回一个箭头函数
+  return (a) => {
+    // this继承自foo()
+    console.log(this.a);
+  };
+}
+var obj1 = {
+  a: 2,
+};
+var obj2 = {
+  a: 3,
+};
+var bar = foo.call(obj1);
+bar.call(obj2); // 2, 不是3！
 ```
 
 ## 使用时需要注意(非箭头函数)

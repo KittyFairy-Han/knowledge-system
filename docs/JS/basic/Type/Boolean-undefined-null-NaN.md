@@ -2,9 +2,10 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-22 11:00:29
  * @LastEditors: your name
- * @LastEditTime: 2021-03-27 18:44:34
+ * @LastEditTime: 2021-04-05 16:37:43
  * @Description: file content
 -->
+
 # Boolean 类型
 
 ```js
@@ -14,7 +15,11 @@ Boolean(0);
 Boolean("");
 Boolean(NaN);
 //除了以上和false都是true
+//比如
+Boolean(" "); //true
 ```
+
+> 注意：Number(" ")得到 0，但是 Boolean(" ")得到 true
 
 # 特殊值 undefined 、 null 、 NaN
 
@@ -44,9 +49,10 @@ Boolean(NaN);
 | 转换为 Number  | NaN       | 0      |
 | 用 typeof      | undefined | object |
 | 转换为 Boolean | false     | false  |
-``` js
-undefined == null //true
-undefined === null //false
+
+```js
+undefined == null; //true
+undefined === null; //false
 ```
 
 ## NaN 出现的场景

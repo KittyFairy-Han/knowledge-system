@@ -139,19 +139,22 @@ object.getNameFunc(); // The Window
 
 ```js
 /* 函数柯里化 */
-
-function add(x, y, z) {
-  return [x, y, z];
-}
-
-function curringAdd(x) {
-  return function fn1(y) {
-    return function fn2(z) {
-      return add(x, y, z);
+function curryN(n, fn) {
+  const args = [];
+  function stepCurry(n, fn) {
+    return (stepX) => {
+      args.push(stepX);
+      return n == 1 ? fn(...args) : stepCurry(n - 1, fn);
     };
-  };
+  }
+  return stepCurry(n, fn);
 }
+//测试
+let add = (x, y, z) => {
+  return [x, y, z];
+};
 
+let curringAdd = curryN(3, add);
 curringAdd(1)(2)(3);
 ```
 
@@ -192,4 +195,5 @@ let throttle = function(cb, delay, wait) {
   };
 };
 ```
+
 [验证节流防抖](throttle.html)

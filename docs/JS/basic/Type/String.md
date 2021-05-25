@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 18:17:26
  * @LastEditors: your name
- * @LastEditTime: 2021-03-27 19:30:43
+ * @LastEditTime: 2021-04-08 15:15:51
  * @Description: file content
 -->
 
@@ -108,4 +108,15 @@ str.match(/rou/g); // ['rou','rou','rou']
 ```js
 "hello"[0]; // 'h'
 "hello".length; // 5
+```
+
+## 考点
+### 去掉字符两边的空格
+- 方法一字符转数组然后过滤然后再拼接
+```js
+str.split('').filter(item=>Boolean(Number(item))).join() //中间的空格也去掉了所以还需要进化
+```
+- 方法二正则表达式替换
+```js
+str.replace(/^\s*|\s*$/g,"")
 ```

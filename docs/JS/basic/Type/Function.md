@@ -66,6 +66,74 @@ copyF(); //o.a=300
 
 ## 考点
 
+### 杂
+
+```js
+var a = 4;
+
+function b() {
+  a = 3;
+  a = function() {};
+
+  console.log(a); //f(){}
+}
+b();
+```
+
+```js
+var a = 4;
+
+function b() {
+  a = 3;
+  function a() {}
+
+  console.log(a); //3
+}
+b();
+```
+
+```js
+var b = 10;
+function b(params) {
+  b = 20;
+  console.log(b);
+}
+b(); //Uncaught TypeError: b is not a function
+```
+
+```js
+var b = 10;
+b = function(params) {
+  b = 10;
+  console.log(b); //10
+};
+b();
+```
+
+```js
+var b = 10;
+(function b(params) {
+  b = 10;
+  console.log(b); //是函数本身
+})();
+```
+
+```js
+for (var i = 0; i < arr.length; i++) {
+  arr[i] = function() {
+    alert(i);
+  };
+}
+```
+### 箭头函数与原型链
+``` js
+const a = () => {
+      return 1;
+    };
+    a.prototype; //无
+    a.__proto__ == Function.prototype; //true
+```
+
 ### 用 apply 写 bind
 
 ```js

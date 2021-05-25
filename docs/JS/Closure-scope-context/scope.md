@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 21:02:17
  * @LastEditors: your name
- * @LastEditTime: 2020-11-21 19:33:05
+ * @LastEditTime: 2021-04-06 23:07:07
  * @Description: file content
 -->
 
@@ -76,3 +76,7 @@ with ({ x: 20 }) {
 alert(x); // 10
 alert(y); // 10
 ```
+
+
+## 题目
+[作用域相关的题目](https://blog.csdn.net/qq_32560473/article/details/79774565)

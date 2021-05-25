@@ -120,6 +120,11 @@ try {
 
 ## Promise 扩展
 
+### 状态
+
+- 待定（pending）: 初始状态，既没有被兑现，也没有被拒绝。
+- 已兑现（fulfilled）: 意味着操作成功完成。
+- 已拒绝（rejected）: 意味着操作失败。
 - 类似下面的用法其实是把异步操作 asyncTask、task2、task3 串联起来了
 
 ```js
@@ -138,7 +143,7 @@ success();
 
 ### Promise.all 可以让异步操作并行, 减少请求的时间
 
-- 所有请求都成功了就会调用 .then 方法
+- 等待所有请求都成功了就会调用 .then 方法。或者等待某一个失败了就进 .catch
 
 ```js
 Promise.all([asyncTask(), task2(), task3()]).then(success);
@@ -153,4 +158,24 @@ success();
 
 ### Promise.race 请求也是并行
 
-- 所有请求中只要有一个成功了就会调用 .then
+- 所有请求中只要有一个完成了（成功或者失败）就会调用 .then
+
+### Promise.resolve、Promise.reject 但是 resolve、reject 不是实例方法
+``` js
+function fetchWithtimeOut(timeout) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject("timeout");
+    }, timeout);
+    fetch(url, data)
+      .then((res) => {
+        clearTimeout(timer);
+        resolve(res);
+      })
+      .catch((e) => {
+        clearTimeout(timer);
+        reject(e);
+      });
+  });
+}
+```

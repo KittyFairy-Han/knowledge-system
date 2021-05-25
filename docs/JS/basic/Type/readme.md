@@ -1,3 +1,11 @@
+<!--
+ * @Author: 鱼小柔
+ * @Date: 2020-11-07 18:16:35
+ * @LastEditors: your name
+ * @LastEditTime: 2021-04-05 20:16:46
+ * @Description: file content
+-->
+
 # 数据类型
 
 Number（包括 NaN）、String、Boolean、复合类型（Array 、Object 、Function、null） 、undefined
@@ -9,16 +17,17 @@ Number（包括 NaN）、String、Boolean、复合类型（Array 、Object 、Fu
 - 用法: typeof A
 - 返回值: String
 
-| 测试值    | 返回值      |
-| --------- | ----------- |
-| Number    | "number"    |
-| String    | "string"    |
-| Boolean   | "boolean"   |
-| Object    | "object"    |
-| Array     | "object"    |
-| null      | "object"    |
-| Function  | "function"  |
-| undefined | "undefined" |
+| 测试值                            | 返回值      |
+| --------------------------------- | ----------- |
+| Number                            | "number"    |
+| String                            | "string"    |
+| Boolean                           | "boolean"   |
+| Symbol                            | "symbol"    |
+| Object(包含 Set Map Date Math 等) | "object"    |
+| Array                             | "object"    |
+| null                              | "object"    |
+| Function                          | "function"  |
+| undefined                         | "undefined" |
 
 ### instanceof 运算符
 
@@ -33,18 +42,21 @@ Number（包括 NaN）、String、Boolean、复合类型（Array 、Object 、Fu
 
 | 测试值    | 返回值               |
 | --------- | -------------------- |
-| Number    | "[Object Number]"    |
-| String    | "[Object String]"    |
-| Boolean   | "[Object Boolean]"   |
-| Object    | "[Object Object]"    |
-| Array     | "[Object Array]"     |
-| null      | "[Object Null]"      |
-| Function  | "[Object Function]"  |
-| undefined | "[Object Undefined]" |
-| Error     | "[Object Error]"     |
-| Math      | "[Object Math]"      |
-| Date      | "[Object Date]"      |
-| 正则      | "[Object RegExp]"    |
+| Number    | "[object Number]"    |
+| String    | "[object String]"    |
+| Boolean   | "[object Boolean]"   |
+| Symbol    | "[object Symbol]"    |
+| Object    | "[object Object]"    |
+| Array     | "[object Array]"     |
+| null      | "[object Null]"      |
+| Function  | "[object Function]"  |
+| undefined | "[object Undefined]" |
+| Error     | "[object Error]"     |
+| Math      | "[object Math]"      |
+| Date      | "[object Date]"      |
+| Set       | "[object Set]"       |
+| Map       | "[object Map]"       |
+| 正则      | "[object RegExp]"    |
 
 ## 类型转换
 
@@ -68,3 +80,11 @@ Number（包括 NaN）、String、Boolean、复合类型（Array 、Object 、Fu
   String()
 - ——> Boolean:
   Boolean()
+
+## 写正则表达式
+
+1. 用正则表达式匹配字符串，以字母开头，后面是数字、字符串或者下划线，长度为 9-20
+
+```js
+new RegExp("^[a-zA-Z][a-zA-Z0-9_]{8,19}$");
+```

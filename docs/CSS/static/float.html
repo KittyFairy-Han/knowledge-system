@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>float相关</title>
+  </head>
+  <style>
+    section {
+      border: 1px solid green;
+      overflow: hidden;
+    }
+
+    div {
+      /* padding: 10px; */
+    }
+
+    h2 + section {
+      border: 3px solid green;
+    }
+
+    h4 {
+      color: rgb(224, 77, 77);
+    }
+
+    h3 {
+      color: lightskyblue;
+    }
+
+    .box {
+      width: 400px;
+      height: 200px;
+      background-color: aquamarine;
+    }
+    .green {
+      color: aquamarine;
+    }
+
+    .parent {
+      width: 400px;
+      background-color: pink;
+    }
+    .pink {
+      color: pink;
+    }
+
+    .bfc {
+      overflow: hidden;
+    }
+
+    .float {
+      width: 200px;
+      height: 100px;
+      float: left;
+      background-color: rgba(255, 160, 122, 0.4);
+      color: aliceblue;
+    }
+    .red {
+      color: rgba(255, 160, 122, 1);
+    }
+
+    .img-container {
+      padding: 50px;
+      background-color: lightgoldenrodyellow;
+    }
+
+    .img-container img {
+      margin: 20px;
+      width: 150px;
+      float: left;
+    }
+
+    .parent.clear::after {
+      content: "";
+      width: 0;
+      height: 0;
+      clear: both;
+      display: block;
+    }
+    .box.clear {
+      width: 0;
+      height: 0;
+      clear: both;
+    }
+  </style>
+
+  <body>
+    <h2>float布局</h2>
+    <section class="img-container">
+      <img src="./cat.jpg" />
+      <img src="./cat.jpg" />
+      <img src="./cat.jpg" />
+      <img src="./cat.jpg" />
+      <img src="./cat.jpg" />
+      <img src="./cat.jpg" />
+    </section>
+    <p>
+      <span class="red">float 200*100; </span>
+      <span class="green">box 400*200; </span>
+      <span class="pink">parent 400*auto;</span>
+    </p>
+    <h2>float特点</h2>
+    <section>
+      <h3>兄弟元素float重叠</h3>
+      <h4>兄弟静态元素，它看不到float元素，所以仍然贴着父元素左上边缘布局</h4>
+      <section>
+        <div class="box float">float元素</div>
+        <div class="box"></div>
+      </section>
+
+      <h4>兄弟bfc，它看得到float元素，所以不贴着父元素左上边缘布局</h4>
+      <section>
+        <div class="box float">float元素</div>
+        <div class="box bfc"></div>
+      </section>
+      <h3>父元素高度坍塌</h3>
+      <h4>父元素是BFC,看得到float元素，所以高度被自动撑开</h4>
+      <section>
+        <div class="parent bfc">
+          <div class="box float">float元素</div>
+        </div>
+      </section>
+
+      <h4>父元素不是BFC，看不到float元素，所以高度不被自动撑开</h4>
+      <section>
+        <div class="parent">
+          <div class="box float">float元素</div>
+        </div>
+      </section>
+      <h3>文字环绕</h3>
+      <h4>文字节点看得到float元素，所以会发生环绕</h4>
+      <section>
+        <div class="box float">float元素</div>
+        <div class="box">
+          静态元素上的文字描述,静态元素上的文字描述,静态元素上的文字描述
+          ，静态元素上的文字描述，静态元素上的文字描述，静态元素上的文字描述，静态元素上的文字描述
+        </div>
+      </section>
+    </section>
+
+    <h2>清除float</h2>
+    <section>
+      <h3>父元素创建bfc</h3>
+      <section>
+        <div class="parent bfc">
+          <div class="box float">float元素</div>
+        </div>
+      </section>
+      <h3>父元素添加after伪元素使用clear属性</h3>
+      <section>
+        <div class="parent clear">
+          <div class="box float">float元素</div>
+        </div>
+      </section>
+      <h3>父元素末尾添加孩子使用clear属性</h3>
+      <section>
+        <div class="parent">
+          <div class="box float">float元素</div>
+          <div class="box clear"></div>
+        </div>
+      </section>
+    </section>
+  </body>
+</html>

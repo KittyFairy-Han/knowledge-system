@@ -208,3 +208,8 @@ Awindow.addEventListener(
 - 发出预检请求 Option
 - 预检请求请求头关键字段：Orign 、Access-Control-Request-Method 、Access-Control-Request-Headers
 - 返回头关键字段：Access-Control-Allow-Origin、Access-Control-Allow-Methods、Access-Control-Allow-Headers
+
+## 考点
+- 为什么 ajax 不能跨域，但是 form 可以跨域
+ajax 跨域本身就是针对 js 的设定的限制，一个域名内的 js 读取另一个域名的内容，浏览器认为这是不安全的。
+form 表单提交后会刷新页面，这个时候已经不存在原来页面的 js 了，所以也不存在把新的内容给原来的 js，浏览器认为相对安全。

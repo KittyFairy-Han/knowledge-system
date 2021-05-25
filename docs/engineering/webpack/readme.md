@@ -18,11 +18,6 @@
 
 - 集成公司构建规范：提测、上线等
 
-
-
-
-
-
 ## 核心概念
 
 ### module
@@ -54,7 +49,7 @@ webpack 在运行过程中会广播事件，插件只需要监听它所关心的
 
 我们直接写出来的是 module，webpack 处理时是 chunk，最后生成浏览器可以直接运行的 bundle。
 
-![与模块的关系]('./module-chunk-bundle-simple.png')
+![与模块的关系](./static/module-chunk-bundle-simple.png "与模块的关系")
 
 #### 先回顾一下 module
 
@@ -63,6 +58,7 @@ webpack 在运行过程中会广播事件，插件只需要监听它所关心的
 #### chunk
 
 当 webpack 对 module 源文件进行处理时，webpack 会根据依赖关系生成 chunk 文件。
+
 > chunk 知识细节见 chunk 章节
 
 #### bundle
@@ -136,13 +132,14 @@ moudle.exports={
 }
 ```
 
-![用图表示]('./module-chunk-bundle.png')
+![alt text](./static/module-chunk-bundle.png "module-chunk-bundle关系")
 
 ## 主线流程
-![webpack 总流程]('./webpack总流程.jpg)
-<br/>
+
+![webpack 总流程](./static/webpack.jpg "webpack 总流程")
+<br>
 webpack 就像一条生产线，要经过一系列处理流程后才能将源文件转换成输出结果。 这条生产线上的每个处理流程的职责都是单一的，多个流程之间有存在依赖关系，只有完成当前处理后才能交给下一个流程去处理。
-<br/>
+<br>
 webpack 源码非常复杂，想完全看明白源码太困难，对于应用它的人来说，只要看懂主线剧情就可以了。主线剧情就是从配置文件读取 entry 开始，到最后输出 bundle.js 的过程。在 webpack 内部逻辑中就是 compilation.addEntry 方法开始。
 
 #### 解开哪些疑问？
@@ -162,7 +159,6 @@ webpack 源码非常复杂，想完全看明白源码太困难，对于应用它
 - - make 在钩子的回调中有 compilaiion.addEntry 方法
 - - emit 在钩子的回调中执行生成文件的逻辑
 - - done 文件已写入文件系统后触发
-
 
 ### 1.准备工作阶段
 

@@ -2,13 +2,14 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 18:17:26
  * @LastEditors: your name
- * @LastEditTime: 2021-03-27 18:53:04
+ * @LastEditTime: 2021-04-08 17:50:12
  * @Description: file content
 -->
 
 # Number 类型
 
 ## 属性
+
 > _(平时用的并不多)_
 
 ```js
@@ -56,6 +57,7 @@ Number.isFinite(NaN); //false
 | [1,2,3]   | 1        | NaN    |
 | {}        | NaN      | NaN    |
 | 其他      | NaN      | NaN    |
+| " "       | NaN      | 0      |
 
 ### toString(radix) 把十进制数转换为相应的进制数 返回字符串
 
@@ -90,7 +92,7 @@ number.toString(2);
 ### 判断小数是否相等
 
 ```js
-var delta = 1e-5; // 定义精度精确到0.00001
+var delta = Number.MIN_VALUE ;
 var a = 0.1;
 var b = 0.2;
 var sum = 0.3;
@@ -98,4 +100,30 @@ var sum = 0.3;
 if (a + b - sum < delta) {
   console.log("a + b == sum");
 }
+```
+
+### 小数相加得到数学上的值
+```js
+function add(a,b){
+  //转换为整数在计算
+  //在转换回去
+
+}
+```
+
+### 对称数
+```js
+function isN(number){
+  const str = String(number)
+  const half = parseInt(str.length/2)
+  const left = str.substring(0,half)
+  const right = str.substring(half)
+  if(left==right.reverse()){
+
+  }
+}
+```
+```js
+//数字->字符串->数组
+//逐一比较
 ```
