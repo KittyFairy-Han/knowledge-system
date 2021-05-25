@@ -7,7 +7,7 @@
  */
 
 module.exports = {
-  base:'/knowledeg-system/',
+  base:'/knowledge-system/',
   dest: './dist',   // 设置输出目录
   head:[
     [
