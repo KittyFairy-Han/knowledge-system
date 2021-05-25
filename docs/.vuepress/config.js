@@ -2,13 +2,28 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 17:36:39
  * @LastEditors: your name
- * @LastEditTime: 2021-04-26 22:30:07
+ * @LastEditTime: 2021-05-25 15:59:16
  * @Description: file content
  */
 
 module.exports = {
+  base:'/knowledge-system/',
+  dest: './dist',   // 设置输出目录
+  head:[
+    [
+      'link',
+      {rel:'icon',href:'image/logo.png'}
+    ]
+  ],
   themeConfig: {
-    sidebarDepth: 2, //提取到 h3
+    sidebarDepth: 2,//提取到 h3
+    nav: [
+      { text: 'Home', link: '/' },
+      { text: 'CSS', link: '/CSS/' },
+      { text: 'JS', link: '/JS/' },
+      { text: '浏览器', link: '/broswer/' },
+      { text: '工程化', link: '/engineering/' },
+    ],
     sidebar: {
       "/html/":[
         ["/html/mianjing", "面经"],
