@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 17:36:39
  * @LastEditors: your name
- * @LastEditTime: 2021-04-08 13:57:09
+ * @LastEditTime: 2021-04-26 22:30:07
  * @Description: file content
  */
 
@@ -10,10 +10,15 @@ module.exports = {
   themeConfig: {
     sidebarDepth: 2, //提取到 h3
     sidebar: {
-      // "/CSS/": [
-      //   ["/CSS/selector", "选择器"],
-      //   ["/CSS/base", "经典题目"],
-      // ],
+      "/html/":[
+        ["/html/mianjing", "面经"],
+      ],
+      "/CSS/": [
+        ["/CSS/selector", "选择器"],
+        ["/CSS/size", "尺寸"],
+        ["/CSS/strange-style", "冷门样式"],
+        // ["/CSS/size", "考点"],
+      ],
       "/JS/": [
         {
           title: "数据类型", // 必要的
@@ -94,27 +99,16 @@ module.exports = {
           ],
         },
       ],
-
       "/broswer/": [
+        ["/broswer/work", "浏览器的工作原理"],
         ["/broswer/http", "http"],
         ["/broswer/cache", "浏览器缓存"],
         ["/broswer/memory", "内存"],
+        ["/broswer/security", "安全"],
         ["/broswer/render", "网页渲染"],
       ],
     },
   },
 };
 
-// let person = {
-//   family:{
 
-//   }
-// }
-// function test(familyOFperson){
-//   familyOFperson = {
-//     mom:'li',
-//     dad:'zhang'
-//   }
-// }
-// test(person.family)
-// console.log(person)
