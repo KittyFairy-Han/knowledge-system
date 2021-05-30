@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2021-04-08 13:22:12
  * @LastEditors: your name
- * @LastEditTime: 2021-04-20 17:51:41
+ * @LastEditTime: 2021-05-30 18:07:52
  * @Description: file content
 -->
 
@@ -25,3 +25,10 @@
 
 - .parent .child 加法
 - .className1.className2 乘法
+
+## 伪元素
+
+### 注意
+
+- content 一定要有
+- dispaly 跟随父标签的默认 display
