@@ -118,7 +118,7 @@ sct.close();
 
 ### CORS
 
-> 是一种通信方式更是 ajax 跨域通信方案，可以理解为 ajax 的一个变种通信方式
+> 是一种通信方式更是 ajax 跨域通信方案，可以理解为 ajax 的一个变种通信方式。查看CORS小节
 
 ## 如何跨域通信
 
@@ -181,28 +181,29 @@ Awindow.addEventListener(
 
 [CORS【参考资料】](http://www.ruanyifeng.com/blog/2016/04/cors.html)
 
-#### 是什么
+### 是什么
 
 跨域资源共享(CORS) 是一种机制，它使用额外的 HTTP 头来告诉浏览器 让运行在一个 origin (domain) 上的 Web 应用被准许访问来自不同源服务器上的指定的资源。
 
-#### 为什么
+### 为什么
 
 是一种通信方式更是解决 ajax 不能跨域的方案，可以理解为 ajax 的一个变种通信方式
 
-#### 原理
+### 原理
 
 - 整个 CORS 通信过程，都是浏览器自动完成，不需要用户参与。对于开发者来说，CORS 通信与同源的 AJAX 通信没有差别，代码完全一样。
 - 浏览器一旦发现 AJAX 请求跨源，就会自动添加一些附加的头信息，有时还会多出一次附加的请求，但用户不会有感觉。
 - 因此，实现 CORS 通信的关键是服务器。只要服务器实现了 CORS 接口，就可以跨源通信。
 
-### 简单请求
+### 简单请求和非简单请求
+#### 简单请求
 
 - 简单请求：方法仅限于 ：GET POST HEAD、http头信息仅限于：Accept、Accept-Language、Content-Language、Last-Event-ID、Content-Type(只限于三个值application/x-www-form-urlencoded、multipart/form-data、text/plain)
 >HEAD请求一般可以用在很多并不真正需要资源的场景，避免传输 body 数据造成不必要的资源浪费。如检查一个文件是否存在可以用 HEAD 请求，没有必要用 GET 把整个文件都取下来。
 - 请求头关键字段：Orign
 - 返回头关键字段：Access-Control-Allow-Origin
 
-### 非简单请求
+#### 非简单请求
 
 - 非简单请求：PUT DELETE 等
 - 发出预检请求 Option
@@ -211,5 +212,6 @@ Awindow.addEventListener(
 
 ## 考点
 - 为什么 ajax 不能跨域，但是 form 可以跨域
+<br>
 ajax 跨域本身就是针对 js 的设定的限制，一个域名内的 js 读取另一个域名的内容，浏览器认为这是不安全的。
 form 表单提交后会刷新页面，这个时候已经不存在原来页面的 js 了，所以也不存在把新的内容给原来的 js，浏览器认为相对安全。

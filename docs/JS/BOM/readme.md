@@ -1,5 +1,7 @@
 # BOM 对象
 
+## 结构
+
 ```js
 var window = {
   对话框: {
@@ -20,64 +22,34 @@ var window = {
 };
 ```
 
-# 浏览器内核
+## 前端路由
 
-- Trident：ie 内核
-- Gecko：ff 内核
-- webkit：Safari
-- Blink：（Chrome，operal，
-- Trident+webkit：QQ 浏览器
+基于 BOM API 实现前端路由
 
-# 检测浏览器类型
+### hash
 
-navigator.userAgent
+window.location.hash、
+window.hashChnge
+
+### history
+
+window.history.pushState、
+window.history.popState
+
+### 前端路由比传统路由优缺点
+
+- 首次页面展现慢
+- 之后展现快
+- 有利于前后端分离开发
+
+
+## 其他考点
+
+### 检测浏览器类型
+
+navigator.userAgent 属性
 
 ```js
-/**
- *检查环境，启动下载
- *
- * @param {*} { 会传入一个cb，用于控制在beforeJump中控制跳转 }
- * @returns
- */
-const checkToDownload = ({
-  downloadUrl,
-  iosCallback = () => {
-    window.location.href = "/youtui/ab/getIosDownload";
-  },
-}) => {
-  if (!isWeiXin() && !getUrlParameter("appPreview")) {
-    // 当前页面在安卓的其他浏览器中并且不在趣晒app中 自动发起下载
-    if (isAndroid()) {
-      toDownloadUrl(downloadUrl);
-    } else {
-      iosCallback && iosCallback();
-    }
-  }
-};
-
-const toDownloadUrl = (url) => {
-  if (url) {
-    setTimeout(() => {
-      window.location.href = url;
-    }, 120);
-  } else {
-    console.error("重定向url为空");
-  }
-};
-
-/**
- * 获取url中特定字符串的值
- * @param {*} name 字符串key
- * @param {*} path 默认为页面链接地址，也可自己传某段string
- */
-const getUrlParameter = (name, path = window.location.href) => {
-  const result =
-    decodeURIComponent(
-      (new RegExp("[?|&]" + name + "=([^&;]+?)(&|#|;|$)").exec(path) || [undefined, ""])[1].replace(/\+/g, "%20")
-    ) || null;
-  return result ? result : "";
-};
-
 /**
  * 是否为android机
  * @returns {boolean}
@@ -102,22 +74,20 @@ const isWeiXin = () => {
 };
 ```
 
-# 前端路由
+## location 属性的应用
 
-## 基于 BOM API
+```js
+/**
+ * 获取url中特定字符串的值
+ * @param {*} name 字符串key
+ * @param {*} path 默认为页面链接地址，也可自己传某段string
+ */
+const getUrlParameter = (name, path = window.location.href) => {
+  const result =
+    decodeURIComponent(
+      (new RegExp("[?|&]" + name + "=([^&;]+?)(&|#|;|$)").exec(path) || [undefined, ""])[1].replace(/\+/g, "%20")
+    ) || null;
+  return result ? result : "";
+};
+```
 
-### hash
-
-window.location.hash
-window.hashChnge
-
-### history
-
-window.history.pushState
-window.history.popState
-
-## 优缺点
-
-- 首次页面展现慢
-- 之后展现快
-- 有利于前后端分离开发

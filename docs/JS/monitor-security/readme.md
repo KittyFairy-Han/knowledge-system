@@ -1,3 +1,12 @@
+<!--
+ * @Author: 鱼小柔
+ * @Date: 2021-05-30 19:05:38
+ * @LastEditors: your name
+ * @LastEditTime: 2021-06-06 18:40:41
+ * @Description: file content
+-->
+# 错误监控
+
 ## 是什么(两种大类)
 
 代码运行错误
@@ -38,9 +47,9 @@ window.addEventListener("error",function (message,source,lineno,colno,error) {..
 
 ### 资源加载方式错误
 
-- object.onerror (object 泛指 <img> 或 <script> 等)
-  资源加载失败会触发一个 Event 接口的 error 事件，并执行 onerror()处理函数。
-  资源加载失败的 error 事件不会向上冒泡到 window，
+- object.onerror (object 泛指 img 或 script 等)
+  <br>资源加载失败会触发一个 Event 接口的 error 事件，并执行 onerror()处理函数。
+  <br>资源加载失败的 error 事件不会向上冒泡到 window，
 
 ```js
 //注意和 window.onerror 的参数不同
@@ -48,9 +57,10 @@ imgdom.onerror = function(event){...}
 ```
 
 - performance.getEntries()
+  <br>
   获取加载成功的资源 函数返回的是数组
 - window.addEventListener 事件捕获阶段
-  资源加载失败的 error 事件虽然不会冒泡到 window 但是能被 window.addEventListener 捕获阶段监听到。
+  <br>资源加载失败的 error 事件虽然不会冒泡到 window 但是能被 window.addEventListener 捕获阶段监听到。
 
 ```js
 // 第三个参数一定是 true 才是再捕获阶段的监听
@@ -65,8 +75,7 @@ window.addEventListener(
 
 ### 跨域的 js 运行错误怎么捕获
 
-在 script 标签增加 crossorign
-js 资源响应头 Acess-Cross-
+？？
 
 ### promise 异步的错误
 
