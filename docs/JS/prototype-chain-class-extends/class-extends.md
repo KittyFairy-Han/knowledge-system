@@ -61,7 +61,7 @@ function B(age) {
 }
 ```
 
-1. 借助构造函数
+### 1. 借助构造函数
    ```js
    function B(name, age) {
      A.call(this, name);
@@ -71,7 +71,7 @@ function B(age) {
    const b2 = new B("ze", 20);
    ```
    - 缺点 ：和 Parent 的原型链没有形成任何关系，对 Parent 的原型扩展，扩展部分(属性、方法) Children 的实例不拥有
-2. 借助原型链 prototype + new
+### 2. 借助原型链 prototype + new
 
    ```js
    const a = new A("zhangsan");
@@ -84,7 +84,7 @@ function B(age) {
    - 解决第一个问题就是在 Children 里面填一句 Parent.call(this)。但是，这个方案 让 Parent 执行了两次
    - 解决第二个问题 Children.prototype.constructor = Children
 
-3. 借助原型链 prototype + Object.create
+### 3. 借助原型链 prototype + Object.create
 
    ```js
    const a = Object.create(A.prototype);
@@ -98,12 +98,14 @@ function B(age) {
    - 解决第一个问题就是在 Children 里面填一句 Parent.call(this)
    - 解决第二个问题 Children.prototype.constructor = Children
 
-4. 一三组合
+### 4. 一三组合
    - class 继承原理就是对 3 的再优化
-5. 比 ES6 的 class
+### 5. 比 ES6 的 class
    - 用原型链讲继承的时候，是没有静态方法的。如何实现？
    ```js
    A.staticFn = function() {
      console.log("A的静态方法");
    };
    ```
+### 原型链与继承   
+![原型链与继承](./static/prototype-chain.jpg "原型链与继承")

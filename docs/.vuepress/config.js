@@ -2,39 +2,31 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 17:36:39
  * @LastEditors: your name
- * @LastEditTime: 2021-06-06 10:24:48
+ * @LastEditTime: 2021-06-06 12:44:03
  * @Description: file content
  */
 
 module.exports = {
-  base:'/knowledge-system/',
-  dest: './dist',   // 设置输出目录
-  head:[
-    [
-      'link',
-      {rel:'icon',href:'image/logo.png'}
-    ]
-  ],
+  base: "/knowledge-system/",
+  dest: "./dist", // 设置输出目录
+  head: [["link", { rel: "icon", href: "image/logo.png" }]],
   themeConfig: {
-    sidebarDepth: 2,//提取到 h3
+    sidebarDepth: 2, //提取到 h3
     nav: [
-      { text: 'Home', link: '/' },
-      { text: 'CSS', link: '/CSS/' },
-      { text: 'JS', link: '/JS/' },
-      { text: '浏览器', link: '/broswer/' },
-      { text: '工程化', link: '/engineering/' },
+      { text: "Home", link: "/" },
+      { text: "CSS", link: "/CSS/layout/" },
+      { text: "JS", link: "/JS/" },
+      { text: "浏览器", link: "/broswer/" },
+      { text: "工程化", link: "/engineering/" },
     ],
     sidebar: {
-      "/html/":[
-        ["/html/mianjing", "面经"],
-      ],
+      "/html/": [["/html/mianjing", "面经"]],
       "/CSS/": [
         ["/CSS/selector", "选择器"],
         ["/CSS/size", "尺寸"],
         ["/CSS/props", "属性"],
         ["/CSS/layout", "布局"],
         ["/CSS/strange-style", "冷门样式"],
-    
       ],
       "/JS/": [
         {
@@ -42,31 +34,37 @@ module.exports = {
           path: "/JS/basic/Type", // 可选的, 标题的跳转链接，应为绝对路径且必须存在
           collapsable: false, // 可选的, 默认值是 true,
           children: [
-            "/JS/basic/Type/Boolean-undefined-null-NaN",
-            "/JS/basic/Type/Number",
-            "/JS/basic/Type/String",
-            "/JS/basic/Type/Array",
-            "/JS/basic/Type/Object",
-            "/JS/basic/Type/Function",
-            "/JS/basic/Type/Set+Map",
+            ["/JS/basic/Type/Boolean-undefined-null-NaN", "特殊值"],
+            ["/JS/basic/Type/Number", "Number"],
+            ["/JS/basic/Type/String", "String"],
+            ["/JS/basic/Type/Array", "Array"],
+            ["/JS/basic/Type/Symbol", "Symbol"],
           ],
         },
-        ["/JS/basic/ES6", "ES6"],
+        {
+          title: "ES6", // 必要的
+          collapsable: false, // 可选的, 默认值是 true,
+          children: [
+            ["/JS/basic/ES6/Proxy+Reflect", "Proxy和Reflect"],
+            ["/JS/basic/ES6/fetch", "fetch"],
+            ["/JS/basic/ES6/other", "其他"],
+          ],
+        },
         {
           title: "闭包、作用域和 this 关键字", // 必要的
           collapsable: false, // 可选的, 默认值是 true,
           children: [
-            "/JS/Closure-scope-context/Closure",
-            "/JS/Closure-scope-context/scope",
-            "/JS/Closure-scope-context/context",
+            ["/JS/Closure-scope-context/Closure", "闭包"],
+            ["/JS/Closure-scope-context/scope", "作用域"],
+            ["/JS/Closure-scope-context/context", "上下文this"],
           ],
         },
         {
           title: "原型链、类和继承", // 必要的
           collapsable: false, // 可选的, 默认值是 true,
           children: [
-            "/JS/prototype-chain-class-extends/prototype-chain",
-            "/JS/prototype-chain-class-extends/class-extends",
+            ["/JS/prototype-chain-class-extends/prototype-chain", "原型链"],
+            ["/JS/prototype-chain-class-extends/class-extends", "继承"],
           ],
         },
         {
@@ -74,9 +72,9 @@ module.exports = {
           path: "/JS/single-thread-async-event-loop",
           collapsable: false, // 可选的, 默认值是 true,
           children: [
-            "/JS/single-thread-async-event-loop/WebWork",
-            "/JS/single-thread-async-event-loop/async",
-            "/JS/single-thread-async-event-loop/event-loop",
+            ["/JS/single-thread-async-event-loop/async","异步"],
+            ["/JS/single-thread-async-event-loop/event-loop","事件轮询"],
+            ["/JS/single-thread-async-event-loop/WebWork","WebWork"]
           ],
         },
         {
@@ -93,9 +91,9 @@ module.exports = {
             "/JS/modularity-componential-design-patterns/design",
           ],
         },
-        // ["/JS/BOM","浏览器对象"],
-        // ["/JS/DOM","文档对象"],
-        // ["/JS/monitor-security","错误监控"],
+        ["/JS/BOM/","浏览器对象"],
+        ["/JS/DOM/","文档对象"],
+        ["/JS/monitor-security/","错误监控"],
       ],
       "/engineering/": [
         {
@@ -127,5 +125,3 @@ module.exports = {
     },
   },
 };
-
-

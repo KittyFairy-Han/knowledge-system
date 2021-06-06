@@ -1,8 +1,21 @@
 # 异步
 
-## 异步解决方案的发展
+## 异步方案的发展历程
 
-- 假设有一个异步的任务和对异步任务成功和失败的后续处理
+**callback -> jq defferd -> promise -> promise + async await**
+
+回调有一个“回调地狱的问题”<br>
+
+<hr>
+jq defferd 、 promise 有一个共同点是支持链式操作<br>
+链式操作解决了回调地狱的问题,可以使逻辑分离,可以追加逻辑而不用每次修改callback里面的逻辑<br>
+符合开放封闭原则<br>
+<hr>
+async await 在 promise 上封装了语法糖，让异步代码更像同步代码，更语义化。
+
+## 异步方案逐一介绍
+
+假设有一个异步的任务和对异步任务成功和失败的后续处理
 
 ```js
 function asyncTask() {
@@ -161,7 +174,8 @@ success();
 - 所有请求中只要有一个完成了（成功或者失败）就会调用 .then
 
 ### Promise.resolve、Promise.reject 但是 resolve、reject 不是实例方法
-``` js
+
+```js
 function fetchWithtimeOut(timeout) {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {

@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 18:17:26
  * @LastEditors: your name
- * @LastEditTime: 2021-04-16 18:56:28
+ * @LastEditTime: 2021-06-06 10:50:12
  * @Description: file content
 -->
 
@@ -86,7 +86,7 @@ delete obj.name;
 - keys(obj) - 可枚举且自身的 key - Array
 - values(obj) - 可枚举且自身的 value -Array
 
-## 实例方法
+## 实例方法 Array.prototy.
 
 - valueOf
 - toString

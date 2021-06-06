@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-15 21:35:29
  * @LastEditors: your name
- * @LastEditTime: 2021-03-28 12:06:01
+ * @LastEditTime: 2021-06-06 12:09:50
  * @Description: file content
 -->
 
@@ -10,11 +10,11 @@
 
 ## 什么是原型链
 
-```vue
-<img :src="$withBase('/imgs/prototype-chain.jpg')" alt="mixureSecure">
-```
+通过  prototype \_\_proto\_\_ constructor 的关系来看
 
-### prototype \_\_proto\_\_ constructor 的关系
+
+
+
 
 - 非函数的对象没有 prototype 属性，只有\_\_proto\_\_属性
 - 函数既有 prototype 又有\_\_proto\_\_属性

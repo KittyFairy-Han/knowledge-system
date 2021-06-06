@@ -2,17 +2,22 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-15 17:33:52
  * @LastEditors: your name
- * @LastEditTime: 2021-04-05 17:03:31
+ * @LastEditTime: 2021-06-06 12:35:31
  * @Description: file content
 -->
-![事件轮询]('./event-loop.png)
+
 # 事件轮询
+
 [事件轮询【参考资料】]('https://www.cnblogs.com/dong-xu/p/7000163.html)
 
-### 宏任务 微任务
+## 宏任务 微任务
 
 - 宏任务：setTimeout、setInterval、requestAnimationFrame
 - 微任务：nextTick、then
+
+## 轮巡过程
+
+![事件轮询](./static/event-loop.png)
 
 ## 考点
 
