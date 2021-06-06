@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 17:36:39
  * @LastEditors: your name
- * @LastEditTime: 2021-05-30 18:40:33
+ * @LastEditTime: 2021-06-06 10:24:48
  * @Description: file content
  */
 
@@ -32,6 +32,7 @@ module.exports = {
         ["/CSS/selector", "选择器"],
         ["/CSS/size", "尺寸"],
         ["/CSS/props", "属性"],
+        ["/CSS/layout", "布局"],
         ["/CSS/strange-style", "冷门样式"],
     
       ],
