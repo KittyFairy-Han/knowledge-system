@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 17:36:39
  * @LastEditors: your name
- * @LastEditTime: 2021-06-06 23:56:17
+ * @LastEditTime: 2021-06-07 00:06:16
  * @Description: file content
  */
 
@@ -97,7 +97,7 @@ module.exports = {
           children: [
             ["/engineering/design/modularity","模块化"],
             ["/engineering/design/componential","组件化"],
-            ["/engineering/design/design","设计模式"],
+            ["/engineering/design/-pattern","设计模式"],
           ],
         },
         {
