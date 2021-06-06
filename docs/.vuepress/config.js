@@ -2,13 +2,13 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 17:36:39
  * @LastEditors: your name
- * @LastEditTime: 2021-06-06 12:44:03
+ * @LastEditTime: 2021-06-06 19:55:17
  * @Description: file content
  */
 
 module.exports = {
   base: "/knowledge-system/",
-  dest: "./dist", // 设置输出目录
+  dest: "../knowledge-system-ghpage/dist", // 设置输出目录
   head: [["link", { rel: "icon", href: "image/logo.png" }]],
   themeConfig: {
     sidebarDepth: 2, //提取到 h3
@@ -80,17 +80,12 @@ module.exports = {
         {
           title: "通信(跨域)、Ajax 和存储", // 必要的
           collapsable: false, // 可选的, 默认值是 true,
-          children: ["/JS/communication-AJAX-storage/communication", "/JS/communication-AJAX-storage/storage"],
-        },
-        {
-          title: "模块化、组件化和设计模式", // 必要的
-          collapsable: false, // 可选的, 默认值是 true,
           children: [
-            "/JS/modularity-componential-design-patterns/modularity",
-            "/JS/modularity-componential-design-patterns/componential",
-            "/JS/modularity-componential-design-patterns/design",
+            ["/JS/communication-AJAX-storage/communication","通信"], 
+            ["/JS/communication-AJAX-storage/storage","存储"]
           ],
         },
+        
         ["/JS/BOM/","浏览器对象"],
         ["/JS/DOM/","文档对象"],
         ["/JS/monitor-security/","错误监控"],
@@ -100,6 +95,15 @@ module.exports = {
           title: "Vue",
           collapsable: false,
           children: ["/engineering/Vue/use", "/engineering/Vue/principle", "/engineering/Vue/Vue3"],
+        },
+        {
+          title: "模块化、组件化和设计模式", // 必要的
+          collapsable: false, // 可选的, 默认值是 true,
+          children: [
+            ["/engineering/design/modularity","模块化"],
+            ["/engineering/design/componential","组件化"],
+            ["/engineering/design/design","设计模式"],
+          ],
         },
         ["/engineering/vdom/", "vdom"],
         {

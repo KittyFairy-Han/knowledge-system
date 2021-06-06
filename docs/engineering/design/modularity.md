@@ -1,4 +1,3 @@
-# 模块化
 
 # 模块化
 
@@ -134,9 +133,9 @@ save(module, exported);
 require("./lily.js"); //
 ```
 
-![require结果]('./images/1.png')
 
-### 3. CommonJs  规范  module.exports={xxx} VS exports.xxx=xxx
+### 3.两种导出写法对比 
+CommonJs  规范  module.exports={xxx} VS exports.xxx=xxx
 
 - exports.xxx=xxx  的写法
 
@@ -189,7 +188,7 @@ var exported = load(module, module.exports);
 save(module, exported);
 ```
 
-- 防止多种用法写懵了，就统一用  module.exports={xxx}  吧
+> 防止多种用法写懵了，就统一用  module.exports={xxx}  吧
 
 ## 二、ES6  标准语法  export  和  import
 
@@ -365,11 +364,11 @@ import * as lilyModule from "./lily.js";
 console.log(lilyModule);
 ```
 
-- 转换比较复杂，不做展示，输出的结果：
+> 转换比较复杂，不做展示
 
-![image]('./images/2.png')
 
-## 三、exports+require  和  export+import  混用
+## 三、CommonJS和ES6  混用
+exports+require  和  export+import
 
 - 因为  export、import  最后会转换成  exports+require，所以是可以混用的
 
@@ -464,7 +463,9 @@ console.log(a); //null
 consle.log(require("./a.js")); //[]
 ```
 
-### 4.  当输出的是非引用类型时，ES6  写法可以响应模块内部对值的改变，CommonJS  不行。（当输出值是引用类型时两者情况一样）
+### 4.  
+
+当输出的是非引用类型时，ES6  写法可以响应模块内部对值的改变，CommonJS  不行。（当输出值是引用类型时两者情况一样）
 
 - 非引用类型，CommonJS
 
