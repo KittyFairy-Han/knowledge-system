@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2021-04-14 20:51:27
  * @LastEditors: your name
- * @LastEditTime: 2021-05-30 11:37:35
+ * @LastEditTime: 2021-06-06 09:59:02
  * @Description: css 尺寸
 -->
 
@@ -20,9 +20,9 @@
 | left 、 right   | parent's width  |
 | top 、 bottom   | parent's height |
 
-parent 非 child 最近的祖先元素，parent 与 child 的 position 属性值有关
+>parent **不一定**是 child **最近的祖先**元素，如下：
 
-| position | parent                     |
+| child's position | parent                     |
 | -------- | -------------------------- |
 | static   | 最近的祖先元素             |
 | relative | 最新的祖先元素             |

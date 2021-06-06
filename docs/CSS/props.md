@@ -2,13 +2,15 @@
  * @Author: 鱼小柔
  * @Date: 2021-05-30 18:03:32
  * @LastEditors: your name
- * @LastEditTime: 2021-05-30 18:05:49
+ * @LastEditTime: 2021-06-06 10:14:16
  * @Description: css 属性考点
 -->
 
 # 属性考点
 
-## 对比 opacity=0、visibility=hidden、display=none
+## 显示属性
+
+对比 opacity=0、visibility=hidden、display=none
 
 |              | opacity:0       | visibility:hidden            | display:none       |
 | ------------ | --------------- | ---------------------------- | ------------------ |
@@ -23,7 +25,9 @@
 
 - 一个 sticky 元素会“固定”在离它最近的一个拥有“滚动机制”的祖先上
 
-## float
+## float 属性
+
+父元素高度坍塌、清除浮动等
 
 ## border 属性
 
