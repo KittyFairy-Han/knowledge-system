@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 17:36:39
  * @LastEditors: your name
- * @LastEditTime: 2021-06-06 19:55:17
+ * @LastEditTime: 2021-06-06 23:56:17
  * @Description: file content
  */
 
@@ -16,7 +16,7 @@ module.exports = {
       { text: "Home", link: "/" },
       { text: "CSS", link: "/CSS/layout/" },
       { text: "JS", link: "/JS/" },
-      { text: "浏览器", link: "/broswer/" },
+      { text: "浏览器", link: "/broswer/work/" },
       { text: "工程化", link: "/engineering/" },
     ],
     sidebar: {
@@ -92,11 +92,6 @@ module.exports = {
       ],
       "/engineering/": [
         {
-          title: "Vue",
-          collapsable: false,
-          children: ["/engineering/Vue/use", "/engineering/Vue/principle", "/engineering/Vue/Vue3"],
-        },
-        {
           title: "模块化、组件化和设计模式", // 必要的
           collapsable: false, // 可选的, 默认值是 true,
           children: [
@@ -105,6 +100,12 @@ module.exports = {
             ["/engineering/design/design","设计模式"],
           ],
         },
+        {
+          title: "Vue",
+          collapsable: false,
+          children: ["/engineering/Vue/use", "/engineering/Vue/principle", "/engineering/Vue/Vue3"],
+        },
+        
         ["/engineering/vdom/", "vdom"],
         {
           title: "webpack",

@@ -2,12 +2,10 @@
  * @Author: 鱼小柔
  * @Date: 2021-04-14 20:28:39
  * @LastEditors: your name
- * @LastEditTime: 2021-06-06 17:37:22
+ * @LastEditTime: 2021-06-06 23:37:58
  * @Description: 浏览器的工作原理
 -->
 # 浏览器工作原理
-
-
 
 ## 浏览器的构成部分
 
@@ -39,6 +37,16 @@
 2. 避免第三方插件奔溃影响整个浏览器
 3. 充分利用多核优势
 
+
+## 浏览器内核
+
+
+- Trident：ie 内核
+- Gecko：ff 内核
+- webkit：Safari
+- Blink：（Chrome，operal，
+- Trident+webkit：QQ 浏览器
+
 ## 内核进程中的线程
 
 浏览器内核中有 3 个最主要的线程：JS 线程，UI 渲染线程，事件处理线程。此外还有 http 网络线程，定时器任务线程，文件系统处理线程等等。
@@ -63,12 +71,3 @@ UI 渲染线程当然是负责构建渲染树，执行页面元素渲染。<br>
 ### 其他线程
 
 其他线程统称工作线程，如处理 ajax 的线程，dom 事件线程、定时器线程、读写文件的线程等，工作线程的任务完成之后， 会推入到一个任务队列（task queue）
-
-## 浏览器内核
-
-
-- Trident：ie 内核
-- Gecko：ff 内核
-- webkit：Safari
-- Blink：（Chrome，operal，
-- Trident+webkit：QQ 浏览器
