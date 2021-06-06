@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2021-04-08 13:22:12
  * @LastEditors: your name
- * @LastEditTime: 2021-06-06 09:54:32
+ * @LastEditTime: 2021-06-06 10:17:25
  * @Description: file content
 -->
 
@@ -25,6 +25,12 @@
 
 - .parent .child 加法
 - .className1.className2 乘法
+
+## 选择器考点
+
+- 选中3的倍数 ？
+- 选中前三个 ？
+- 伪元素 dispaly 的值 ？
 
 <!-- ## 伪元素
 
