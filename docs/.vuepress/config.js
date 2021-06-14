@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 17:36:39
  * @LastEditors: your name
- * @LastEditTime: 2021-06-07 00:07:31
+ * @LastEditTime: 2021-06-14 15:57:53
  * @Description: file content
  */
 
@@ -72,50 +72,55 @@ module.exports = {
           path: "/JS/single-thread-async-event-loop",
           collapsable: false, // 可选的, 默认值是 true,
           children: [
-            ["/JS/single-thread-async-event-loop/async","异步"],
-            ["/JS/single-thread-async-event-loop/event-loop","事件轮询"],
-            ["/JS/single-thread-async-event-loop/WebWork","WebWork"]
+            ["/JS/single-thread-async-event-loop/async", "异步"],
+            ["/JS/single-thread-async-event-loop/event-loop", "事件轮询"],
+            ["/JS/single-thread-async-event-loop/WebWork", "WebWork"],
           ],
         },
         {
           title: "通信(跨域)、Ajax 和存储", // 必要的
           collapsable: false, // 可选的, 默认值是 true,
           children: [
-            ["/JS/communication-AJAX-storage/communication","通信"], 
-            ["/JS/communication-AJAX-storage/storage","存储"]
+            ["/JS/communication-AJAX-storage/communication", "通信"],
+            ["/JS/communication-AJAX-storage/storage", "存储"],
           ],
         },
-        
-        ["/JS/BOM/","浏览器对象"],
-        ["/JS/DOM/","文档对象"],
-        ["/JS/monitor-security/","错误监控"],
+
+        ["/JS/BOM/", "浏览器对象"],
+        ["/JS/DOM/", "文档对象"],
+        ["/JS/monitor-security/", "错误监控"],
       ],
       "/engineering/": [
         {
           title: "模块化、组件化和设计模式", // 必要的
           collapsable: false, // 可选的, 默认值是 true,
           children: [
-            ["/engineering/design/modularity","模块化"],
-            ["/engineering/design/componential","组件化"],
-            ["/engineering/design/design-pattern","设计模式"],
+            ["/engineering/design/modularity", "模块化"],
+            ["/engineering/design/componential", "组件化"],
+            ["/engineering/design/design-pattern", "设计模式"],
           ],
         },
         {
           title: "Vue",
           collapsable: false,
-          children: ["/engineering/Vue/use", "/engineering/Vue/principle", "/engineering/Vue/Vue3"],
+          path:"/engineering/Vue/",
+          children: [
+            ["/engineering/Vue/use", "使用"],
+            ["/engineering/Vue/principle", "原理"],
+            ["/engineering/Vue/Vue3", "Vue3"],
+          ],
         },
-        
+
         ["/engineering/vdom/", "vdom"],
         {
           title: "webpack",
+          path:"/engineering/webpack/",
           collapsable: true,
           children: [
-            "/engineering/webpack/",
-            "/engineering/webpack/chunk",
-            "/engineering/webpack/SPA-MPA-MB",
-            "/engineering/webpack/optimization",
-            "/engineering/webpack/app-demo",
+            ["/engineering/webpack/chunk","chunk"],
+            ["/engineering/webpack/SPA-MPA-MB","SPA-MPA-MB"],
+            ["/engineering/webpack/optimization","优化"],
+            ["/engineering/webpack/app-demo","经验案例-iarrm插件化"]
           ],
         },
       ],
