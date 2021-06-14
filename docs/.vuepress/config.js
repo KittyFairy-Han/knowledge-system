@@ -2,13 +2,13 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 17:36:39
  * @LastEditors: your name
- * @LastEditTime: 2021-06-14 15:57:53
+ * @LastEditTime: 2021-06-14 16:13:38
  * @Description: file content
  */
 
 module.exports = {
   base: "/knowledge-system/",
-  dest: "../knowledge-system-ghpage/dist", // 设置输出目录
+  dest: "../dist", // 设置输出目录
   head: [["link", { rel: "icon", href: "image/logo.png" }]],
   themeConfig: {
     sidebarDepth: 2, //提取到 h3
