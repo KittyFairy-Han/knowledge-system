@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 17:36:39
  * @LastEditors: your name
- * @LastEditTime: 2021-06-14 16:13:38
+ * @LastEditTime: 2021-07-04 16:36:00
  * @Description: file content
  */
 
@@ -18,6 +18,7 @@ module.exports = {
       { text: "JS", link: "/JS/" },
       { text: "浏览器", link: "/broswer/work/" },
       { text: "工程化", link: "/engineering/" },
+      { text: "其他", link: "/scene/lottieUsage/" },
     ],
     sidebar: {
       "/html/": [["/html/mianjing", "面经"]],
@@ -131,6 +132,9 @@ module.exports = {
         ["/broswer/memory", "内存"],
         ["/broswer/security", "安全"],
         ["/broswer/render", "网页渲染"],
+      ],
+      "/scene/":[
+        ["/scene/lottieUsage", "lottie的应用场景"],
       ],
     },
   },
