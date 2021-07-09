@@ -5,19 +5,62 @@
  * @LastEditTime: 2021-07-04 22:43:04
  * @Description: file content
 -->
+
 # Lottie 常见应用
+
 这篇分享是基于[如何制作 Lottie 动画并应用在前端项目](https://kms.netease.com/article/36099)的续集，所以这里不会再介绍引用和加载动画，是对进一步使用的介绍。<br>
-以如下JSON动画为例进行介绍([源文件]())<br>
+以如下 JSON 动画为例进行介绍([源文件]())<br>
 ![开奖](./static/lottery.gif)
 
 ## 灵活的控制动画播放
-有一些业务需求中会出现比较复杂的动画适合用Lottie来实现，比如抽奖活动，抽奖过程中一些物理碰撞的动画和展示结果前的一些过度的魔法光效。在前端开发中，通常都是调用后端接口（获取抽奖结果）的同时播放一些过度的动画，获取到结果后，停止动画并展示结果。理想的效果是获取到结果刚好动画播放结束。但是接口请求时间终究是不可控的，所以这就需要对动画播放过程和播放时间做一些处理来配合接口请求时间。<br>
-官方提供了一些控制播放的api[传送门](http://airbnb.io/lottie/#/web?id=usage)<br>
-以上面的红包动画为例子，红包放大和旋转为过渡动画，此时接口返回结果，然后渐显“金额”。(在具体的业务场景中，“金额”应该替换为具体的结果数字，这个我们后面会讨论到，暂先不讨论。)
-### 情况1 动画播放时间>接口请求时间
-这种情况下，发送请求同时开始播放动画
-### 情况2 动画播放时间<接口请求时间
+
+有一些业务需求中会出现比较复杂的动画适合用 Lottie 来实现，比如抽奖活动，抽奖过程中一些物理碰撞的动画和展示结果前的一些过度的魔法光效。在前端开发中，通常都是调用后端接口（获取抽奖结果）的同时播放一些过度的动画，获取到结果后展示结果。理想的效果是获取到结果刚好动画播放结束。但是接口请求时间终究是不可控的，所以这就需要对动画播放过程和播放时间做一些处理来配合接口请求时间。<br>
+官方提供了一些控制播放的 api[传送门](http://airbnb.io/lottie/#/web?id=usage)<br>
+以上面的红包动画为例子，动画是一个完整的开奖过程，但实际应用中因为配合接口时间，可以把动画分为三部分。
+
+1. step1 前奏阶段（红包放大):动画播放一次
+2. step2 请求阶段（红包旋转）：发起请求的同时开启循环播放直到接口请求回来，结束播放
+3. step3 结果阶段（渐显“金额”）：动画播放一次。
+   > 在具体的业务场景中，“金额”应该替换为具体的结果数字，这个我们后面会讨论到，暂先不讨论。
+
+### 分割动画
+
+官方提供了 playSegments 的方法，接收一个双元素数组 [start,end] 作为参数，播放指定的起始帧和结束帧之间的片段。把每步播放封装成一个异步任务，结合 async、await 语法，控制播放流程。要实现这样的异步封装，我们需要感知播放结束，在结束的时候调用 resolve。
+
+```js
+playStep1() {
+      return new Promise((resolve) => {
+        this.lottieAnim.playSegments([0, 50], true);
+        this.lottieAnim.addEventListener("complete", () => {
+          // console.log(1)
+          resolve("complete1");
+          this.lottieAnim.removeEventListener("complete");
+        });
+      });
+    },
+    playStep2() {
+      return new Promise((resolve) => {
+        this.lottieAnim.playSegments([51, 62], true);
+        this.lottieAnim.addEventListener("complete", () => {
+          // console.log(2)
+          resolve("complete2");
+          this.lottieAnim.removeEventListener("complete");
+        });
+      });
+    },
+    playStep3() {
+      return new Promise((resolve) => {
+        this.lottieAnim.playSegments([63, 90], true);
+        this.lottieAnim.addEventListener("complete", () => {
+          resolve("complete3");
+          this.lottieAnim.removeEventListener("complete");
+        });
+      });
+    },
+```
+
 ## 替换
+
 有些业务场景中，会需要替换动画中的文字和图片。[例如](https://cloud.video.taobao.com/play/u/270923/p/1/d/hd/e/6/t/1/250398793745.mp4?auth_key=YXBwX2tleT04MDAwMDAwMTImYXV0aF9pbmZvPXsidGltZXN0YW1wRW5jcnlwdGVkIjoiNTE0YzYwMjY4NmU3NDlmN2VhNGQ2MDY4YmY4NjE4MWYifSZkdXJhdGlvbj0mdGltZXN0YW1wPTE2MjUxOTEyMjQ=)。这段动画中的 「3.39%」「2.43%」以及「1000 万」都属于业务数字，数字变化频率高，如果每次数字变化要重新导出视频效率太低，这种场景下就需要动态替换动画中数字。
 动态替换又进一步分为，① 动画初始化之前替换一次，播放动画时动画中的文字或图片内容不变（下文称为静态替换）;② 动画播放时，改变动画中的文字或图片（下文称之为动态替换）。
 
@@ -68,11 +111,9 @@ const newStr = str.replace("${文本}", "new text"); //找到对应的属性，�
 const lottieAnim = loadLottieAnimation(JSON.parse(newStr));
 ```
 
-这种方式看起来比上一个方便一些，但是这是需要设计师高度配合的，要先和设计师沟通，把需要替换的部分做一个特殊的标识'${}'，所以这也是存在不确定性的方法。
+这种方式看起来比上一个方便一些，但是这是需要设计师高度配合的，要先和设计师沟通，把需要替换的部分做一个特殊的标识'\${}'，所以这也是存在不确定性的方法。
 修改 lottie 解析后的运行时 JS 对象，理论上一样可以修改文本，官方其实提供了相应的 API，仔细查找的话在 lottie-web 的官方文档里有提及，请看 https://github.com/airbnb/lottie-web/wiki/TextLayer.updateDocumentData
 
-
 ### 动态替换文字
-
 
 ### 动态替换图片
