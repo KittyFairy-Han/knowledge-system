@@ -2,15 +2,17 @@
  * @Author: 鱼小柔
  * @Date: 2021-07-04 09:26:36
  * @LastEditors: your name
- * @LastEditTime: 2021-07-04 22:43:04
+ * @LastEditTime: 2021-07-12 00:29:08
  * @Description: file content
 -->
 
 # Lottie 常见应用
 
-这篇分享是基于[如何制作 Lottie 动画并应用在前端项目](https://kms.netease.com/article/36099)的续集，所以这里不会再介绍引用和加载动画，是对进一步使用的介绍。<br>
-以如下 JSON 动画为例进行介绍([源文件]())<br>
-![开奖](./static/lottery.gif)
+这篇分享是基于[如何制作 Lottie 动画并应用在前端项目](https://kms.netease.com/article/36099)的续集，所以这里不会再介绍引用和加载动画，是对 lottie 进一步使用的介绍(我是在 vue 中做这个 demo，所以会有一些 vue 中的特定用法)。<br>
+
+- [源文件](https://github.com/KittyFairy-Han/study-demos/blob/master/vue-demo/public/lottery.json)
+- 动画效果<br>
+  ![开奖](./static/lottery.gif)
 
 ## 灵活的控制动画播放
 
@@ -23,41 +25,141 @@
 3. step3 结果阶段（渐显“金额”）：动画播放一次。
    > 在具体的业务场景中，“金额”应该替换为具体的结果数字，这个我们后面会讨论到，暂先不讨论。
 
-### 分割动画
+### 动画分段，通过异步封装实现播放可控
 
-官方提供了 playSegments 的方法，接收一个双元素数组 [start,end] 作为参数，播放指定的起始帧和结束帧之间的片段。把每步播放封装成一个异步任务，结合 async、await 语法，控制播放流程。要实现这样的异步封装，我们需要感知播放结束，在结束的时候调用 resolve。
+#### 播放片段
+
+官方提供了 playSegments 的方法，第一个参数是双元素数组 [start,end] ，播放指定的起始帧和结束帧之间的片段。（动画 0~50 帧是红包放大过程、51~60 帧是动画旋转过程、63~90 帧是出现文字过程。）
+
+- 官方文档截图 playSegments
+  ![官方文档截图 playSegments](./static/playSegments.png)
+
+- 以第一段为例，大概的代码思路就是：anim.playSegments([0, 50])
+
+#### 感知结束
+
+拆分后要实现按步骤播放，需要利用 promise 把每步播放封装成一个异步任务。要实现这样的异步封装，我们需要感知播放结束，在结束的时候调用 resolve。官方提供了 complete 事件，每一次动画播放结束会触发该事件。<br>
+每次播放结束的含义是，不论是 play 还是 playSegments 当渲染了全程或者片段的最后一帧的时候都执行回调，这里需要注意的是 lottie 并不会告诉我们现在播放完的是哪一段动画，如果需要知道当前播放完哪一段动画，需要我们自己区分。<br>
+我每段动画都会添加 complete 事件监听，在回调中 resolve 不同的数据并且移除当前的监听。(为什么要移除？如果不移除的话，第二段动画播放完依然会执行第一段动画的回调，第三段播放完会执行第一段和第二段动画的回调)
+
+- 官方文档截图 events
+  ![官方文档截图 events](./static/events.png)
+
+- 以第一段为例，大概的代码思路就是：
 
 ```js
-playStep1() {
+new Promise((resolve) => {
+  anim.playSegments([51, 60], true);
+  anim.addEventListener("complete", () => {
+    resolve("step1 end");
+    anim.removeEventListener("complete");
+  });
+});
+```
+
+#### 结合 async await 按照 1-1-2-3 的顺序播放动画
+
+- 代码
+
+```js
+import lottie from "lottie-web";
+const JSON_DATA = require("../../public/lottery.json");
+export default {
+  data() {
+    return {
+      lottieAnim: null,
+    };
+  },
+  async mounted() {
+    this.lottieAnim = this.loadLottieAnimation(JSON_DATA);
+    const r1a = await this.step1st();
+    console.log(r1a);
+    const r1b = await this.step1st();
+    console.log(r1b);
+    const r2 = await this.step2nd();
+    console.log(r2);
+    const r3 = await this.step3rd();
+    console.log(r3);
+  },
+  methods: {
+    loadLottieAnimation(data) {
+      return lottie.loadAnimation({
+        container: this.$refs.LottieD, //挂在到对应的dom节点
+        renderer: "svg",
+        loop: false,
+        animationData: data,
+        autoplay: false,
+      });
+    },
+
+    step1st() {
       return new Promise((resolve) => {
         this.lottieAnim.playSegments([0, 50], true);
         this.lottieAnim.addEventListener("complete", () => {
-          // console.log(1)
-          resolve("complete1");
-          this.lottieAnim.removeEventListener("complete");
+          resolve("step1 end");
+          this.lottieAnim.removeEventListener("complete"); //移除事件监听，不然在第二段播放的时候也会执行这个回调。
         });
+        // 或者
+        /* this.lottieAnim.onComplete = () => {
+          resolve("step1 end");
+          this.lottieAnim.onComplete = null //不移除也行，后面onComplete重新赋值会直接替换。
+        }; */
       });
     },
-    playStep2() {
+    step2nd() {
       return new Promise((resolve) => {
-        this.lottieAnim.playSegments([51, 62], true);
+        this.lottieAnim.playSegments([51, 60], true);
         this.lottieAnim.addEventListener("complete", () => {
-          // console.log(2)
-          resolve("complete2");
+          resolve("step2 end");
           this.lottieAnim.removeEventListener("complete");
         });
       });
     },
-    playStep3() {
+    step3rd() {
       return new Promise((resolve) => {
-        this.lottieAnim.playSegments([63, 90], true);
+        this.lottieAnim.playSegments([61, 90], true);
         this.lottieAnim.addEventListener("complete", () => {
-          resolve("complete3");
+          resolve("step3 end");
           this.lottieAnim.removeEventListener("complete");
         });
       });
     },
+  },
+};
 ```
+
+- 效果<br>
+  ![分割后按顺序播放](./static/s1.gif)
+
+### 加上请求逻辑，第二段动画与请求同时进行
+
+- 请求与第二段动画"并发"，请求和动画都结束再进行第三段动画，关键点在于“并发”。关键思路:<br>
+  Promise.all([this.step2nd(), this.getData()])
+
+```js
+// vue-methods ，模拟一个异步请求
+getData() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(parseInt((Math.random() + 1) * 100));
+    }, 3000);
+  });
+},
+// vue-mounted ，修改 mounted 中的代码
+this.lottieAnim = this.loadLottieAnimation(JSON_DATA);
+const r1 = await this.step1st();
+console.log(r1);
+const [r2, data] = await Promise.all([this.step2nd(), this.getData()]);
+console.log(r2, data);
+const r3 = await this.step3rd();
+console.log(r3);
+```
+
+- 效果<br>
+  ![加上请求逻辑](./static/s1.gif)
+
+### 循环播放播放第二段动画直到拿到请求结果
+上面实现的效果还有很大的缺陷，就是当请求时间比较长的时候，第二段动画（过度阶段）在拿到结果之前播放完了，会让人觉得卡住了。这里应该实现一个循环播放第二段动画。
 
 ## 替换
 
