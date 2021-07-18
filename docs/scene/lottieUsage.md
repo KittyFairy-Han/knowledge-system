@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2021-07-04 09:26:36
  * @LastEditors: your name
- * @LastEditTime: 2021-07-12 00:29:08
+ * @LastEditTime: 2021-07-18 13:08:55
  * @Description: file content
 -->
 
@@ -25,27 +25,29 @@
 3. step3 结果阶段（渐显“金额”）：动画播放一次。
    > 在具体的业务场景中，“金额”应该替换为具体的结果数字，这个我们后面会讨论到，暂先不讨论。
 
-### 动画分段，通过异步封装实现播放可控
+### 进阶（一）动画分段，通过异步封装实现播放可控
 
 #### 播放片段
 
-官方提供了 playSegments 的方法，第一个参数是双元素数组 [start,end] ，播放指定的起始帧和结束帧之间的片段。（动画 0~50 帧是红包放大过程、51~60 帧是动画旋转过程、63~90 帧是出现文字过程。）
+官方提供了 playSegments 的方法，第一个参数是双元素数组 [start,end] ，播放指定的起始帧和结束帧之间的片段。（动画 0~50 帧是红包放大过程、51~60 帧是动画旋转过程、63~90 帧是出现文字过程。）<br>
+![官方文档截图 playSegments](./static/playSegments.png)
+<br>官方文档截图 playSegments ↑ <br>
 
-- 官方文档截图 playSegments
-  ![官方文档截图 playSegments](./static/playSegments.png)
+以前奏阶段为例，大概的代码思路就是：
 
-- 以第一段为例，大概的代码思路就是：anim.playSegments([0, 50])
+```js
+anim.playSegments([0, 50]);
+```
 
 #### 感知结束
 
 拆分后要实现按步骤播放，需要利用 promise 把每步播放封装成一个异步任务。要实现这样的异步封装，我们需要感知播放结束，在结束的时候调用 resolve。官方提供了 complete 事件，每一次动画播放结束会触发该事件。<br>
 每次播放结束的含义是，不论是 play 还是 playSegments 当渲染了全程或者片段的最后一帧的时候都执行回调，这里需要注意的是 lottie 并不会告诉我们现在播放完的是哪一段动画，如果需要知道当前播放完哪一段动画，需要我们自己区分。<br>
-我每段动画都会添加 complete 事件监听，在回调中 resolve 不同的数据并且移除当前的监听。(为什么要移除？如果不移除的话，第二段动画播放完依然会执行第一段动画的回调，第三段播放完会执行第一段和第二段动画的回调)
+我每段动画都会添加 complete 事件监听，在回调中 resolve 不同的数据并且移除当前的监听。(为什么要移除？如果不移除的话，第二段动画播放完依然会执行第一段动画的回调，第三段播放完会执行第一段和第二段动画的回调)<br>
+![官方文档截图 events](./static/events.png)
+<br>官方文档截图 events ↑<br>
 
-- 官方文档截图 events
-  ![官方文档截图 events](./static/events.png)
-
-- 以第一段为例，大概的代码思路就是：
+以前奏阶段为例，大概的代码思路就是：
 
 ```js
 new Promise((resolve) => {
@@ -59,7 +61,10 @@ new Promise((resolve) => {
 
 #### 结合 async await 按照 1-1-2-3 的顺序播放动画
 
-- 代码
+有了以上的基础，我们就可以自由的控制每个片段了，这里之所以第一段播放两遍，是为了明显看出对动画的控制成功了。
+
+- 定义方法 step1st、step2nd、step3rd 分别代表前奏阶段、过度阶段、结果阶段
+- 结合 async await 控制播放
 
 ```js
 import lottie from "lottie-web";
@@ -128,13 +133,16 @@ export default {
 };
 ```
 
-- 效果<br>
-  ![分割后按顺序播放](./static/s1.gif)
+#### 效果<br>
 
-### 加上请求逻辑，第二段动画与请求同时进行
+![分割后按顺序播放](./static/jj1.gif)
 
-- 请求与第二段动画"并发"，请求和动画都结束再进行第三段动画，关键点在于“并发”。关键思路:<br>
-  Promise.all([this.step2nd(), this.getData()])
+### 进阶（二）加上请求逻辑，第二段动画与请求同时进行
+
+请求与第二段动画"并发"，请求和动画都结束再进行第三段动画，关键点在于“并发”，采用 Promise.all。关键思路如下:<br>
+
+- 添加 getData 方法，模拟一个异步请求
+- 修改 mounted 中的逻辑。用 Promise.all([this.step2nd(), this.getData()]) 实现“并发”请求。
 
 ```js
 // vue-methods ，模拟一个异步请求
@@ -145,7 +153,7 @@ getData() {
     }, 3000);
   });
 },
-// vue-mounted ，修改 mounted 中的代码
+// vue-mounted ，用Promise.all([this.step2nd(), this.getData()]) 实现“并发”请求
 this.lottieAnim = this.loadLottieAnimation(JSON_DATA);
 const r1 = await this.step1st();
 console.log(r1);
@@ -155,11 +163,64 @@ const r3 = await this.step3rd();
 console.log(r3);
 ```
 
-- 效果<br>
-  ![加上请求逻辑](./static/s1.gif)
+#### 效果
 
-### 循环播放播放第二段动画直到拿到请求结果
-上面实现的效果还有很大的缺陷，就是当请求时间比较长的时候，第二段动画（过度阶段）在拿到结果之前播放完了，会让人觉得卡住了。这里应该实现一个循环播放第二段动画。
+![加上请求逻辑](./static/jj2.gif)
+
+### 进阶（三）循环播放播放第二段动画直到拿到请求结果
+
+上面实现的效果还有很大的缺陷，就是当请求时间比较长的时候，第二段动画（过度阶段）在拿到结果之前播放完了，会让人觉得卡住了。这里应该实现一个循环播放第二段动画的效果。我采用了 while 循环的方式，关键思路如下：<br>
+(可能大家想到 loop 属性，但是播放片段的方法 playSegments 不支持传入 loop 参数去控制该片段循环播放。)
+
+- data 中添加一个属性 pending 作为循环的条件控制
+- 修改 getData 的方法，用于给 pending 赋值
+- 添加一个 rollStep2nd 方法，循环播放第二段动画的函数
+- 修改 mounted 中的逻辑,把 step2nd 替换成 rollStep2nd
+
+```js
+
+// vue-method
+// 修改 getData 的方法，用于给 pending 赋值
+async getData() {
+  this.pending = true;
+  const result = await new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(parseInt((Math.random() + 1) * 100));
+    }, 3000);
+  });
+  this.pending = false;
+  return result
+},
+// 添加一个 rollStep2nd 方法，循环播放第二段动画的函数
+async rollStep2nd() {
+  while (this.pending) {
+    await this.step2nd();
+  }
+},
+
+//vue-mounted,把 step2nd 替换成 rollStep2nd
+this.lottieAnim = this.loadLottieAnimation(JSON_DATA);
+const r1 = await this.step1st();
+console.log(r1);
+const [data] = await Promise.all([this.getData(),this.rollStep2nd()]);
+console.log(data);
+const r3 = await this.step3rd();
+console.log(r3);
+
+```
+
+#### 效果
+
+![加上循环逻辑](./static/jj3.gif)
+
+### 小结
+
+现在我们已经实现了最开始期望的状态即：
+
+1. step1 前奏阶段（红包放大):动画播放一次
+2. step2 请求阶段（红包旋转）：发起请求的同时开启循环播放直到接口请求回来，结束播放。
+3. step3 结果阶段（渐显“金额”）：动画播放一次。
+   接下来我们将替换“金额”为具体的结果，甚至可以把红包换成其他图片！
 
 ## 替换
 
