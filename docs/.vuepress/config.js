@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 17:36:39
  * @LastEditors: your name
- * @LastEditTime: 2021-07-04 16:36:00
+ * @LastEditTime: 2021-07-25 17:41:44
  * @Description: file content
  */
 
@@ -118,6 +118,7 @@ module.exports = {
           path:"/engineering/webpack/",
           collapsable: true,
           children: [
+            ["/engineering/webpack/main-flow","主流程（主线剧情）"],
             ["/engineering/webpack/chunk","chunk"],
             ["/engineering/webpack/SPA-MPA-MB","SPA-MPA-MB"],
             ["/engineering/webpack/optimization","优化"],
