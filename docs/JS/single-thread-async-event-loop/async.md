@@ -193,3 +193,34 @@ function fetchWithtimeOut(timeout) {
   });
 }
 ```
+
+### Promise.resolve 与 new Promise(resolve=>{resolve()}) 不完全等同！
+
+基本逻辑
+
+```js
+const p = new Promise((resovle) => resovle("then"));
+const f = (v) => {
+  console.log(v);
+};
+
+p.then(() => {
+  console.log("tick 1");
+}).then(() => {
+  console.log("tick 2");
+});
+```
+
+如果，追加下面这行代码，复制到浏览器查看打印  
+用 new Promise 打印 ：1-2-then
+
+```js
+new Promise((resolve) => resolve(p)).then(f);
+```
+
+如果，追加下面这行代码，复制到浏览器查看打印  
+用 Promise.resolve 打印： 1-then-2
+
+```js
+Promise.resolve(p).then(f);
+```
