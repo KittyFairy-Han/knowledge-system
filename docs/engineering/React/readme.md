@@ -232,9 +232,163 @@ export default () => {
 ```
 
 ```js
-// 2s 后,又执行了 setCount(59)。但是不会进行第三次渲染了
+// 2s 后,又执行了 setCount(59)。
 // ...
-// ns 后，又执行了 setCount(59)。但是不会触发渲染
+// ns 后，又执行了 setCount(59)。
 ```
 
 ## 如何解决
+
+通过上面的原因分析，我们知道了由于 useCountDown 只执行了一次，setInterval 的回调函数 (下文简称‘cb’) 这个闭包中的 count 变量始终是调用 useCountDown 那次渲染时的 count，count 不变所以计时器数值不更新。
+所以，我们就从 count 这个点切入，
+
+### 使用 ref
+
+让 count 跳出一次渲染（以下“一次渲染”称为“快照”）的限制，成为组件整个生命周期都一直存在的，这样每秒执行回调函数的时候，去读取 count 的值，就是不同的。跳出快照的限制，在整个生命周期中一直存在，你一定想要了 ref 吧，就用它！  
+但这里有个限制，那就是 ref 的 current 值改变的时候，并不会重新触发渲染。所以我们不能完全抛弃 useState 而只用 useRef，要两者结合使用！
+
+```js
+export default () => {
+  const countSaver = useRef(60);
+  const [count, setCount] = useState(countSaver.current);
+
+  const useCountDown = () => {
+    setInterval(() => {
+      if (countSaver.current === 0) {
+        // 清除定时器等操作
+      }
+      // console.log("tick", countSaver.current);
+      countSaver.current = countSaver.current - 1;
+      setCount(countSaver.current);
+    }, 1000);
+  };
+
+  return (
+    <>
+      <span>{count}</span>
+      <button onClick={useCountDown}>倒计时</button>
+    </>
+  );
+};
+```
+
+我们也可以做一些小的改变，还是使用 ref，这次我们 current 不用来存 count，直接用来存 cb。每个快照都重新给 current 赋值， 这样每秒执行的 cb 都是一个新的 cb，每个新的 cb 中都使用了新的 count，而不再是调用 useCountDown 那个快照中的 count。
+
+```js
+export default () => {
+  const cbSaver = useRef();
+  const [count, setCount] = useState(60);、
+
+  cbSaver.current = () => {
+      if (count === 0) {
+        // 清除定时器等操作
+      }
+      setCount(count - 1);
+  };
+
+  const useCountDown = () => {
+    setInterval(() => {
+      cbSaver.current();
+    }, 1000);
+  };
+
+  return (
+    <>
+      <span>{count}</span>
+      <button onClick={useCountDown}>倒计时</button>
+    </>
+  );
+};
+```
+
+### 使用形如 setCount(count=>count-1)
+
+其实不使用 ref，就用 setCount 也可以解决问题。这种方式可以理解为:是在给 React“发送指令”告知如何更新状态,不需要关心当前值是什么，只要对 “旧的值” 进行修改即可。
+优点：代码最简单，在原有的代码上改造最小。  
+局限：无法获取到新的 props。(比如这种场景：当 count 每次不是 -1 而是根据 prop 进行动态改变的时候)  
+我个人还是觉得很别扭，这种写法有一种自相矛盾的感觉。
+
+```js
+export default () => {
+  const [count, setCount] = useState(60);
+  if (count === 0) {
+    //清除定时器等操作
+  }
+  const useCountDown = () => {
+    setInterval(() => {
+      setCount((count) => count - 1);
+    }, 1000);
+  };
+  return (
+    <>
+      <span>{count}</span>
+      <button onClick={useCountDown}></button>
+    </>
+  );
+};
+```
+
+### 使用 reducer
+
+使用 reducer 这种方式，在我看来是上面方法的一个升级版本。在保留优点的同时，它打破了无法获取新的 props 这一局限。  
+useReducer 返回的 state 并不是一个生命周期内的变量，它还是只属于当前快照的一个普通变量。用这种方式，就我个人来讲，比上面的别扭感大大降低了。
+
+```js
+export default () => {
+  const reducer = (state) => state - 1;
+  const [state, dispatch] = useReducer(reducer, 10);
+  if (state === 0) {
+    //清除定时器等操作
+  }
+  const useCountDown = () => {
+    setInterval(() => {
+      dispatch({});
+    }, 1000);
+  };
+
+  return (
+    <>
+      <span>{state}</span>
+      <button onClick={useCountDown}>倒计时</button>
+    </>
+  );
+};
+```
+
+### 三种方法分别加上清除定时器的逻辑
+
+- ref 方案
+- updater 方案
+- useReducer 方案
+
+```js
+export default () => {
+  const reducer = (state, { type, payload }) => {
+    if (type === "deCount") {
+      if (state.count <= 0) {
+        return { timer: null, count: 0 };
+      } else {
+        return { ...state, count: state.count - 1 };
+      }
+    }
+    if (type === "createTimer") {
+      return { ...state, timer: payload };
+    }
+  };
+  const [state, dispatch] = useReducer(reducer, { count: 60 });
+
+  const useCountDown = () => {
+    const timer = setInterval(() => {
+      dispatch({ type: "deCount" });
+    }, 1000);
+    dispatch({ type: "createTimer", payload: timer });
+  };
+
+  return (
+    <>
+      <span>{state.count}</span>
+      <button onClick={useCountDown}>倒计时</button>
+    </>
+  );
+};
+```
