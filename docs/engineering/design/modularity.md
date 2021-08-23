@@ -565,3 +565,38 @@ setTimeout(()=>{
 ## 五、相同点
 
 import 最后会转换成 require 所以 import 命令也是同步的，非异步加载，为了满足异步加载的需求使用 import()
+
+## 六、额外说明
+import 语法命令是完全静态的（不能使用判断语句、不能使用变量），不会产生独立的 chunk。require 函数虽然可以动态加载（用 if else 语句控制动态加载、或者直接用变量控制动态加载）, 但是 require 并不会产生一个独立 chunk。import、require 的代码模块会合并到 entry 产生的 chunk 中。具体说明如下：
+
+#### 对 require 的解释
+
+```js
+// pages/demo/home/main.js
+// 根据客户端传参 params.skin 就是主题关键字
+require(`../../skin/${params.skin}/index.less`);
+```
+
+编译后的代码输出在一个 css 文件中。具体流程是：main.js 作为多页应用的一个入口，编译后形成一个 chunk,chunk 中包含了 main.js 引入的所有模块(所有以 import、require方式引入的模块)，样式代码编译后就在 这个 chunk(假设叫 entry-js-chunk) 中。然后，把 chunk 中的所有样式代码都抽离出来形成一个单独的 chunk(假设叫 css-chunk-from-js)。最后entry-js-chunk和css-chunk-from-js分别输入对应的js和css文件。
+
+```css
+.demo-home-root {
+  background-color: #08ff70;
+  border: 5px solid #90ee90;
+}
+.demo-home-root:hover {
+  background-color: #e6941a;
+}
+/* ==========以上是绿色主题生成的代码======== */
+/* ==========以下是蓝色主题生成的代码======== */
+.demo-home-root {
+  background-color: #1a68c2;
+  border: 5px solid #87ceeb;
+}
+.demo-home-root:hover {
+  background-color: #e3e61a;
+}
+```
+
+最后两套样式都会合并到一个文件，弊端一，如果皮肤样式有很多套，并且根据需求每次只使用一套，请求文件的体积过大，且大部分属于没有用到的样式。弊端二，样式发生了覆盖，除了最后一份主题，其他的主题永远不会生效，并没有办法动态的加载某一套主题。
+

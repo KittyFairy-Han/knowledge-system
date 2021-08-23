@@ -2,60 +2,61 @@
  * @Author: 鱼小柔
  * @Date: 2021-01-24 11:07:56
  * @LastEditors: your name
- * @LastEditTime: 2021-01-24 15:06:04
+ * @LastEditTime: 2021-08-22 18:41:52
  * @Description: webpack chunk 相关的知识点和实战例子
 -->
 
 # webpack chunk
 
-## chunk 来源
+## 划分chunk的意义（why）
 
-1. entry 入口
-2. import() 异步加载
-3. webpack 配置中的 optimization.splitchunk.cacheGroup 选项
+因为最终输出的文件 bundle 很大程度上取决于 chunk，可以看作是一一对应，所以。。。
 
-#### 在默认的配置下 optimization.splitchunk.cacheGroup
+## chunk 来源（how）
+
+1. webpack 配置中的 entry(入口) 选项
+2. import() 异步加载函数
+> import 命令、require() 函数不会产生chunk。具体见[import()、import、require() 工作原理和区别](https://kittyfairy-han.github.io/knowledge-system/engineering/design/modularity.html#六、额外说明)
+3. webpack 配置中的 optimization.splitchunk 选项
+
+#### 默认情况下 splitchunk 配置的规则：
 
 - 在异步形成的 chunk 中，引用 node_modules 中的代码会产生一个 chunk、
 - 在异步形成的 chunk 中，有公共引用的代码会单独抽出产生一个 chunk
-  > 注意！ import 是完全静态的（不能使用判断语句、不能使用变量），不会产生独立的 chunk。require 虽然可以动态加载（用 if else 语句控制动态加载、或者直接用变量控制动态加载）, 但是 require 并不会产生一个独立 chunk。import、require 的代码模块会合并到 entry 产生的 chunk 中。具体说明如下：
 
-#### 对 require 的解释
 
-```js
-// pages/demo/home/main.js
-// 根据客户端传参 params.skin 就是主题关键字
-require(`../../skin/${params.skin}/index.less`);
+## 逐一介绍
+
+### entry
+每一个入口就会对应的形成一个chunk。  
+#### 那么entry配置方式是怎么样的呢？  
+entry 可以配置为字符串、数组、对象。[详细写法说明](https://webpack.docschina.org/concepts/entry-points/#root)。前两种都是单入口，用对象形式配置的时，是多入口，每个属性就是一个入口。  
+#### 什么情况会用到多入口?
+默认情况是单入口，当项目设计方案为多页应用的时候会配置多入口。
+
+### import() 
+
+假设我的目录结构是  
+
+```code
+  src
+  ├── main.js
+  ├── ...
+  ├── skin
+  |   ├── green
+  |   |   ├── theme.less # 定义一些主题通用的变量
+  |   |   ├── demo-vars.less # 定义一些业务相关的变量
+  |   |   └── index.less # green 主题的主人口
+  |   ├── blue
+  |   |   ├── theme.less # 定义一些主题通用的变量
+  |   |   ├── demo-vars.less # 定义一些业务相关的变量
+  |   |   └── index.less # blue 主题的主人口
+  |   └── style
+  |       └── demo.less # demo 使用对应的业务变量或者直接引用主题变量定义样式
+  └── ...
+
 ```
-
-编译后的代码输出在一个 css 文件中。具体流程是：main.js 作为多页应用的一个入口，编译后形成一个 chunk,chunk 中包含了 main.js 引入的所有模块(所有以 import、require方式引入的模块)，样式代码编译后就在 这个 chunk(假设叫 entry-js-chunk) 中。然后，把 chunk 中的所有样式代码都抽离出来形成一个单独的 chunk(假设叫 css-chunk-from-js)。最后entry-js-chunk和css-chunk-from-js分别输入对应的js和css文件。
-
-```css
-.demo-home-root {
-  background-color: #08ff70;
-  border: 5px solid #90ee90;
-}
-.demo-home-root:hover {
-  background-color: #e6941a;
-}
-/* ==========以上是绿色主题生成的代码======== */
-/* ==========以下是蓝色主题生成的代码======== */
-.demo-home-root {
-  background-color: #1a68c2;
-  border: 5px solid #87ceeb;
-}
-.demo-home-root:hover {
-  background-color: #e3e61a;
-}
-```
-
-最后两套样式都会合并到一个文件，弊端一，如果皮肤样式有很多套，并且根据需求每次只使用一套，请求文件的体积过大，且大部分属于没有用到的样式。弊端二，样式发生了覆盖，除了最后一份主题，其他的主题永远不会生效，并没有办法动态的加载某一套主题。
-
-
-
-## 方案比较
-
-### import() 例子
+我想要把每个主题形成一个chunk
 
 #### 写法
 
@@ -167,3 +168,4 @@ rel=preload as=style>
 
 - preload chunk 会在父 chunk 加载时,以并行方式开始加载。也就是说在加载 主入口形成的 chunk 的同时,浏览器同时请求了两套皮肤文件的内容。
 - prefetch chunk 会用于未来的某个时刻,在浏览器闲置时下载。也就是说在加载 主入口形成的 chunk 的时候,浏览器没有请求两套皮肤文件的内容，当 setSkin 方法调用时,才去请求某一个皮肤文件的内容。
+
