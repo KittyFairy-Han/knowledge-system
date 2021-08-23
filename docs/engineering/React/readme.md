@@ -1,8 +1,8 @@
 # 开始入门啦
+ 
+新手上路总是有很多坑，如果你也遇到了相同的问题，希望可以对你有点帮助 ✿✿ヽ(°▽°)ノ✿
 
-新手上路总是有很多坑
-
-## 前情提要 setInterval 不更新？
+## 发现问题 setInterval 不更新？
 
 一个很小的需求，发送手机验证码，60s 的倒计时。我是这样写的（简化版，无关的业务代码删除了），发现 count60-59-59....59,后面一直是 59。当时的我：(ｷ｀ﾟ Д ﾟ ´)!! 为啥么不更新！！？？
 
@@ -31,9 +31,9 @@ export default () => {
 
 ### step1 走出误区
 
-工作两年一直都是用 Vue2.x ，最近项目现学现卖 React17+，使用**函数式**组件写法，发现会有一些思维定式 ， 会以 Vue 的思路去考虑 React 函数式组件的数据驱动机制，然后就进入了一些误区。在这里总结一下，希望对你（和我差不多情况的）有所帮助。  
+工作两年一直都是用 Vue2.x ，最近项目现学现卖 React17+，使用函数式组件+hook的写法，发现会有一些思维定式，会以原来的思路去考虑 React 函数式组件的数据驱动机制，然后就进入了一些误区。
 （题外话，Vue 还是真爱，进入误区怪自己不怪 Vue，(づ￣ 3 ￣)づ）  
-由一个简单的例子开始
+#### 由一个简单的例子开始
 
 ```js
 function Counter() {
@@ -123,12 +123,17 @@ function Counter() {
 ```
 
 点击一下“show alert”按钮，然后点一下“click me”。alert 结果会是？  
-即将剧透  
-即将剧透  
-即将剧透  
-即将剧透  
-即将剧透  
-结果是 0  
+即  
+将  
+剧  
+透  
+
+![cat](http://www.zmaomao.com/uploads/201208/9-20120QG1302K.jpg)
+
+结  
+果  
+是  
+0  
 结合上面的理解，其实每次渲染可以提取成以下:
 
 ```js
@@ -216,7 +221,7 @@ export default () => {
 ```js
 // 1s 后，执行了setCount(59)。进行第二次渲染
 export default () => {
-  const count = 59;
+  const count = 59; // 这个 59 没有排上用场！！
 
   const useCountDown = () => {
     /* 这次没有执行这个函数，省略这部分代码 */
@@ -239,13 +244,12 @@ export default () => {
 
 ## 如何解决
 
-通过上面的原因分析，我们知道了由于 useCountDown 只执行了一次，setInterval 的回调函数 (下文简称‘cb’) 这个闭包中的 count 变量始终是调用 useCountDown 那次渲染时的 count，count 不变所以计时器数值不更新。
-所以，我们就从 count 这个点切入，
+
 
 ### 使用 ref
-
-让 count 跳出一次渲染（以下“一次渲染”称为“快照”）的限制，成为组件整个生命周期都一直存在的，这样每秒执行回调函数的时候，去读取 count 的值，就是不同的。跳出快照的限制，在整个生命周期中一直存在，你一定想要了 ref 吧，就用它！  
-但这里有个限制，那就是 ref 的 current 值改变的时候，并不会重新触发渲染。所以我们不能完全抛弃 useState 而只用 useRef，要两者结合使用！
+通过上面的原因分析，我们知道了由于 useCountDown 只执行了一次，setInterval 的回调函数 (下文简称‘cb’) 这个闭包中的 count 变量始终是调用 useCountDown 那次渲染时的 count，count 不变所以计时器数值不更新。
+所以，我们就从 count 这个点切入，让 count 跳出一次渲染（以下“一次渲染”称为“快照”）的限制，成为组件整个生命周期都一直存在的，这样每秒执行回调函数的时候，去读取 count 的值，就是不同的。跳出快照的限制，在整个生命周期中一直存在，你一定想要了 ref 吧，就用它！  
+不过呢，ref 有个限制，那就是 ref 的 current 值改变的时候，并不会重新触发渲染。所以我们不能完全抛弃 useState 而只用 useRef，要两者结合使用！
 
 ```js
 export default () => {
@@ -254,12 +258,13 @@ export default () => {
 
   const useCountDown = () => {
     setInterval(() => {
+      // 这里的 count 永远是 60，但是 countSaver.current 是随时间改变的
       if (countSaver.current === 0) {
         // 清除定时器等操作
       }
       // console.log("tick", countSaver.current);
       countSaver.current = countSaver.current - 1;
-      setCount(countSaver.current);
+      setCount(countSaver.current); //触发下一次渲染
     }, 1000);
   };
 
@@ -272,18 +277,19 @@ export default () => {
 };
 ```
 
-我们也可以做一些小的改变，还是使用 ref，这次我们 current 不用来存 count，直接用来存 cb。每个快照都重新给 current 赋值， 这样每秒执行的 cb 都是一个新的 cb，每个新的 cb 中都使用了新的 count，而不再是调用 useCountDown 那个快照中的 count。
+我们也可以做一些小的改变，还是借助 ref，这次我们 current 不用来存 count，直接用来存 cb。每个快照都重新给 current 赋值， 这样每秒执行的 cb 都是一个新的 cb，每个新的 cb 中都使用了新的 count，而不再是调用 useCountDown 那个快照中的 count。  
+我参考的文章《使用 React Hooks 声明 setInterval》中正是这样做的
 
 ```js
 export default () => {
   const cbSaver = useRef();
-  const [count, setCount] = useState(60);、
+  const [count, setCount] = useState(60);
 
   cbSaver.current = () => {
-      if (count === 0) {
-        // 清除定时器等操作
-      }
-      setCount(count - 1);
+    if (count === 0) {
+      // 清除定时器等操作
+    }
+    setCount(count - 1);
   };
 
   const useCountDown = () => {
@@ -301,22 +307,29 @@ export default () => {
 };
 ```
 
-### 使用形如 setCount(count=>count-1)
+### “以旧推新” 的思路
 
-其实不使用 ref，就用 setCount 也可以解决问题。这种方式可以理解为:是在给 React“发送指令”告知如何更新状态,不需要关心当前值是什么，只要对 “旧的值” 进行修改即可。
-优点：代码最简单，在原有的代码上改造最小。  
-局限：无法获取到新的 props。(比如这种场景：当 count 每次不是 -1 而是根据 prop 进行动态改变的时候)  
-我个人还是觉得很别扭，这种写法有一种自相矛盾的感觉。
+其实不使用 ref，也可以解决问题。这种方式可以理解为:是在给 React“发送指令”告知如何更新状态,不需要关心当前值是什么，只要对 “旧的值” 进行修改即可。
+能获取到“旧的值”的方案有两种。一个是 形如 setSome(old=>old-1) 这样的 updater，另外一个就是把 useState 换成 useReducer。
+
+#### 先说使用形如 setCount(count=>count-1) 这样的 updater 吧！
+
+**优点**：代码最简单，在原有的代码上改造最小。  
+**局限**：①updater 中无法获取到新的 props。② 数据复杂时，不好管理
+
+> 对 ① 的举例 ：当 count 每次不是减 1 而是根据 prop 进行动态改变具体的减量的时候。第 ② 点，后面会提到。
 
 ```js
 export default () => {
   const [count, setCount] = useState(60);
+  const updater = (count) => count - 1;
   if (count === 0) {
     //清除定时器等操作
   }
   const useCountDown = () => {
     setInterval(() => {
-      setCount((count) => count - 1);
+      // 这里取到的 count 永远是 60
+      setCount(updater); //updater 函数体内不可以读取到新的 props
     }, 1000);
   };
   return (
@@ -328,20 +341,22 @@ export default () => {
 };
 ```
 
-### 使用 reducer
+#### 使用 useReducer
 
-使用 reducer 这种方式，在我看来是上面方法的一个升级版本。在保留优点的同时，它打破了无法获取新的 props 这一局限。  
-useReducer 返回的 state 并不是一个生命周期内的变量，它还是只属于当前快照的一个普通变量。用这种方式，就我个人来讲，比上面的别扭感大大降低了。
+在我看来是上面 updater 方案的一个升级版本。它能够获取新的 props，也更适用于数据复杂的情况（现在还体现不出来，后面加上清除定时器的逻辑会有所体现）。
+
+<!-- useReducer 返回的 state 并不是一个生命周期内的变量，它还是只属于当前快照的一个普通变量。和 useRef 不同哦。 -->
 
 ```js
 export default () => {
-  const reducer = (state) => state - 1;
-  const [state, dispatch] = useReducer(reducer, 10);
+  const reducer = (state) => state - 1; //reducer 函数体内可以读取到新的 props
+  const [state, dispatch] = useReducer(reducer, 60);
   if (state === 0) {
     //清除定时器等操作
   }
   const useCountDown = () => {
     setInterval(() => {
+      // 这里取到的 state 永远是 60
       dispatch({});
     }, 1000);
   };
@@ -355,28 +370,99 @@ export default () => {
 };
 ```
 
-### 三种方法分别加上清除定时器的逻辑
+## 补充逻辑
 
-- ref 方案
+### ref 方案
+
+```js
+export default () => {
+  const cbSaver = useRef();
+  const [count, setCount] = useState("");
+  const [timer, setTimer] = useState(null);
+  if (count === 0) {
+    timer && clearInterval(timer);
+    timer && setTimer(null);
+  }
+  cbSaver.current = () => {
+    setCount(count - 1);
+  };
+
+  const useCountDown = () => {
+    const t = setInterval(() => {
+      cbSaver.current();
+    }, 1000);
+    setTimer(t);
+    setCount(5);
+  };
+
+  return (
+    <>
+      {timer ? (
+        <button>{count}</button>
+      ) : (
+        <button onClick={useCountDown}>倒计时</button>
+      )}
+    </>
+  );
+};
+```
+
+《使用 React Hooks 声明 setInterval》文章中最后提取出了一个自定义的 hook ，本来我也是想提取出一个自己的 hook。但是我发现，我和参考文章不同的是，我是需要点击触发定时器，这样的话 hook 就不是在函数式组件顶层调用，违背了 hook 的原则。这种情况，死活不知道咋写才能提取出来。请大佬们指路
+
+### updater 方案、useReducer 方案
+
 - updater 方案
+
+```js
+export default () => {
+  const [count, setCount] = useState(5);
+  const [timer, setTimer] = useState(null);
+  const updater = (count) => count - 1;
+  if (count === 0) {
+    timer && clearInterval(timer);
+    timer && setTimer(null);
+  }
+  const useCountDown = () => {
+    const t = setInterval(() => {
+      // 这里取到的 count 永远是 60
+      setCount(updater); //updater 函数体内不可以读取到新的 props
+    }, 1000);
+    setCount(5);
+    setTimer(t);
+  };
+  return (
+    <>
+      {timer ? (
+        <button>{count}</button>
+      ) : (
+        <button onClick={useCountDown}>倒计时</button>
+      )}
+    </>
+  );
+};
+```
+
 - useReducer 方案
 
 ```js
 export default () => {
   const reducer = (state, { type, payload }) => {
     if (type === "deCount") {
-      if (state.count <= 0) {
-        return { timer: null, count: 0 };
-      } else {
-        return { ...state, count: state.count - 1 };
-      }
+      return { ...state, count: state.count - 1 };
     }
     if (type === "createTimer") {
-      return { ...state, timer: payload };
+      return { count: 5, timer: payload };
+    }
+    if (type === "clearTimer") {
+      clearInterval(state.timer);
+      return { count: 0, timer: null };
     }
   };
-  const [state, dispatch] = useReducer(reducer, { count: 60 });
+  const [state, dispatch] = useReducer(reducer, {});
 
+  if (state.count === 0) {
+    state.timer && dispatch({ type: "clearTimer" });
+  }
   const useCountDown = () => {
     const timer = setInterval(() => {
       dispatch({ type: "deCount" });
@@ -386,9 +472,25 @@ export default () => {
 
   return (
     <>
-      <span>{state.count}</span>
-      <button onClick={useCountDown}>倒计时</button>
+      {state.timer ? (
+        <button>{state.count}</button>
+      ) : (
+        <button onClick={useCountDown}>倒计时</button>
+      )}
     </>
   );
 };
 ```
+
+当数据管理多了的时候，并且多个 state 直接相互依赖，useState+updater 的方案不如 useReducer 方案逻辑更加清晰易读。虽然在这个例子上体现不是很明显，但是有一些场景，useReducer 优势体现更明显[比如](https://medium.com/%E6%89%8B%E5%AF%AB%E7%AD%86%E8%A8%98/react-hooks-usestate-vs-usereducer-b14966ad37dd)。
+
+## 参考
+
+[useEffect 指南](https://overreacted.io/a-complete-guide-to-useeffect/)    
+
+[使用 React Hooks 声明 setInterval](https://overreacted.io/making-setinterval-declarative-with-react-hooks/)   
+
+[React-Hook usereducer](https://zh-hans.reactjs.org/docs/hooks-reference.html#usereducer)    
+
+[React-Hook useRef](https://zh-hans.reactjs.org/docs/hooks-reference.html#useref)    
+
