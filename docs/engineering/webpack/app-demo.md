@@ -6,20 +6,18 @@
  * @Description: file content
 -->
 
-# iarrm 插件化
+# 标题没想好
 
 ## 背景
 
-### 需求
+之前工作中遇到过这样的一个项目（下文称之为 iarrm ），需求点如下
 
-1. iarrm 整体是嵌在客户端里面的，客户端有标签(可以理解为几个按钮的组合体)，标签类型有多种，对应多个业务类型，对应多个 iarrm 插件。多个插件要完全独立，单独安装某个插件，该插件就包含了它自己所有的逻辑、资源、数据等等。
+1. 插件化：iarrm 整体是嵌在PC客户端里面的，客户端有标签(可以理解为几个功能按钮的组合体)，标签类型有多种，对应多个业务类型，对应多个 iarrm 插件。多个插件要完全独立，单独安装某个插件，该插件就包含了它自己所有的逻辑、资源、数据等等。
 2. 点击一个标签中的一个按钮，则唤起 web 页面, 相当于浏览器打开一个新的标签页，根据当前标签的类型和点击的按钮，渲染对应的插件和插件中对应的页面。
 3. 要提供一个脚手架给业务中心的人用，当新增标签类型时，尽量少配置，只开发业务就行。
 4. 支持多皮肤，打开客户端之前选择一套皮肤，切换皮肤需要重启客户端。所以每次打开网页其实只会使用一套皮肤，不会出现动态切换。
 
-### 技术基础
-
-webpack、vue
+（公司内部前端工程都是 webpack+vue）
 
 ## 插件化
 
@@ -27,7 +25,8 @@ webpack、vue
 
 1. 根据需求多个插件完全独立，就说明多个插件对应多个 app，也就是多个前端包。但是这些插件对于前端开发来说，大多数的依赖和使用的组件都是相同的（比如人脸插件、人体插件都有用到轮播）。而且标签类型很多。所以每个标签用一个前端工程不好管理，开发效率太低，后期也不好维护。还是要用一个工程输出多个包。
 2. 标签中的每个按钮点击都相当于在浏览器打开一个新的标签页。有两个方案，1 多页应用（每个按钮对应 webpack 中的多页的一个 page），2 单页应用结合路由懒加载（每个按钮对应 vue 的一个 router，结合路由懒加载。）。单页应用的优势就是在一个页面进行前端路由跳转，页面更新快，因为不用发 http 请求通过后端去返回一个新的页面了，转场动画页容易实现。但是对于这个需求来说，每次点击一个按钮都是重新打开一个标签页，无论如何都是发起一次 http 请求了，也不需要转场动画。所以单页应用的优势基本是没有应用到的。所以采用多页应用的形式。
-> 单页应用、多页应用、多个包、路由分割和懒加载详细对比见 SPA-MPA-MB 章节
+   > 单页应用、多页应用、多个包、路由分割和懒加载详细对比见 SPA-MPA-MB 章节
+
 ### how to 1 个工程->N 个包
 
 #### 目录结构(关键部分，不包含任何业务相关的目录)
@@ -82,12 +81,16 @@ const path = require("path");
 const fs = require("fs");
 let pages = {};
 // vue.config.js -- 在生产环境下 ===== start
-// 当前的 process.env.PLUGIN_KEY值是 demo 
+// 当前的 process.env.PLUGIN_KEY值是 demo
 // 读取 src/pages/demo 下面的的所有目录，也就是 home、about
-const pageNameList = fs.readdirSync(path.resolve(__dirname, `src/pages/${process.env.PLUGIN_KEY}`));
+const pageNameList = fs.readdirSync(
+  path.resolve(__dirname, `src/pages/${process.env.PLUGIN_KEY}`)
+);
 // 设置当前plugin所有page下面的main.js为入口，也就是 home、about 目录下的 main.js 为两个入口
 pageNameList.forEach((pageName) => {
-  pages[`${pluginKey}-${pageName}`] = `src/pages/${pluginKey}/${pageName}/main.js`; 
+  pages[
+    `${pluginKey}-${pageName}`
+  ] = `src/pages/${pluginKey}/${pageName}/main.js`;
 });
 // 最后形成的多页面配置项是这样的
 // pages:{
@@ -98,9 +101,13 @@ pageNameList.forEach((pageName) => {
 // vue.config.js -- 在开发环境下 ===== start
 const pluginKeyList = fs.readdirSync(path.resolve(__dirname, `src/pages`));
 pluginKeyList.forEach((pluginKey) => {
-  const pageNameList = fs.readdirSync(path.resolve(__dirname, `src/pages/${pluginKey}`));
+  const pageNameList = fs.readdirSync(
+    path.resolve(__dirname, `src/pages/${pluginKey}`)
+  );
   pageNameList.forEach((pageName) => {
-    pages[`${pluginKey}-${pageName}`] = `src/pages/${pluginKey}/${pageName}/main.js`; //根据pluginKey去配置pages选项
+    pages[
+      `${pluginKey}-${pageName}`
+    ] = `src/pages/${pluginKey}/${pageName}/main.js`; //根据pluginKey去配置pages选项
   });
 });
 // vue.config.js -- 在开发环境下 ===== end
@@ -132,19 +139,23 @@ function setSkin(skin){
 
 ### 目录结构以及使用示例
 
+
 ```code
   src
-  └── skin
-      ├── green
-      |   ├── theme.less # 定义一些主题通用的变量
-      |   ├── demo-vars.less # 定义一些业务相关的变量
-      |   └── index.less # green 主题的主人口
-      ├── blue
-      |   ├── theme.less # 定义一些主题通用的变量
-      |   ├── demo-vars.less # 定义一些业务相关的变量
-      |   └── index.less # blue 主题的主人口
-      └── style
-          └── demo.less # demo 使用对应的业务变量或者直接引用主题变量定义样式
+  ├── main.js
+  ├── ...
+  ├── skin
+  |   ├── green
+  |   |   ├── theme.less # 定义一些主题通用的变量
+  |   |   ├── demo-vars.less # 定义一些业务相关的变量
+  |   |   └── index.less # green 主题的主人口 里面引用了green/theme.less、green/demo-vars.less、style/demo.less
+  |   ├── blue
+  |   |   ├── theme.less # 定义一些主题通用的变量
+  |   |   ├── demo-vars.less # 定义一些业务相关的变量
+  |   |   └── index.less # blue 主题的主人口 blue/theme.blue/demo-vars.less、style/demo.less
+  |   └── style
+  |       └── demo.less # demo 使用对应的业务变量或者直接引用主题变量定义样式
+  └── ...
 
 ```
 
@@ -230,9 +241,11 @@ function setSkin(skin) {
 ```
 
 ## webpack 通用优化
-移步webpack优化章节
+
+移步 webpack 优化章节
 
 ## 规范性方面
+
 > 如何自定义打包后的文件名称？
 
 ### css 文件
