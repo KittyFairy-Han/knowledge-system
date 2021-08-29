@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2021-01-24 11:07:56
  * @LastEditors: your name
- * @LastEditTime: 2021-08-22 18:41:52
+ * @LastEditTime: 2021-08-29 13:53:18
  * @Description: webpack chunk 相关的知识点和实战例子
 -->
 
@@ -29,6 +29,61 @@ webpack 最后输出的文件是 bundle，chunk 是 bundle 的前身。所以划
 
 ## 举个栗子
 
+### entry
+
+每一个入口就会对应的形成一个 chunk。
+
+entry 可以配置为字符串、数组、对象。[详细写法说明](https://webpack.docschina.org/concepts/entry-points/#root)。前两种都是单入口；用对象形式配置的时，是多入口，每个属性就是一个入口。
+
+单页应用 SPA 就采用单入口的配置形式。多页面的应用 MPA 就采用多入口的配置形式。假设我想构建一个多页应用，有两个页面 home 和 about
+
+那么目录结构就可以这样拟定
+
+```code
+  src
+  ├── ...
+  ├── pages
+  |   ├── home
+  |   |    ├── main.js
+  |   |    └── ...
+  |   └── about
+  |        ├── main.js
+  |        └── ...
+  └── ...
+
+```
+
+webpack.config.js 中的配置
+
+```js
+// webpack.config.js
+module.exports = {
+  entry: {
+    home: "./src/pages/home/main.js",
+    about: "./src/pages/about/main.js",
+  },
+};
+```
+最后会对应的输出2个html和2个主要js   
+
+```code
+  dist
+  ├── assets/js
+  |    ├── home.js //home.html 引入的主要js
+  |    └── about.js //about.html 引入的主要js
+  |
+  ├── home.html
+  └── about.html
+
+```
+通过entry去划分chunk的方式，是为了构建MPA，每次不仅js分割出来同时会对应有两个html。 
+> TIPS  
+entry.home、entry.about 可以配置为一个对象，支持的选项与划分 chunk 没关系，所以这里就不介绍了。     
+最后打包生成的目录结构是、目录中文件的名称是 output 选项控制的，这里也不介绍了。  
+
+
+### import()
+
 假设我的目录结构是
 
 ```code
@@ -43,14 +98,6 @@ webpack 最后输出的文件是 bundle，chunk 是 bundle 的前身。所以划
 ```
 
 我想要把每个主题形成一个 chunk
-
-### entry
-
-每一个入口就会对应的形成一个 chunk。
-
-entry 可以配置为字符串、数组、对象。[详细写法说明](https://webpack.docschina.org/concepts/entry-points/#root)。前两种都是单入口，用对象形式配置的时，是多入口，每个属性就是一个入口。
-
-### import()
 
 import() 必须至少包含一些关于模块的路径信息，打包可以限定于一个特定的目录或文件集。也就是说 import(变量/xxx/xxx) 是不允许的，但是 import(常量字符串路径/xxx/xxx) 是允许的。  
 例如， import(`src/skin/${color}.less`) 会把 src/skin 目录中的每个 .less 文件打包到新的 chunk 中。在运行时，计算完变量 color 后，就可以使用像 blue.less 或 green.less 的任何文件。
@@ -73,52 +120,30 @@ function setSkin(skin) {
   ① 'lazy' 每个文件都生成一个独立的懒加载 chunk。blue.less->blue.css,green.less->green.css。懒加载的含义在于，执行 setSkin 的时候才去加载具体的文件。  
   ② 'lazy-once' 只生成一个独立的懒加载 chunk。也就是说 blue.less、green.less 会打包到一个 css 文件中。执行 setSkin 的时候才去加载这个文件。  
   ③ 'eager' 不会生成独立的 chunk。如果 setSkin 这个函数是在 main.js 中定义的，那么 blue.less、green.less 会打包到主包中。
-  
+
   > 与 静态 import 的区别？
   > 对于 less 文件来说和静态的 import 没有区别。但是对于 js 则表现不一样，假设 import() 的是一个 js 文件，那么执行 setSkin 的时候才把该 js 文件的内容执行一遍。
 
-  ④ 'weak' 官网的解释没看懂 o(╥﹏╥)o。自己试验的过程中发现 green.less,blue.less 没有被打包进主包，也没有独立形成 chunk，调用 setSkin 的时候发生了报错。  
-  
-  通过上面的分析 webpackMode = 'lazy' 满足独立分包的需求。默认配置也是 'lazy'。所以这项也可以不配置~  
+  ④ 'weak' 官网的解释没看懂 o(╥﹏╥)o。自己试验的过程中发现 green.less,blue.less 没有被打包进主包，也没有独立形成 chunk，调用 setSkin 的时候发生了报错。
+
+  通过上面的分析 webpackMode = 'lazy' 满足独立分包的需求。默认配置也是 'lazy'。所以这项也可以不配置~
+
+- webpackPrefetch、webpackPreload 与划分 chunk 的关系不大。不论设置 webpackPrefetch 为 true；还是设置 webpackPreload 为 true 都对划分 chunk 没影响，这两项主要是影响文件的加载时机。所以也不用配置，默认是 webpackPrefetch:true。
 
 折腾了半天，其实只需要给 chunk 起个名字就好，其他都用默认的就行啦
 
 ```js
-function setSkin(skin) {
+function setSkin(color) {
   /* webpackChunkName: "global-theme-" */
-  import(`../../skin/${skin}/index.less`);
+  import(`../../skin/${color}/index.less`);
 }
 ```
 
-这样使用后，打包出来两个主题文件，名称为
-
-```js
-function setSkin(name) {
-  //这里就两个皮肤，所以使用了if else，比较多的时候用switch更好一点
-  if (name === "green") {
-    import(
-      /* webpackChunkName: "global-theme-green" */
-      `../../skin/green.less`
-    );
-  } else if (name === "blue") {
-    import(
-      /* webpackChunkName: "global-theme-blue" */
-      `../../skin/blue.less`
-    );
-  } else {
-    import(
-      /* webpackChunkName: "global-theme-blue" */
-      `../../skin/blue/index.less`
-    );
-  }
-}
-// 使用魔法注释为chunk命名,这样打包出来的文件名就是global-theme-green、global-theme-blue、...
-```
-
-打包后两个皮肤文件分别为 global-theme-green.css(绿色主题对应的 css)、global-theme-blue.css (蓝色主题对应的 css)
+这样使用后，打包出来两个主题文件，名称为 global-theme-0.css、global-theme-1.css  
+文件
 
 ```css
-/* global-theme-green.css 绿色主题对应的css */
+/* global-theme-1.css 绿色主题对应的css */
 .demo-home-root {
   background-color: #08ff70;
   border: 5px solid #90ee90;
@@ -126,7 +151,7 @@ function setSkin(name) {
 .demo-home-root:hover {
   background-color: #e6941a;
 }
-/* global-theme-blue.css 蓝色主题对应的css */
+/* global-theme-0.css 蓝色主题对应的css */
 .demo-home-root {
   background-color: #1a68c2;
   border: 5px solid #87ceeb;
@@ -136,14 +161,14 @@ function setSkin(name) {
 }
 ```
 
-打包后,在入口 html 中引用的方式
+在入口 html 中引用的方式
 
 ```html
-<link href=assets/css/global-theme-green.css rel=prefetch> <link
-href=assets/css/global-theme-blue.css rel=prefetch>
+<link href=assets/css/global-theme-green.css rel=prefetch> <link href=assets/css/global-theme-blue.css rel=prefetch>
 ```
 
-分成两个包后，html 初始化时，本身时没有引入主题样式的，当执行 setSkin 函数的时候，浏览器去获取对应的 css 文件内容。
+prefetch 的表现：html 初始化时，本身时没有引入主题样式的，当执行 setSkin 函数的时候，浏览器去加载了对应的 css 文件内容。  
+preload 的表现：html 初始化时，就去加载了 css 文件内容，当执行 setSkin 函数的时候，使对应的 css 文件生效。所以用 preload 可能会浪费一定的请求次数。
 
 ### 配置 optimization.splitchunk.cacheGroup 例子
 
@@ -201,8 +226,8 @@ chainWebpack: (webpackConfig) => {
 #### html 中的引用方式
 
 ```html
-<link href=assets/css/global-themes-blue.css rel=preload as=style> <link
-href=assets/css/global-themes-green.css rel=preload as=style>
+<link href=assets/css/global-themes-blue.css rel=preload as=style> <link href=assets/css/global-themes-green.css
+rel=preload as=style>
 ```
 
 ### 比较
