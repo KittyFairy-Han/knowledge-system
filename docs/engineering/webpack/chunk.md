@@ -11,7 +11,7 @@
 ## 划分 chunk 的意义（why）
 
 先说一个概念 code splitting  
-代码分割（code splitting）和首屏加载优化有紧密的关系，利用 code splitting 的思想把一些首次加载不会用到的代码单独抽离出来，页面首次加载时不去请求这部分代码，进而提高首屏加载的速度。  
+代码分割（code splitting）① 和首屏加载优化有紧密的关系，利用 code splitting 的思想把一些首次加载不会用到的代码单独抽离出来，页面首次加载时不去请求这部分代码，进而提高首屏加载的速度。② 再比如，很多地方都用到了一些相同的代码，并且这个代码体积比较大，这个时候把这部分代码单独抽离出来，就可以减少引用这部分代码的文件的体积。并且单独抽离出文件也可以提高缓存的命中率。  
 那和 chunk 有什么关系呢？  
 webpack 最后输出的文件是 bundle，chunk 是 bundle 的前身。所以划分 chunk 很大程度上决定了最后 bundle 是如何进行 code splitting 输出多个文件的
 
@@ -27,9 +27,7 @@ webpack 最后输出的文件是 bundle，chunk 是 bundle 的前身。所以划
 - 在异步形成的 chunk 中，引用 node_modules 中的代码会产生一个 chunk、
 - 在异步形成的 chunk 中，有公共引用的代码会单独抽出产生一个 chunk
 
-## 举个栗子
-
-### entry
+## entry
 
 每一个入口就会对应的形成一个 chunk。
 
@@ -64,7 +62,8 @@ module.exports = {
   },
 };
 ```
-最后会对应的输出2个html和2个主要js   
+
+最后会对应的输出 2 个 html 和 2 个主要 js
 
 ```code
   dist
@@ -76,15 +75,24 @@ module.exports = {
   └── about.html
 
 ```
-通过entry去划分chunk的方式，是为了构建MPA，每次不仅js分割出来同时会对应有两个html。 
+
+### 小结
+
+通过 entry 去划分 chunk 的方式，是为了构建 MPA，每次不仅 js 分割出来同时会对应有两个 html。
+
 > TIPS  
-entry.home、entry.about 可以配置为一个对象，支持的选项与划分 chunk 没关系，所以这里就不介绍了。     
-最后打包生成的目录结构是、目录中文件的名称是 output 选项控制的，这里也不介绍了。  
+> entry.home、entry.about 可以配置为一个对象，支持的选项与划分 chunk 没关系，所以这里就不介绍了。  
+> 最后打包生成的目录结构是、目录中文件的名称是 output 选项控制的，这里也不介绍了。
 
+## import()
 
-### import()
+import() 一个具体的路径会把该模块静态引入的所有模块一起划分为一个独立的 chunk  
+import() 也可以是固定目录下，不固定的文件。  
+例如， import(`src/skin/${color}.less`) 会把 src/skin 目录中的每个 .less 文件打包到新的 chunk 中。在运行时，计算完变量 color 后，就可以使用像 blue.less 或 green.less 的任何文件。
 
-假设我的目录结构是
+import() 必须至少包含一些关于模块的路径信息，打包可以限定于一个特定的目录或文件集。也就是说 import(变量/xxx/xxx) 是不允许的，但是 import(常量字符串路径/xxx/xxx) 是允许的。
+
+假设我现在有一个多皮肤的需求，每次只需要用到一套皮肤。目录结构如下
 
 ```code
   src
@@ -97,10 +105,7 @@ entry.home、entry.about 可以配置为一个对象，支持的选项与划分 
 
 ```
 
-我想要把每个主题形成一个 chunk
-
-import() 必须至少包含一些关于模块的路径信息，打包可以限定于一个特定的目录或文件集。也就是说 import(变量/xxx/xxx) 是不允许的，但是 import(常量字符串路径/xxx/xxx) 是允许的。  
-例如， import(`src/skin/${color}.less`) 会把 src/skin 目录中的每个 .less 文件打包到新的 chunk 中。在运行时，计算完变量 color 后，就可以使用像 blue.less 或 green.less 的任何文件。
+这种情况就很适合用 import() 把每个主题形成一个 chunk 然后按需(异步)加载
 
 ```js
 function setSkin(skin) {
@@ -164,75 +169,31 @@ function setSkin(color) {
 在入口 html 中引用的方式
 
 ```html
-<link href=assets/css/global-theme-green.css rel=prefetch> <link href=assets/css/global-theme-blue.css rel=prefetch>
+<link href=assets/css/global-theme-green.css rel=prefetch> <link
+href=assets/css/global-theme-blue.css rel=prefetch>
 ```
 
 prefetch 的表现：html 初始化时，本身时没有引入主题样式的，当执行 setSkin 函数的时候，浏览器去加载了对应的 css 文件内容。  
 preload 的表现：html 初始化时，就去加载了 css 文件内容，当执行 setSkin 函数的时候，使对应的 css 文件生效。所以用 preload 可能会浪费一定的请求次数。
 
-### 配置 optimization.splitchunk.cacheGroup 例子
+### 小结
 
-```js
-// pages/demo/home/client-call.js
-function setSkin(skin) {
-  require(`../../skin/${skin}/index.less`);
-}
-// vue.config.js
-chainWebpack: (webpackConfig) => {
-  webpackConfig.optimization.splitChunks({
-    cacheGroups: (() => {
-      let skinsPath = path.resolve(__dirname, "../src/skin");
-      let skinKeyList = fs.readdirSync(skinsPath);
-      skinKeyList = skinKeyList.filter((item) => item != "style"); //动态读取到 src/skin 下的目录
-      let obj = {};
-      for (const skinKey of skinKeyList) {
-        obj[skinKey] = {
-          name: "global-themes-" + skinKey, //最后形成chunk的名称
-          chunks: "initial", //对entry产生的chunk继续分割
-          test: new RegExp(`[\\\\/]src[\\\\/]skin[\\\\/]${skinKey}[\\\\/]`), //匹配对应的目录
-          minSize: 0, //不限制块的大小，只要满足匹配就独立出chunk
-          reuseExistingChunk: true, // 如果当前的 chunk 已被从 split 出来，那么将会直接复用这个 chunk 而不是重新创建一个
-        };
-      }
-      return obj;
-    })(),
-  });
-};
-```
+import() 适用于非多页面，但是想要单独提取出一个异步加载的 chunk 的情景。
 
-打包后两个皮肤文件分别为 global-themes-blue.css、global-themes-green.css
+## optimization.splitchunk
 
-> 文件内容与使用 import() 方式打包出来的一样
+splitchunk 有很多配置项，其中 splitchunk.cacheGroups 的每个属性对应一个 chunk。   
 
-```css
-/* global-themes-green.css */
-.demo-home-root {
-  background-color: #08ff70;
-  border: 5px solid #90ee90;
-}
-.demo-home-root:hover {
-  background-color: #e6941a;
-}
-/* global-themes-blue.css */
-.demo-home-root {
-  background-color: #1a68c2;
-  border: 5px solid #87ceeb;
-}
-.demo-home-root:hover {
-  background-color: #e3e61a;
-}
-```
 
-#### html 中的引用方式
+splitchunk 可以更加细粒度的划分 chunk，可以对 entry 形成的同步 chunk 和 import()形成的异步 chunk，再进行抽离和提取。比如多页面 home、page 都引用了 react，本来入口形成的 chunk 都包含了 react，通过 splitchunk 可以把 react 抽离出来形成一个 chunk，避免重复的代码。  
+optimization.splitchunk 是 webpack4+ 的一个内置插件，专门用来让开发者更细粒度的控制 chunk。（webpack4 之前是 CommonsChunkPlugin）。默认情况下，它只会影响到按需加载的 chunks(也就是通过 import()抽离的异步 chunk)，拆分 chunk 的规则如下：
 
-```html
-<link href=assets/css/global-themes-blue.css rel=preload as=style> <link href=assets/css/global-themes-green.css
-rel=preload as=style>
-```
+1. 新的 chunk 可以被共享，或者模块来自于 node_modules 文件夹
+2. 新的 chunk 体积大于 20kb（在进行 min+gz 之前的体积）
+3. 当按需加载 chunks 时，并行请求的最大数量小于或等于 30
+4. 当加载初始化页面时，并发请求的最大数量小于或等于 30
+5. 当尝试满足 3、4 条件时，最好使用较大的 chunks。
 
-### 比较
 
-这两种方案打包后的差别就在于 html 引用时 rel 属性的值，一个是 prefetch(import 方案)一个是 preload(splitchunks 方案)。他们的差别如下
 
-- preload chunk 会在父 chunk 加载时,以并行方式开始加载。也就是说在加载 主入口形成的 chunk 的同时,浏览器同时请求了两套皮肤文件的内容。
-- prefetch chunk 会用于未来的某个时刻,在浏览器闲置时下载。也就是说在加载 主入口形成的 chunk 的时候,浏览器没有请求两套皮肤文件的内容，当 setSkin 方法调用时,才去请求某一个皮肤文件的内容。
+
