@@ -11,7 +11,7 @@
 ## 划分 chunk 的意义（why）
 
 先说一个概念 code splitting  
-代码分割（code splitting）① 和首屏加载优化有紧密的关系，利用 code splitting 的思想把一些首次加载不会用到的代码单独抽离出来，页面首次加载时不去请求这部分代码，进而提高首屏加载的速度。② 再比如，很多地方都用到了一些相同的代码，并且这个代码体积比较大，这个时候把这部分代码单独抽离出来，就可以减少引用这部分代码的文件的体积。并且单独抽离出文件也可以提高缓存的命中率。  
+代码分割（code splitting）① 和首屏加载优化有紧密的关系，利用 code splitting 的思想把一些首次加载不会用到的代码单独抽离出来，页面首次加载时不去请求这部分代码，进而提高首屏加载的速度。② 再比如，很多业务代码都引入了相同的第三方库，并且这个代码体积比较大，这个时候把这部分代码单独抽离出来，就可以减少入口形成的 chunk 的体积。并且单独抽离出文件也可以提高缓存的命中率。  
 那和 chunk 有什么关系呢？  
 webpack 最后输出的文件是 bundle，chunk 是 bundle 的前身。所以划分 chunk 很大程度上决定了最后 bundle 是如何进行 code splitting 输出多个文件的
 
@@ -182,10 +182,9 @@ import() 适用于非多页面，但是想要单独提取出一个异步加载�
 
 ## optimization.splitchunk
 
-splitchunk 有很多配置项，其中 splitchunk.cacheGroups 的每个属性对应一个 chunk。   
+splitchunk 有很多配置项，其中 splitchunk.cacheGroups 的每个属性对应一个 chunk。
 
-
-splitchunk 可以更加细粒度的划分 chunk，可以对 entry 形成的同步 chunk 和 import()形成的异步 chunk，再进行抽离和提取。比如多页面 home、page 都引用了 react，本来入口形成的 chunk 都包含了 react，通过 splitchunk 可以把 react 抽离出来形成一个 chunk，避免重复的代码。  
+splitchunk 可以更加细粒度的划分 chunk，可以对 entry 形成的同步 chunk 和 import()形成的异步 chunk，再进行抽离和提取。比如多页面 home、page 都引用了 echarts 这种大型的第三方库，本来入口形成的 chunk 都会包含 echarts，通过 splitchunk 可以把 echarts 抽离出来形成一个 chunk，最后输出一个独立的文件。  
 optimization.splitchunk 是 webpack4+ 的一个内置插件，专门用来让开发者更细粒度的控制 chunk。（webpack4 之前是 CommonsChunkPlugin）。默认情况下，它只会影响到按需加载的 chunks(也就是通过 import()抽离的异步 chunk)，拆分 chunk 的规则如下：
 
 1. 新的 chunk 可以被共享，或者模块来自于 node_modules 文件夹
@@ -194,6 +193,58 @@ optimization.splitchunk 是 webpack4+ 的一个内置插件，专门用来让开
 4. 当加载初始化页面时，并发请求的最大数量小于或等于 30
 5. 当尝试满足 3、4 条件时，最好使用较大的 chunks。
 
+```code
+  src
+  ├── ...
+  ├── pages
+  |   ├── home
+  |   |    ├── main.js
+  |   |    ├── ...
+  |   |    └── App.vue （引用了echarts）
+  |   └── about
+  |        ├── main.js
+  |        ├── ...
+  |        └── App.vue （引用了echarts）
+  └── ...
 
+```
+
+所以有了大概的思路
+
+```js
+module.exports = {
+  // ...
+  optimization: {
+    splitChunks: {
+      //... 默认
+      cacheGroups: {
+        //... 默认
+        // 增加
+         echarts: {
+             name: "echartsVendor",
+             chunks: "initial",
+             test: /(echarts)/,
+             priority: 100,
+        },
+      },
+    }
+  // ...
+}
+
+```
+cacheGroup 有很多配置项，但在我实践的过程中只用到 name、chunks、test、priority
+- name 是打包后的文件名。当我们设置 name为echarts-vendor后，打包出来的文件名是echarts-vendor.[hash].js
+- chunks 和 test 共同决定哪些模块会被这个缓存组包括进来最后形成一个 chunk。
+chunks 可以配置为函数或者是三个特定的值（'initial'、'async'、'all'）。
+设置为initial代表这个缓存组只对入口形成的chunk起作用，设置为async只对异步import()形成的chunk起作用，设置为all则可以共享同步和异步的chunk。
+在我们的例子中echarts是通过import静态引入的，所以chunks的值为initial。
+test 值可以是函数或者正则。在chunks限制的范围内，在进行模块名称的匹配。我们就要匹配echarts所以设置为/(echarts)/就行了。
+- priority 这个配置项是用来协调各个缓存组之间的优先级的。  
+默认情况下 webpack 已经内置了两组缓存  
+①是来自node_modules中的模块会独立出一个chunk，这组的优先级是-10。
+②是被重复使用（引用次数>=2）的模块会独立出一个chunk，这组的优先级是-20。  
+就拿echarts来说，它即是来自node_modules又是被重复使用的。如果我们不增加缓存组，它会合并到①的chunk而不会合并到②的chunk，因为①的优先级更高。
+priority 的默认值是 0，大于默认两组的优先级，所以我们不设置这个值，也是可以把 echarts 提取出来的。
+- minChunks 拆分前（该缓存即将形成的chunk被抽离之前）共享的最小chunks数。我们设置了chunks是initial，所以只考虑由entry形成的chunk，有两个home和about，并且这两个里面分别都用了echarts。minchunk设置为1或者2都能达到把chunk单独抽离的目的。
 
 
