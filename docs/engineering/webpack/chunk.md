@@ -8,14 +8,14 @@
 
 # webpack chunk
 
-## 拆分 chunk 的意义（why）
+## 拆分 chunk 的意义
 
 先说一个概念 code splitting  
 代码分割（code splitting）① 和首屏加载优化有紧密的关系，利用 code splitting 的思想把一些首次加载不会用到的代码单独拆分出来，页面首次加载时不去请求这部分代码，进而提高首屏加载的速度。② 再比如，很多业务代码都引入了相同的第三方库，并且这个代码体积比较大，这个时候把这部分代码单独拆分出来，就可以减少入口形成的 chunk 的体积。并且单独拆分出文件也可以提高缓存的命中率。  
 那和 chunk 有什么关系呢？  
 webpack 最后输出的文件是 bundle，chunk 是 bundle 的前身。所以拆分 chunk 很大程度上决定了最后 bundle 是如何进行 code splitting 输出多个文件的
 
-## chunk 来源（how）
+## chunk 来源
 
 1. webpack 配置中的 entry(入口) 选项
 2. import() 按需加载函数
@@ -24,13 +24,13 @@ webpack 最后输出的文件是 bundle，chunk 是 bundle 的前身。所以拆
 
 ### entry
 
-#### 对应关系
+#### 对应关系 🖇️
 
 每一个入口就会对应地形成一个 chunk。
 
 entry 可以配置为字符串、数组、对象。前两种都是单入口；用对象形式配置的时，是多入口，形如 entry:{e1:'入口 1',e2:'入口 2'}。[详细写法说明](https://webpack.docschina.org/concepts/entry-points/#root)。
 
-#### 举例说明
+#### 举例说明 🌰 
 
 为了方便介绍 chunk 与 entry 的对应关系，下面用一个多页应用作为例子。
 
@@ -92,7 +92,7 @@ module.exports = {
 
 ```
 
-#### 小结
+#### 小结 🎀 
 
 每个 entry 会对应形成一个 chunk 最后打包出来对应的 js 和 html。entry 会对应形成 chunk，但是它不是为了拆分 chunk 而生的，它是为了构建多页应用而生的。
 
@@ -101,7 +101,7 @@ module.exports = {
 
 ### import()
 
-#### 对应关系
+#### 对应关系 🖇️
 
 import() 一个具体的路径会把该模块静态引入的所有模块一起拆分为一个独立的 chunk；
 
@@ -110,7 +110,7 @@ import() 也可以是固定目录下，不固定的文件。
 
 import() 必须至少包含一些关于模块的路径信息，打包可以限定于一个特定的目录或文件集。也就是说 import([变量]/xxx/xxx) 是不允许的，但是 import([常量字符串路径]/xxx/xxx) 是允许的。
 
-#### 举例说明
+#### 举例说明 🌰
 
 假设我现在有一个多皮肤的需求，每次只需要用到一套皮肤。目录结构如下
 
@@ -189,14 +189,14 @@ href=assets/css/global-theme-blue.css rel=prefetch>
 prefetch 的表现：html 初始化时，本身时没有引入主题样式的，当执行 setSkin 函数的时候，浏览器去加载了对应的 css 文件内容。  
 preload 的表现：html 初始化时，就去加载了 css 文件内容，当执行 setSkin 函数的时候，使对应的 css 文件生效。所以用 preload 可能会浪费一定的请求次数。
 
-#### 小结
+#### 小结 🎀
 
 import() 会拆分出 chunk，但它是为了按需加载而生的，它也不是专门为了拆分 chunk 而生的。
 
 ### optimization.splitchunk
 
-#### 对应关系
-
+#### 对应关系 🖇️
+ 
 splitchunk 有很多配置项，其中 **splitchunk.cacheGroups 对象中的每一项对应一个 chunk**。
 
 optimization.splitchunk 是 webpack4+ 的一个内置插件。（webpack4 之前是 CommonsChunkPlugin）。  
@@ -204,7 +204,7 @@ splitchunk 可以更加细粒度的拆分 chunk，可以对 entry 形成的同�
 比如多页面应用的场景下， 多个入口都引用了 echarts 这种比较大的第三方库，如果 cacheGroup 对象为空，那么每个入口形成的 chunk 都会包含一份 echarts 的代码。  
 webpack[默认情况](https://webpack.docschina.org/plugins/split-chunks-plugin/#optimizationsplitchunks)下，cacheGroup 已经配置了两个组，但是不作用于入口形成的 chunk。如果是使用 vuecli3 这样的脚手架，它对 splitchunk 又进行了一些修改，它的默认情况(补充说明部分)会把入口 chunk 中的 echarts 和其他的 node_modules 模块一起拆分出来形成一个独立的 chunk。
 
-#### 举例说明
+#### 举例说明 🌰
 
 对于以下的一个多页应用，假设我们想要把 echarts 单独拆分为一个 chunk 进而打包到一个独立的文件该怎么做呢？
 
@@ -363,7 +363,7 @@ module.exports = {
 
 上面提到的 cacheGroup 中的配置项，chunks、maxAsyncRequests、maxInitialRequests、minChunks、minSize ，也可以作为 splitChunks 的配置项进行一个全局配置。当 cacheGroup 中没有配置的时候，就用 splitChunks.xxx 的值。如果 cacheGroup 中配置了，那么就用 cacheGroup 中配置的值。
 
-#### 小结
+#### 小结 🎀
 
 当原始 chunk（entry 形成的、import()形成的),需要再次拆分以便于提取出公共部分或则其他用途就适合派出 splitChunks 啦 !
 
