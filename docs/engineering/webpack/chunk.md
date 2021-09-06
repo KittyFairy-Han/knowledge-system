@@ -30,7 +30,7 @@ webpack 最后输出的文件是 bundle，chunk 是 bundle 的前身。所以拆
 
 entry 可以配置为字符串、数组、对象。前两种都是单入口；用对象形式配置的时，是多入口，形如 entry:{e1:'入口 1',e2:'入口 2'}。[详细写法说明](https://webpack.docschina.org/concepts/entry-points/#root)。
 
-#### 举例说明 🌰 
+#### 举例说明 🌰
 
 为了方便介绍 chunk 与 entry 的对应关系，下面用一个多页应用作为例子。
 
@@ -54,7 +54,7 @@ webpack.config.js 中的配置
 // webpack.config.js
 module.exports = {
   entry: {
-    home: "./src/pages/home/main.js",
+    home: {"./src/pages/home/main.js"},
     about: "./src/pages/about/main.js",
   },
 };
@@ -84,15 +84,18 @@ module.exports = {
 
 ```code
   dist
-  ├── assets //一些其他资源：js、css、图片等
-  ├── home.html //引入 home.js
-  ├── home.js
-  ├── about.html //引入 about.js
-  └── about.js
+  ├── home.html //引入了home.[hash].js
+  ├── about.html //引入了about.[hash].js
+  └── assets
+     ├── js
+     |    ├── home.[hash].js //home入口形成的
+     |    ├── about.[hash].js //about入口形成的
+     |    └── ...
+     └── ...
 
 ```
 
-#### 小结 🎀 
+#### 小结 🎀
 
 每个 entry 会对应形成一个 chunk 最后打包出来对应的 js 和 html。entry 会对应形成 chunk，但是它不是为了拆分 chunk 而生的，它是为了构建多页应用而生的。
 
@@ -196,7 +199,7 @@ import() 会拆分出 chunk，但它是为了按需加载而生的，它也不�
 ### optimization.splitchunk
 
 #### 对应关系 🖇️
- 
+
 splitchunk 有很多配置项，其中 **splitchunk.cacheGroups 对象中的每一项对应一个 chunk**。
 
 optimization.splitchunk 是 webpack4+ 的一个内置插件。（webpack4 之前是 CommonsChunkPlugin）。  
@@ -361,7 +364,43 @@ module.exports = {
 }
 ```
 
-上面提到的 cacheGroup 中的配置项，chunks、maxAsyncRequests、maxInitialRequests、minChunks、minSize ，也可以作为 splitChunks 的配置项进行一个全局配置。当 cacheGroup 中没有配置的时候，就用 splitChunks.xxx 的值。如果 cacheGroup 中配置了，那么就用 cacheGroup 中配置的值。
+上面提到的 cacheGroup 中的配置项，chunks、maxAsyncRequests、maxInitialRequests、minChunks、minSize ，也可以作为 splitChunks 的配置项进行一个全局配置。当 cacheGroup 中没有配置的时候，就用 splitChunks.xxx 的值。如果 cacheGroup 中配置了，那么就用 cacheGroup 中配置的值。  
+自定义拆分 chunk 后要在入口配置一下，这样才能在 html 中正常引入。
+
+```js
+// vue.config.js
+module.exports = {
+  pages: {
+    home: {
+      // page 的入口(相对于项目的根目录)
+      entry: `src/pages/home/main.js`,
+      // 其他配置项...
+      // 与入口js一起加载的
+      chunks: ["chunk-echarts", "chunk-vendors", "chunk-common", "home"], //默认是['chunk-vendors', 'chunk-common', 'index']
+    },
+    about: {
+      // page 的入口(相对于项目的根目录)
+      entry: `src/pages/about/main.js`,
+      // 其他配置项...
+      // 与入口js一起加载的
+      chunks: ["chunk-echarts", "chunk-vendors", "chunk-common", "home"], //默认是['chunk-vendors', 'chunk-common', 'index']
+    },
+  },
+  chainWebpack: (webpackConfig) => {
+    // 其他配置...
+    /* 主动分 chunk */
+    webpackConfig.optimization.splitChunks({
+      cacheGroups: Object.assign(
+        {},
+        defaultCacheGroups,
+        config.customCacheGroups
+      ),
+    });
+  },
+};
+```
+
+打包后 chunk-echarts 会在 dist/assets/js 下。并且会和入口 js 一起在页面启动时就加载。
 
 #### 小结 🎀
 
@@ -390,3 +429,40 @@ module.exports = {
   }
 }
 ```
+
+## 示例使用
+
+[代码地址](https://github.com/KittyFairy-Han/pluggable-MPA/tree/learning/webpack-chunk)
+
+1. 下载到本地
+2. npm i
+3. npm run build_test
+4. 查看 dist 文件夹，打包结果应该是如下这样的：
+
+```code
+  dist
+  ├── home.html
+  ├── about.html
+  └── assets
+     ├── js
+     |    ├── home.[hash].js //home入口形成的
+     |    ├── about.[hash].js //about入口形成的
+     |    ├── chunk-echarts.[hash].js //通过splitchunk对echarts进行了拆分，独立出一个文件
+     |    ├── chunk-vendors.[hash].js //splitchunk默认配置下，node_modules中的模块独立出一个文件
+     |    ├── app-theme-0.[hash].js //配合app-theme-0.css
+     |    └── app-theme-1.[hash].js //配合app-theme-1.css
+     └── css
+          ├── home.css //webpack默认配置会把入口js中的css代码单独拆分出一个css文件
+          ├── about.css //webpack默认配置会把入口js中的css代码单独拆分出一个css文件
+          ├── app-theme-0.css //通过import()动态引入主题文件，产生了一个独立的异步加载文件
+          └── app-theme-1.css //通过import()动态引入主题文件，产生了一个独立的异步加载文件
+```
+
+3. 本地打开 home.html、about.html。能够正常启动。
+   ![home页面](./static/home-init.png)
+   ![about页面](./static/about-init.png)
+4. home 页面，浏览器控制台执行 setSkin('green')。能够应用绿色主题
+   ![home页面应用主题](./static/home-theme.png)
+
+## 参考文档
+[webpack](https://webpack.js.org/)   
