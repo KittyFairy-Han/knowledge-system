@@ -14,7 +14,7 @@
    例如，安装了人脸插件的客户端，就携带有查看人脸抓拍历史、人脸实时抓拍情况、人脸数据统计图等功能。当点击人脸标签上的人脸历史按钮时，就打开人脸历史的 web 页面，使用其中的功能。
    ![f1](./static/app-demo-f1.png)
 
-2. 支持多皮肤。客户端唤起网页时，通知 web 当前使用的主题，web 全局应用该主题。
+2. 支持多主题。客户端唤起网页时，通知 web 当前使用的主题，web 全局应用该主题。
    ![f2](./static/app-demo-f2.png)
 
 3. 要提供一个脚手架（公司内部前端工程都是 webpack+vue）给分公司，当新增标签类型时，尽量能够复用组件，只开发业务。
@@ -163,18 +163,19 @@ module.exports = {
 ![打包demo录屏](./static/app-demo-flow_demo.gif)
 
 那如果 npm run build 是怎样的呢，看图就知道啦  
-![打包录屏](./static/app-demo-flow_all.gif) 
+![打包录屏](./static/app-demo-flow_all.gif)
 
-直接打开html文件
-![运行录屏](./static/app-demo-flow_prod.gif) 
+直接打开 html 文件
+![运行录屏](./static/app-demo-flow_prod.gif)
 
 结果就是依次启动两次打包流程，相当于  
 ① 手动 npm run build:demo 输出文件后。  
-② 然后再手动 npm run build:other 输出文件。  
+② 然后再手动 npm run build:other 输出文件。
 
 以上已经能达到插件化的基本需求，对于生产环境来说没什么问题。但是对于开发环境下可能会不太方便，我们可能需要同时开发多个插件的多个页面。  
-开发环境下我们就不分插件，让apps下面的所有page都参与打包。所以我们需要修改一下pages配置项，其他配置项不变。
-``` js
+开发环境下我们就不分插件，让 apps 下面的所有 page 都参与打包。所以我们需要修改一下 pages 配置项，其他配置项不变。
+
+```js
 const pages = {
   demoHome: {
     entry: `src/apps/demo/home/main.js`, // page 的入口(相对于项目的根目录)
@@ -202,77 +203,63 @@ module.exports = {
 可以正常运行
 ![dev环境](./static/app-demo-flow_dev.gif)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-```js
-const path = require("path");
-const fs = require("fs");
-let pages = {};
-// vue.config.js -- 在生产环境下 ===== start
-// 当前的 process.env.PLUGIN_KEY值是 demo
-// 读取 src/pages/demo 下面的的所有目录，也就是 home、about
-const pageNameList = fs.readdirSync(path.resolve(__dirname, `src/pages/${process.env.PLUGIN_KEY}`));
-// 设置当前plugin所有page下面的main.js为入口，也就是 home、about 目录下的 main.js 为两个入口
-pageNameList.forEach((pageName) => {
-  pages[`${pluginKey}-${pageName}`] = `src/pages/${pluginKey}/${pageName}/main.js`;
-});
-// 最后形成的多页面配置项是这样的
-// pages:{
-//   "demo-home":"src/pages/demo/home/main.js",
-//   "demo-about":"src/pages/demo/about/main.js"
-// }
-// vue.config.js -- 在生产环境下 ===== end
-// vue.config.js -- 在开发环境下 ===== start
-const pluginKeyList = fs.readdirSync(path.resolve(__dirname, `src/pages`));
-pluginKeyList.forEach((pluginKey) => {
-  const pageNameList = fs.readdirSync(path.resolve(__dirname, `src/pages/${pluginKey}`));
-  pageNameList.forEach((pageName) => {
-    pages[`${pluginKey}-${pageName}`] = `src/pages/${pluginKey}/${pageName}/main.js`; //根据pluginKey去配置pages选项
-  });
-});
-// vue.config.js -- 在开发环境下 ===== end
-module.exports.pages = pages;
-```
-
-process.env.PLUGIN_KEY 拿到命令行中 PLUGIN_KEY=xxx 的 xxx。然后根据 process.env.PLUGIN_KEY 去 pages 对应的目录下找 main.js,配置 vue.config.js 中的 pages 选项。在开发环境下，是没有 process.env.PLUGIN_KEY 的，那么就是把 pages 下所有目录中的 main.js 都找到配置 vue.config.js 中的 pages 选项。
-
 ## 与客户端通信
 
-在 window 上注册一个方法供客户端调用，通过客户端传参设置皮肤等信息
+在这个项目中，通信这个功能，主要是客户端向 web 传达一些信息，web 是不需要主动调用客户端的功能的。所以只要弄明白 client 如何调用 js 就行了。  
+其实 client->js 已经有了成熟的技术方案，前端需要做的就是在 window 上注册一个方法，client 调用这个方法进行一些信息的传达。  
+每个页面功能不同，但都会传达的一个信息就是当前使用的主题，所以我们就以传递主题信息为例子。
 
 ```js
-// pages/demo/home/client-call.js
+// apps/demo/home/main.js
 window.clientCallJs = function(params) {
-  {skin,data} = JSON.parse(params);
-  if (!(skin && data)) {
-    console.error("客户端传参不完整");
-  }
+  {skin} = JSON.parse(params);
   setSkin(skin)
 };
 function setSkin(skin){
-  // 设置皮肤
+  // 设置主题
   // 下面小节将补充这个函数
 }
 ```
 
-## 换肤功能
+这样，当客户端调用 clientCallJs 方法时，就会进入 js 内部的逻辑。我们根据 params 传参去做一些后续的事情。
 
-根据需求，多套皮肤每次需要根据客户端传参来决定使用其中的一套，也就是说可能有 5 套皮肤代码，但是其实浏览器中只需要用到 1/5。所以 5 套皮肤需要分 5 个文件，每次去加载其中 1 个文件，这样才合理。 如果全部都在一份文件中，那么一份文件体积过大，且实际用到的只是很小一部分，会造成浪费。在 webpack 中，最后的产生的文件都来源于 chunk，所以分文件就要知道怎么分 chunk。
+## 多主题功能
+
+### 基本思路
+
+结合这个项目的特点，多主题每次只会应用其中的一种，不需要在线换肤。所以采用的技术方案是，把多个主题分包，根据客户端传参去加载对应的文件，其他主题包不会用到，不需要去加载避免浪费资源。  
+这里的关键点是分包，分包的方式有多种，[可以查看这篇文章：webpack chunk](https://juejin.cn/post/7004790532916379655)。结合这个项目的需求，采用 import() 函数这种分包方式，达到拆分和异步加载的目的。
+假设 demo 插件有两种色系的主题，蓝色和绿色。以demo-home页面为例子，源码目录大概就是这样的：
+
+```
+project
+  └── ....
+      ├── demo
+      |   ├── home
+      |   |   ├──main.js
+      |   |   ├──themes
+      |   |   |   ├──blue.less      //home页面蓝色主题样式定义在这里
+      |   |   |   └──green.less     //home页面蓝色主题样式定义在这里
+      |   |   └──App.vue
+      |   └── ...
+      └── ....
+```
+
+引入皮肤的代码雏形大概就是这样的
+
+```js
+// apps/demo/home/main.js
+function setSkin(skin) {
+  /* webpackChunkName: "themes-" */
+  import(`./themes/${skin}.less`);
+}
+```
+
+为了后面更加方便的介绍。我把 App.vue、blue.less、green.less 的代码贴一下
+``` vue
+
+```
+
 
 ### 目录结构以及使用示例
 
@@ -347,15 +334,15 @@ function setSkin(skin){
 #### 写法
 
 ```js
-// pages/demo/home/client-call.js
+// apps/demo/home/main.js
 function setSkin(skin) {
-  /* webpackChunkName: "global-themes" */
-  import(`../../skin/${skin}/index.less`);
+  /* webpackChunkName: "global-themes-" */
+  import(`./themes/${skin}.less`);
 }
 // 使用魔法注释为chunk命名,这样打包出来的文件名就是global-themes0、global-themes1、...
 ```
 
-#### 打包后两个皮肤文件分别为 global-themes0.css(绿色主题对应的 css)、global-themes1.css (蓝色主题对应的 css)
+#### 打包后两个主题文件分别为 global-themes0.css(绿色主题对应的 css)、global-themes1.css (蓝色主题对应的 css)
 
 ```css
 /* global-themes0.css 绿色主题对应的css */
@@ -376,60 +363,44 @@ function setSkin(skin) {
 }
 ```
 
-## webpack 通用优化
-
-移步 webpack 优化章节
-
-## 规范性方面
-
-> 如何自定义打包后的文件名称？
-
-### css 文件
-
-通过上文知道 css 文件就两种，一个是通过主入口 js 提取出来的 css，一个是异步 css。在 vue.config.js 中，前者命名配置 css.extract 选项，后者可以通过魔法注释。
-
-#### 如果是异步 import 产生的 chunk
-
-[webpack 魔法注释](https://webpack.docschina.org/api/module-methods/#magic-comments)
+##
 
 ```js
-// src/pages/demo/home/main.js
-// 就拿换肤那段代码举例子，可以这样写
-import(
-  /* webpackChunkName: "global-themes" */
-  `../../skin/${params.tag}/index.less`
+const path = require("path");
+const fs = require("fs");
+let pages = {};
+// vue.config.js -- 在生产环境下 ===== start
+// 当前的 process.env.PLUGIN_KEY值是 demo
+// 读取 src/pages/demo 下面的的所有目录，也就是 home、about
+const pageNameList = fs.readdirSync(
+  path.resolve(__dirname, `src/pages/${process.env.PLUGIN_KEY}`)
 );
+// 设置当前plugin所有page下面的main.js为入口，也就是 home、about 目录下的 main.js 为两个入口
+pageNameList.forEach((pageName) => {
+  pages[
+    `${pluginKey}-${pageName}`
+  ] = `src/pages/${pluginKey}/${pageName}/main.js`;
+});
+// 最后形成的多页面配置项是这样的
+// pages:{
+//   "demo-home":"src/pages/demo/home/main.js",
+//   "demo-about":"src/pages/demo/about/main.js"
+// }
+// vue.config.js -- 在生产环境下 ===== end
+// vue.config.js -- 在开发环境下 ===== start
+const pluginKeyList = fs.readdirSync(path.resolve(__dirname, `src/pages`));
+pluginKeyList.forEach((pluginKey) => {
+  const pageNameList = fs.readdirSync(
+    path.resolve(__dirname, `src/pages/${pluginKey}`)
+  );
+  pageNameList.forEach((pageName) => {
+    pages[
+      `${pluginKey}-${pageName}`
+    ] = `src/pages/${pluginKey}/${pageName}/main.js`; //根据pluginKey去配置pages选项
+  });
+});
+// vue.config.js -- 在开发环境下 ===== end
+module.exports.pages = pages;
 ```
 
-输出 global-themes0.css、global-themes1.css
-
-#### css.extract 的配置
-
-```js
-// vue.config.js
-module.exports.css.extract = {
-  // 入口js生成的chunk中提取出的css后，为css文件命名
-  // [name] 就是入口的key，src/pages/demo/home/main.js 配置pages选项的时候key是demo-home
-  filename: `assets/css/[name].css`,
-  // 非入口文件生成chunk后，设置css文件名。
-  // 该项目中，非入口文件生成的css就是异步引入皮肤样式代码产生的，
-  // 在import()时使用了魔法注释，形成chunk时，名称就是遵照魔法注释来的，
-  // 我们希望最后生成的文件名与形成 chunk 时一致，所以仍然是 "assets/css/[name].css"
-  // 如果这一项不配置则会取 filename 的值，所以我们得配置为默认的 "assets/css/[name].css"
-  chunkFilename: `assets/css/[name].css`,
-};
-```
-
-输出 demo-home.css
-
-### js 文件
-
-通过上文，没有配置特定的插件，没有使用 splitChunk，输出的 js 来源也是只有两种，一个是主入口形成的，一个是懒加载的。懒加载的同 css 使用魔法注释。来源于主入口的可以通过配置 webpack 原生的 output 选项。
-
-```js
-//vue.config.js
-module.exports.chainWebapck = (config) => {
-  // [name] 就是入口的key，src/pages/demo/home/main.js 配置pages选项的时候key是demo-home
-  config.output.filename(`assets/js/[name].js`).end();
-};
-```
+process.env.PLUGIN_KEY 拿到命令行中 PLUGIN_KEY=xxx 的 xxx。然后根据 process.env.PLUGIN_KEY 去 pages 对应的目录下找 main.js,配置 vue.config.js 中的 pages 选项。在开发环境下，是没有 process.env.PLUGIN_KEY 的，那么就是把 pages 下所有目录中的 main.js 都找到配置 vue.config.js 中的 pages 选项。
