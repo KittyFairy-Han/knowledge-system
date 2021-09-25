@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 17:36:39
  * @LastEditors: your name
- * @LastEditTime: 2021-07-25 17:41:44
+ * @LastEditTime: 2021-09-25 11:18:44
  * @Description: file content
  */
 
@@ -130,7 +130,7 @@ module.exports = {
             ["/engineering/webpack/chunk","chunk"],
             ["/engineering/webpack/SPA-MPA-MB","SPA-MPA-MB"],
             ["/engineering/webpack/optimization","优化"],
-            ["/engineering/webpack/app-demo","经验案例-iarrm插件化"]
+            ["/engineering/webpack/pluggable","one-project-to-multiple-app"]
           ],
         },
       ],
