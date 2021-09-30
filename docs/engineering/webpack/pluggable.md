@@ -334,4 +334,4 @@ module.exports = {
 };
 ```
 ## 资料
-[完整的代码在这里](https://github.com/KittyFairy-Han/study-demos)
+[完整的代码在这里](https://github.com/KittyFairy-Han/pluggable-MPA/tree/learning/multiple-MPA)
