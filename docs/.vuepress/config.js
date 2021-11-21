@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 17:36:39
  * @LastEditors: your name
- * @LastEditTime: 2021-09-25 11:18:44
+ * @LastEditTime: 2021-11-21 17:18:38
  * @Description: file content
  */
 
@@ -109,6 +109,7 @@ module.exports = {
             ["/engineering/Vue/use", "使用"],
             ["/engineering/Vue/principle", "原理"],
             ["/engineering/Vue/Vue3", "Vue3"],
+            ["/engineering/Vue/how-about-Vue3", "how-about-Vue3"],
           ],
         },
         {
