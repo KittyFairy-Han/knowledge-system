@@ -49,72 +49,17 @@ Object.defineProperty 只能劫持对象的属性, 所以在 Vue.js 2.x 中，�
 Proxy 是对象层的劫持，在 Vue.js 3.x 中，初始化一个响应式数据时不会直接进行深层递归调用，**递归调用是发生在 getter 的时候**，也就是说只有属性被使用了才会进一步的深层调用。这其实是一种延时定义子对象响应式的实现，在性能上会有一定的提升。
 ![vue3 数据劫持](./static/proxy_vue3.png)
 
-### 更新（依赖跟踪速度提升约 40%（更高效的 ref 实现（读取速度提升约 260%，写入速度提升约 50%）
+### 更新
+
+（依赖跟踪速度提升约 40%（更高效的 ref 实现（读取速度提升约 260%，写入速度提升约 50%）
 
 #### 响应式
+
 https://juejin.cn/post/7034880625047765000、https://segmentfault.com/a/1190000040163047
 
-#### vdom diff 静态标记
+#### template 预字符串化
 
-（https://juejin.cn/post/6844904134647234568、https://www.cnblogs.com/smart-elwin/p/15269299.html）
-（https://github.com/vuejs/rfcs/issues/89）
-
-diff 算法增加
-HOISTED = -1, // 特殊标志是负整数表示永远不会用作 diff
-举例
-
-```vue
-<span>你好</span>
-<div>{{ message }}</div>
-```
-
-没有静态标记之前
-
-```js
-export function render(...args) {
-  return (
-    _openBlock(),
-    _createBlock(
-      ...args,
-      [
-        _createVNode("span", null, "你好"),
-        _createVNode("div", null, _toDisplayString(_ctx.message), 1 /* TEXT */),
-      ],
-      64 /* STABLE_FRAGMENT */
-    )
-  );
-}
-```
-
-做了静态提升之后
-
-```js
-const _hoisted_1 = /*#__PURE__*/ _createVNode(
-  "span",
-  null,
-  "你好",
-  -1 /* HOISTED */
-);
-
-export function render(...args) {
-  return (
-    _openBlock(),
-    _createBlock(
-      ...args,
-      [
-        _hoisted_1,
-        _createVNode("div", null, _toDisplayString(_ctx.message), 1 /* TEXT */),
-      ],
-      64 /* STABLE_FRAGMENT */
-    )
-  );
-}
-```
-
-静态内容\_hoisted_1 被放置在 render 函数外，每次渲染的时候只要取 \_hoisted_1 即可
-同时 \_hoisted_1 被打上了 PatchFlag ，静态标记值为 -1 ，特殊标志是负整数表示永远不会用于 Diff
-
-template 预字符串化 vdom 节点数量减少，结构会简单
+vdom 节点数量减少，结构会简单。
 举例
 
 ```vue
@@ -137,6 +82,74 @@ template 预字符串化 vdom 节点数量减少，结构会简单
 
 除了 span 元素是动态元素之外，其余都是静态节点。 vue3 模板编译的时候会去识别动/静比例，当遇到大量连续的静态内容时，会直接将他编译为一个普通的字符串节点。  
 diff 算法由双端对比升级成最长递增子序列。属于 vue2.x 的双端对比和 react 的递增法的结合。
+
+#### vdom 静态标记与静态提升
+
+（https://juejin.cn/post/6844904134647234568、https://www.cnblogs.com/smart-elwin/p/15269299.html）
+（https://github.com/vuejs/rfcs/issues/89）
+
+diff 算法增加 HOISTED = -1， 特殊标志是负整数表示永远不会用作 diff  
+用下面的代码举例
+
+```vue
+<template>
+  <span>你好</span>
+  <div>{{ message }}</div>
+</template>
+```
+
+没有静态标记之前，vdom 全量 diff，即使是静态节点也会走一遍 \_createVNode
+
+![vue2 diff](./static/diff_vdom_vue2.png)
+
+<!-- ```js
+export function render(...args) {
+  return (
+    _openBlock(),
+    _createBlock(
+      ...args,
+      [
+        _createVNode("span", null, "你好"),
+        _createVNode("div", null, _toDisplayString(_ctx.message), 1 /* TEXT */),
+      ],
+      64 /* STABLE_FRAGMENT */
+    )
+  );
+}
+``` -->
+
+① PatchFlag = -1 表示永远不会用于 Diff。 在创建 vnode 的时候，会根据 vnode 的内容是否可以变化，为其添加静态标记 PatchFlag。 PatchFlag = -1 永远不会用于 Diff。  
+![vue3 diff](./static/vdom_vue3.png)
+② 做了静态提升之后，直接引用。静态内容\_hoisted_1 被放置在 render 函数外，每次渲染的时候只要取 \_hoisted_1 即可  
+![vue3 diff](./static/diff_vdom_vue3.png)
+
+<!-- ```js
+const _hoisted_1 = /*#__PURE__*/ _createVNode(
+  "span",
+  null,
+  "你好",
+  -1 /* HOISTED */
+);
+
+export function render(...args) {
+  return (
+    _openBlock(),
+    _createBlock(
+      ...args,
+      [
+        _hoisted_1,
+        _createVNode("div", null, _toDisplayString(_ctx.message), 1 /* TEXT */),
+      ],
+      64 /* STABLE_FRAGMENT */
+    )
+  );
+}
+``` -->
+React走了另外一条路，既然主要问题是diff导致卡顿，于是React走了类似cpu调度的逻辑，把vdom这棵树，微观变成了链表，利用浏览器的空闲时间来做diff，如果超过了16ms，有动画或者用户交互的任务，就把主进程控制权还给浏览器，等空闲了继续，特别像等待女神的备胎
+![vue3 diff](./static/vdom_react.png)
+diff的逻辑，变成了单向的链表，任何时候主线程女神有空了，我们在继续蹭上去接盘做diff，大家研究下requestIdleCallback就知道，从浏览器角度看 是这样的
+![vue3 diff](./static/vdom_react2.png)
+#### diff 算法内部优化
 
 ## 内存（内存使用量减少约 17%
 
