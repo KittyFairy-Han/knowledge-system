@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2021-11-21 15:42:21
  * @LastEditors: your name
- * @LastEditTime: 2021-11-21 21:49:21
+ * @LastEditTime: 2021-11-28 23:00:18
  * @Description: vue3 好在哪里
 -->
 
@@ -59,10 +59,12 @@ https://juejin.cn/post/7034880625047765000、https://segmentfault.com/a/11900000
 
 #### template 预字符串化
 
-vdom 节点数量减少，结构会简单。
-举例
+通过 template 预字符串化 vdom 节点数量减少，结构变得简单，遍历时间缩短。  
+举例说明什么是 template 预字符串化  
 
-```vue
+![template与字符串化](./static/template_stringfy.png)
+
+<!-- ```vue
 <div class="menu-bar-container">
     <div class="logo">
       <h1>介绍</h1>
@@ -77,16 +79,17 @@ vdom 节点数量减少，结构会简单。
   </div>
 <div class="user">
     <span>{{user.name}}</span>
-  </div>
+</div>
 ```
+ -->
 
 除了 span 元素是动态元素之外，其余都是静态节点。 vue3 模板编译的时候会去识别动/静比例，当遇到大量连续的静态内容时，会直接将他编译为一个普通的字符串节点。  
-diff 算法由双端对比升级成最长递增子序列。属于 vue2.x 的双端对比和 react 的递增法的结合。
+
 
 #### vdom 静态标记与静态提升
 
-（https://juejin.cn/post/6844904134647234568、https://www.cnblogs.com/smart-elwin/p/15269299.html）
-（https://github.com/vuejs/rfcs/issues/89）
+（https://juejin.cn/post/6844904134647234568）
+
 
 diff 算法增加 HOISTED = -1， 特殊标志是负整数表示永远不会用作 diff  
 用下面的代码举例
@@ -145,12 +148,36 @@ export function render(...args) {
   );
 }
 ``` -->
+
+#### diff 算法内部优化
+diff 算法由双端对比升级成最长递增子序列。属于 vue2.x 的双端对比和 react 的递增法的结合。
+#### 对比 React Fiber
+（https://github.com/vuejs/rfcs/issues/89）
 React走了另外一条路，既然主要问题是diff导致卡顿，于是React走了类似cpu调度的逻辑，把vdom这棵树，微观变成了链表，利用浏览器的空闲时间来做diff，如果超过了16ms，有动画或者用户交互的任务，就把主进程控制权还给浏览器，等空闲了继续，特别像等待女神的备胎
 ![vue3 diff](./static/vdom_react.png)
 diff的逻辑，变成了单向的链表，任何时候主线程女神有空了，我们在继续蹭上去接盘做diff，大家研究下requestIdleCallback就知道，从浏览器角度看 是这样的
 ![vue3 diff](./static/vdom_react2.png)
-#### diff 算法内部优化
+React只是一个'JavaScript'，同时只能做一件事情，这个和 DOS 的单任务操作系统一样的，事情只能一件一件的干。要是前面有一个傻叉任务长期霸占CPU，后面什么事情都干不了，浏览器会呈现卡死的状态，这样的用户体验就会非常差。
 
+对于’前端框架‘来说，解决这种问题有三个方向:
+
+1️⃣ 优化每个任务，让它有多快就多快。挤压CPU运算量
+2️⃣ 快速响应用户，让用户觉得够快，不能阻塞用户的交互
+Vue 选择的是第1️⃣, 因为对于Vue来说，使用模板让它有了很多优化的空间，配合响应式机制可以让Vue可以精确地进行节点更新, 读者可以去看一下今年Vue Conf 尤雨溪的演讲，非常棒!；而 React 选择了2️⃣ 。对于Worker 多线程渲染方案也有人尝试，要保证状态和视图的一致性相当麻烦。
+
+在这里面 React 会递归比对VirtualDOM树，找出需要变动的节点，然后同步更新它们, 一气呵成。这个过程 React 称为 Reconcilation(中文可以译为协调).
+
+在 Reconcilation 期间，React 会霸占着浏览器资源，一则会导致用户触发的事件得不到响应, 二则会导致掉帧，用户可以感知到这些卡顿
+
+React 的 Reconcilation 是CPU密集型的操作, 它就相当于我们上面说的’长进程‘。所以初衷和进程调度一样，我们要让高优先级的进程或者短进程优先运行，不能让长进程长期霸占资源。
+🔴所以 React 通过Fiber 架构，让自己的Reconcilation 过程变成可被中断。 '适时'地让出CPU执行权，除了可以让浏览器及时地响应用户的交互，还有其他好处:
+
+但是它肯定不是完美的，因为浏览器无法实现抢占式调度，无法阻止开发者做傻事的，开发者可以随心所欲，想挖多大的坑，就挖多大的坑。
+为了共同创造美好的世界，我们要严律于己，该做的优化还需要做: 纯组件、虚表、简化组件、缓存...
+
+尤雨溪在今年的Vue Conf一个观点让我印象深刻：如果我们可以把更新做得足够快的话，理论上就不需要时间分片了。
+
+时间分片并没有降低整体的工作量，该做的还是要做, 因此React 也在考虑利用CPU空闲或者I/O空闲期间做一些预渲染。所以跟尤雨溪说的一样：React Fiber 本质上是为了解决 React 更新低效率的问题，不要期望 Fiber 能给你现有应用带来质的提升, 如果性能问题是自己造成的，自己的锅还是得自己背.
 ## 内存（内存使用量减少约 17%
 
 vue 的 hook 得益于 setup 只运行一次
