@@ -7,20 +7,23 @@
 -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>web 3d</title>
     <style>
-        main{
+        main {
             perspective: 800px;
-            perspective-origin: 50% 50%; 
+            perspective-origin: 50% 50%;
             width: 800px;
             height: 800px;
             position: relative;
+            transform-style: preserve-3d;
         }
-        div{
+
+        div {
             width: 400px;
             height: 400px;
             transform-style: preserve-3d;
@@ -29,39 +32,45 @@
             top: 200px;
             left: 200px;
         }
-        .in{
+
+        .in {
             background-color: lightcoral;
-            transform: translateZ(-800px);
-        }
-        .out{
-            background-color:skyblue;
-            transform:perspective(400px);
-            opacity: 0.3;
-        }
-        .left{
-            background-color: sandybrown;
-            transform: translateZ(-800px) rotateY(-90deg);
-            transform-origin: left;
-        }
-        .right{
-            background-color: yellow;
-            transform-origin: right;
-            transform: translateZ(-800px) rotateY(90deg);
-        }
-        .top{
-            background-color: rgb(0, 255, 98);
-            transform-origin: top;
-            transform: translateZ(-800px) rotateX(90deg);
-        }
-        .bottom{
-            background-color: turquoise;
-            transform-origin: bottom;
-            transform: translateZ(-800px) rotateX(-90deg);
-            
+            transform: rotateY(180deg) translateZ(400px);
         }
 
+        .out {
+            background-color: skyblue;
+            opacity: 0.3;
+            transform: rotateY(0deg) translateZ(400px);
+        }
+
+        .left {
+            background-color: sandybrown;
+            transform: rotateY(90deg) translateZ(400px);
+            transform-origin: left;
+        }
+
+        .right {
+            background-color: yellow;
+            transform-origin: right;
+            transform: rotateY(-90deg) translateZ(400px);
+        }
+
+        .top {
+            background-color: rgb(0, 255, 98);
+            transform-origin: top;
+            transform: rotateX(-90deg) translateZ(400px);
+        }
+
+        .bottom {
+            background-color: turquoise;
+            transform-origin: bottom;
+            transform: rotateX(90deg) translateZ(400px);
+
+        }
     </style>
 </head>
+
 <body>
     <main>
         <div class="in"></div>
