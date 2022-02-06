@@ -2,7 +2,7 @@
  * @Author: 鱼小柔
  * @Date: 2020-11-07 17:36:39
  * @LastEditors: your name
- * @LastEditTime: 2021-11-21 17:18:38
+ * @LastEditTime: 2022-02-05 13:29:58
  * @Description: file content
  */
 
@@ -145,6 +145,7 @@ module.exports = {
       ],
       "/scene/":[
         ["/scene/lottieUsage", "lottie的应用场景"],
+        ["/scene/screenshoots","前端截屏方案"]
       ],
     },
   },
