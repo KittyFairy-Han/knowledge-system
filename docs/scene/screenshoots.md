@@ -8,7 +8,9 @@
 
 ## 说在前面
 
-工作需求，以海报形式分享，本质就是 html 转换为图片。就前端而言有两种技术技术（见原理方案）,当时采用了使用最广泛的库 html2canvas。实际应用到业务时候踩了很多坑，在寻找解决方案的过程中发现问题其实可以归类，几个问题可能都是由于一个原因引起的，依赖于库的实现原理。所以又去系统的了解了 html 转换为图片的原理，了解原理后遇到新的问题也许就有了解决方向。所以本文会对原理进行概述，并且给出 checklist，希望能够帮看到文章的你少走一点弯路。
+工作需求，以海报形式分享，本质就是 html 转换为图片。就前端而言有两种技术技术（见原理方案）,当时采用了使用最广泛的库 html2canvas。实际应用到业务时候踩了很多坑，在探究原因过程中了解到一些原理，了解原理的好处是培养举一反三的能力，便于以后遇到新的问题也有一个尝试的方向。  
+所以本文会对原理进行概述，对实践过的 js 截图库给出 checklist，希望能够帮看到文章的你少走一点弯路。  
+js 截屏的坑太多，可能这篇涉及的还是很片面 o(╥﹏╥)o，所以希望可以和大家一起总结、探讨和进步哦~
 
 ## 原理方案
 
@@ -176,11 +178,18 @@ htmlToImage 提供的多个方法返回对应格式的图片。例如 htmlToImag
    - return canvas
 6. 利用 canvas 相关 API 转换为各种格式的图片或者图片二进制数据等
 
-### 使用 html-to-image 时的 checklist
 
-#### 资源加载
-资源加载完毕后再调用 htmlToImage.xxx，同理方案(一)。
-#### 跨域
+
+### 优势
+
+使用 html-to-image 时也要注意资源加载结束后再调用 htmlToImage.toxxx。  
+笔者做需求时是使用 html2Canvas，对 html-to-image 的实践经验较少。但在需求结束后，系统学习截屏方案时也试用了 html-to-image 和 dom-to-image，并且也对比了使用三个库输出图片的效果。  
+![对比](./static/screenshots-result-vs.png)
+目前，比较推荐 html-to-image，优点:
+
+- 流程顺畅没有踩坑
+- 不需要自己写 canvas 到 image 的步骤
+- 清晰度足够
 
 ## puppter
 
@@ -218,7 +227,7 @@ puppeteer 是谷歌官方出品的一个通过 DevTools 协议控制 headless Ch
 ## 参考
 
 [github·html-to-canvas](https://github.com/niklasvh/html2canvas)  
-这篇超赞!❥(^_-)[云音乐·高质量前端快照](https://segmentfault.com/a/1190000021275782)  
+这篇超赞!❥(^\_-)[云音乐·高质量前端快照](https://segmentfault.com/a/1190000021275782)  
 [github·html-to-image](https://github.com/bubkoo/html-to-image/)  
 [npmtrends](https://www.npmtrends.com/dom-to-image-vs-html-to-image)  
 [puppeter 文档](http://www.puppeteerjs.com/#?product=Puppeteer&version=v13.3.2&show=api-class-page)
