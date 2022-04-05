@@ -115,9 +115,10 @@ module.exports = {
         {
           title: "React",
           collapsable: false,
-          path:"/engineering/React/",
+          // path:"/engineering/React/",
           children: [
-           
+           ["/engineering/React/set-interval","functional component中的setInterval"],
+           ["/engineering/React/react-etc","react相关技术栈"]
           ],
         },
 
