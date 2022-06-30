@@ -2,70 +2,88 @@
  * @Author: 鱼小柔
  * @Date: 2022-06-25 07:30:39
  * @LastEditors: your name
- * @LastEditTime: 2022-06-25 15:54:54
+ * @LastEditTime: 2022-06-30 23:41:31
  * @Description: file content
 -->
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>model-viewer</title>
-    <script type="module" src="https://modelviewer.dev/node_modules/@google/model-viewer/dist/model-viewer.min.js"></script>
-</head>
-<style>
-    .example-wrapper model-viewer{
-        width: 50vw;
-        height: 50vh;
-        margin: 20vh auto 0;
-        background-color: black;
+    <script
+      type="module"
+      src="https://modelviewer.dev/node_modules/@google/model-viewer/dist/model-viewer.min.js"
+    ></script>
+  </head>
+  <style>
+    .example-wrapper model-viewer {
+      width: 50vw;
+      height: 50vh;
+      margin: 20vh auto 0;
+      background-color: black;
     }
-</style>
-<body>
+  </style>
+  <body>
     <div class="example-wrapper">
-        <!-- <model-viewer 
+      <!-- <model-viewer 
         camera-controls 
         camera-orbit="(-1.5rad + env(window-scroll-y) * 4rad) calc(0deg + env(window-scroll-y) * 180deg) calc(3m - env(window-scroll-y) * 1.5m)" 
         src="https://modelviewer.dev/shared-assets/models/Astronaut.glb" 
         alt="A 3D model of an astronaut"
         ></model-viewer> -->
-        <!-- <model-viewer 
+      <!-- <model-viewer 
         interpolation-decay="200"
         src="https://modelviewer.dev/shared-assets/models/Astronaut.glb" 
         alt="A 3D model of an astronaut"
         ></model-viewer> -->
-        <!-- <model-viewer 
+      <!-- <model-viewer 
         camera-controls 
         camera-target="0m 1m 0m" 
         src="https://modelviewer.dev/shared-assets/models/Astronaut.glb" 
         alt="A 3D model of an astronaut"
         ></model-viewer> -->
-        <model-viewer 
+      <!-- <model-viewer 
         camera-controls 
         src="https://modelviewer.dev/shared-assets/models/glTF-Sample-Models/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf" 
         alt="A 3D model of an astronaut"
         
         skybox-image="https://modelviewer.dev/assets/whipple_creek_regional_park_04_1k.hdr"
         shadow-intensity="0.5" shadow-softness="0"
-        ></model-viewer>
-        
+        ></model-viewer> -->
+      <model-viewer src="https://res.theuniquer.com/pgc-models/picture.gltf?hiddenType=default" 
+      
+      auto-rotate>
+      </model-viewer>
     </div>
-</body>
-<script>
-/*     (() => {
-      const modelViewer = document.querySelector('model-viewer');
-      const orbitCycle = [
-        '45deg 55deg 4m',
-        '-60deg 110deg 2m',
-      ];
-      let currentOrbitIndex = -1
-      setInterval(() => {
-        currentOrbitIndex++
-        modelViewer.cameraOrbit =
-            orbitCycle[(currentOrbitIndex) % orbitCycle.length];
-      }, 3000);
-    })(); */
-</script>
-    
+  </body>
+  <script>
+    /*     (() => {
+          const modelViewer = document.querySelector('model-viewer');
+          const orbitCycle = [
+            '45deg 55deg 4m',
+            '-60deg 110deg 2m',
+          ];
+          let currentOrbitIndex = -1
+          setInterval(() => {
+            currentOrbitIndex++
+            modelViewer.cameraOrbit =
+                orbitCycle[(currentOrbitIndex) % orbitCycle.length];
+          }, 3000);
+        })(); */
+    const fn = async (modelViewer) => {
+      const targetMaterial = modelViewer.model.materials.find((material) => material.name == "back"); //找到材质
+      const targetTexture = await modelViewer.createTexture(
+        "https://res.theuniquer.com/future/uploadFileToNos/qwe/%E8%8A%B1%E7%81%AF1.jpg?imageView&thumbnail=600x0"
+      ); // 用图片创建纹理
+      targetMaterial.pbrMetallicRoughness.baseColorTexture.setTexture(targetTexture);
+    };
+    (() => {
+      const modelViewer = document.querySelector("model-viewer");
+      modelViewer.addEventListener("load", () => {
+        fn(modelViewer);
+      });
+    })();
+  </script>
 </html>
