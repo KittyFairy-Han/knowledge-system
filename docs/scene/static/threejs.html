@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>3D Character</title>
+    
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js'></script>
+</head>
+<style>
+    body{
+        margin: 0;
+        overflow: hidden;
+    }
+    canvas{
+        width: 100vw;
+        height: 100vh;
+    }
+    
+</style>
+
+<body>
+    <canvas id="app-canvas"></canvas>
+    <script>
+        class App {
+            constructor(canvas) {
+                this.cube = App.createBox();
+                this.camera = App.createCamera();
+                this.scene = App.createScene()
+                    .add(App.createDirectionalLight())
+                    .add(this.cube)
+                    .add(this.camera)
+                
+                this.renderer = App.createRenderer(canvas);
+                this.update();
+            }
+
+            /**
+             * 创建场景
+             */
+            static createScene() {
+                let scene = new THREE.Scene();
+                scene.background = new THREE.Color("black");
+                return scene;
+            }
+
+            /**
+             * 创建点光源
+             */
+            static createDirectionalLight() {
+                let light = new THREE.DirectionalLight(0xffffff, 2);
+                light.position.set(0, 400, 350);
+                return light;
+            }
+
+            /**
+             * 创建相机
+             */
+            static createCamera() {
+                let camera = new THREE.PerspectiveCamera(
+                    50,
+                    window.innerWidth / window.innerHeight,
+                    0.1,
+                    1000
+                );
+
+                // 相机的位置
+                camera.position.set(0,0,-10)
+                camera.rotateY(Math.PI)
+                return camera;
+            }
+
+            /**
+             * 创建渲染器
+             */
+            static createRenderer(canvas) {
+                let renderer = new THREE.WebGLRenderer({ canvas });
+                renderer.setPixelRatio(window.devicePixelRatio);
+                return renderer;
+            }
+
+            /**
+             * 创建物体
+             */
+            static createBox() {
+                const cubeGeometry = new THREE.BoxGeometry(1, 2, 3); //边长为5的正方体（几何体无样式
+                const cube = new THREE.Mesh(cubeGeometry); //物体
+                cube.position.set(0, 0, 0); //物体位置
+                return cube;
+            }
+
+            resize() {
+                let canvasSize = this.renderer.getSize(new THREE.Vector2()); //画布大小
+                let windowSize = new THREE.Vector2(window.innerWidth, window.innerHeight); //视口大小
+                if (!canvasSize.equals(windowSize)) {
+                    this.renderer.setSize(windowSize.x, windowSize.y, false); //重置画布比例
+                    this.camera.aspect = windowSize.x / windowSize.y; //重置相机空间
+                    this.camera.updateProjectionMatrix();
+                }
+            }
+
+            /**
+             * 绘制函数
+             */
+            update() {
+                this.resize();
+                this.renderer.render(this.scene, this.camera); //每一帧的渲染
+                this.cube.rotateY(0.01);
+                window.requestAnimationFrame(() => {
+                    this.update();
+                });
+            }
+        }
+
+        new App(document.getElementById("app-canvas"));
+
+    </script>
+</body>
+
+</html>

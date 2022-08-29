@@ -104,7 +104,7 @@ module.exports = {
         {
           title: "Vue",
           collapsable: false,
-          path:"/engineering/Vue/",
+          path: "/engineering/Vue/",
           children: [
             ["/engineering/Vue/use", "使用"],
             ["/engineering/Vue/principle", "原理"],
@@ -117,22 +117,25 @@ module.exports = {
           collapsable: false,
           // path:"/engineering/React/",
           children: [
-           ["/engineering/React/set-interval","functional component中的setInterval"],
-           ["/engineering/React/react-etc","react相关技术栈"]
+            [
+              "/engineering/React/set-interval",
+              "functional component中的setInterval",
+            ],
+            ["/engineering/React/react-etc", "react相关技术栈"],
           ],
         },
 
         ["/engineering/vdom/", "vdom"],
         {
           title: "webpack",
-          path:"/engineering/webpack/",
+          path: "/engineering/webpack/",
           collapsable: true,
           children: [
-            ["/engineering/webpack/main-flow","主流程（主线剧情）"],
-            ["/engineering/webpack/chunk","chunk"],
+            ["/engineering/webpack/main-flow", "主流程（主线剧情）"],
+            ["/engineering/webpack/chunk", "chunk"],
             // ["/engineering/webpack/SPA-MPA-MB","SPA-MPA-MB"],
-            ["/engineering/webpack/optimization","优化"],
-            ["/engineering/webpack/pluggable","one-project-to-multiple-app"]
+            ["/engineering/webpack/optimization", "优化"],
+            ["/engineering/webpack/pluggable", "one-project-to-multiple-app"],
           ],
         },
       ],
@@ -144,10 +147,11 @@ module.exports = {
         ["/broswer/security", "安全"],
         ["/broswer/render", "网页渲染"],
       ],
-      "/scene/":[
+      "/scene/": [
         ["/scene/lottieUsage", "lottie的应用场景"],
-        ["/scene/screenshoots","前端截屏方案"],
-        ["/scene/modelViewer","modelViewer"]
+        ["/scene/screenshoots", "前端截屏方案"],
+        ["/scene/modelViewer", "modelViewer"],
+        ["/scene/web3d", "web3d"],
       ],
     },
   },
