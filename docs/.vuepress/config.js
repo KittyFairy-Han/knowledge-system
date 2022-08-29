@@ -147,7 +147,8 @@ module.exports = {
       "/scene/":[
         ["/scene/lottieUsage", "lottie的应用场景"],
         ["/scene/screenshoots","前端截屏方案"],
-        ["/scene/modelViewer","modelViewer"]
+        ["/scene/modelViewer","modelViewer"],
+        ["/scene/artGallery","art-gallery"]
       ],
     },
   },
