@@ -19,6 +19,7 @@ module.exports = {
       { text: "浏览器", link: "/broswer/work/" },
       { text: "工程化", link: "/engineering/" },
       { text: "其他", link: "/scene/lottieUsage/" },
+      { text: "web3d", link: "/web3d/" },
     ],
     sidebar: {
       "/html/": [["/html/mianjing", "面经"]],
@@ -152,6 +153,9 @@ module.exports = {
         ["/scene/screenshoots","前端截屏方案"],
         ["/scene/modelViewer","modelViewer"],
         ["/scene/artGallery","art-gallery"]
+      ],
+      "/web3d/": [
+        ["/web3d/artGallery/", "art-gallery"],
       ],
     },
   },
