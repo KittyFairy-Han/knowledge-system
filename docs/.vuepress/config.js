@@ -10,6 +10,9 @@ module.exports = {
   base: "/knowledge-system/",
   dest: "../dist", // 设置输出目录
   head: [["link", { rel: "icon", href: "image/logo.png" }]],
+  plugins: [
+    ['image']
+  ],
   themeConfig: {
     sidebarDepth: 2, //提取到 h3
     nav: [
@@ -152,11 +155,12 @@ module.exports = {
         ["/scene/lottieUsage", "lottie的应用场景"],
         ["/scene/screenshoots","前端截屏方案"],
         ["/scene/modelViewer","modelViewer"],
-        ["/scene/artGallery","art-gallery"]
+        
       ],
       "/web3d/": [
         ["/web3d/artGallery/", "art-gallery"],
       ],
     },
   },
+  
 };
