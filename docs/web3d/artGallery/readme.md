@@ -12,6 +12,10 @@
 
 ## three api
 
+- update 函数 帧的概念
+- 物体 position、rotation
+- camera position、rotation
+
 #### 3d 空间中的物体
 
 创建、变换
@@ -85,13 +89,13 @@
 相框的位置、旋转量、尺寸、图片的 url、尺寸都是来自后端的 json，根据这些信息去创建画作(3d object)，而不需要解析模型数据。  
 ![交互示意图](./assets/ag_exhibit_1.png)  
 这个方案符合常规的开发思路，对前端来说是最友好最方便的。但实际上可行性差，因为模型软件不具备直接导出部分 json 数据的能力，模型导出的数据是二进制文件或者类似这样的 json：![模型软件导出的文件](./assets//ag_exhibit_1_1.png)是很不直观的，不满足我们所需的数据结构。  
-如果偏要模型导出指定的数据结构，还需要针对模型软件开发一个插件，成本更大不如用上面的loader方式解析glb二进制数据。
+如果偏要模型导出指定的数据结构，还需要针对模型软件开发一个插件，成本更大不如用上面的 loader 方式解析 glb 二进制数据。
 
 #### 另二种方案
 
 不用解析每个相框的定位、边长等信息，直接把相框的几何体按照图片的比例收缩，然后把图片纹理贴到相框上并留些边框的距离。
 ![交互示意图](./assets/ag_exhibit_2.png)
-这个方案复用了模型中的 3d 相框的位置、旋转量、几何体，看起来不用读取顶点数据了，少了计算，省了事儿。但局部纹理贴图（需要留边距）还是需要计算出边长的具体值，three里可没有css的calc(100%-边距px)这样的算法。
+这个方案复用了模型中的 3d 相框的位置、旋转量、几何体，看起来不用读取顶点数据了，少了计算，省了事儿。但局部纹理贴图（需要留边距）还是需要计算出边长的具体值，three 里可没有 css 的 calc(100%-边距 px)这样的算法。
 就算不考虑边距，复用几何体对模型的依赖比较大，可能出现如下的情况。  
 期望：
 ![正常情况](./assets/ag_exhibit_2_suc.png)
@@ -100,15 +104,151 @@
 要避免这种情况，需要模型设计师有一定的纹理映射知识，这对于模型制作者来说会有一定的学习成本，增加了工作流程中的沟通成本。所以这个方案可行性也不高。
 
 ## 交互：相机运动
-首先要有一个基础认知那就是在3D空间浏览场景通常是相机运动而不是模型运动，所以主体思路就是识别移动端的手势（在pc端就是鼠标操作），根据手势滑动距离来控制相机的运动。  
-虽然three有几个现成的controller，但是都不满足我们要实现的效果，不过很多3d项目基本都是用相机轨道运动orbitController所以还是介绍一下orbitController。
+
+首先要有一个基础认知那就是在 3D 空间浏览场景通常是相机运动而不是模型运动，所以主体思路就是识别移动端的手势（在 pc 端就是鼠标操作），根据手势滑动距离来控制相机的运动。  
+虽然 three 有几个现成的 controller，但是都不满足我们要实现的效果，不过很多 3d 项目基本都是用相机轨道运动 orbitController 所以还是介绍一下 orbitController。
+
 ### orbitController
+
+[官方例子](https://threejs.org/examples/?q=orb#misc_controls_orbit)  
+默认的鼠标操作对应运动形式为：
+首先想象相机在一个球面的某个位置，
+
+- 左键水平拖动，相机的运动轨迹是类似经线一样的曲线运动。
+- 左键竖直拖动，相机的运动轨迹是类似纬线一样的曲线运动。
+- 鼠标滚轮滚动，相机的运动轨迹朝着球心远近平移。
+  然后再想象相机在一个垂直于屏幕的平面上，
+- 右键水平拖动，相机的运动轨迹是横向平移。
+- 右键竖直拖动，相机的运动轨迹是远近平移。
+- 可以通过配置，修改平面是平行于屏幕的，这样，右键竖直拖动，相机的运动轨迹是垂直平移。
+  需要注意的是，相机曲线运动是围绕一个圆心的，而不是原地自转。
 
 ### 项目中的应用
 
-就拿这个效举例子吧：单指上下滑动平移(类似移动端的长页面浏览)，单指左右滑动环顾四周  
+实际项目中实现的操作对应相机的运动：
+单指上下滑动平移(类似移动端的长页面浏览)，单指左右滑动环顾四周，点击相框相机朝对应位置移动并面向相框。![扫码体验一下](../artGallery/assets/p3_exmaple.png)  
+手势操作与相机运动对应起来就是：
 
-所以最后还是基于移动端手势识别库hammer.js识别手势然后自己写控制相机运动的逻辑
+- 单指水平滑动：相机原地自转
+- 单指垂直滑动：相机沿着平行于 y 轴的方向平移
+- 斜着滑：以上两种运动结合
+- 点击某一画框：相机平移到该位置并自转面向画框
+- 双指扩张收缩：
+
+可以看出要实现的交互系统和 orbitControl 有很大区别，所以还是自己写了一套交互系统。
+
+#### 关键技术点
+
+- 移动端手势识别推荐 hammer.js , 原生 js 监听 touch 事件也 ok，就是双指操作计算麻烦点。
+- 相机运动主要就用到 three Object 的两个属性的设置：camera.position.y=xxx（平移）、camera.rotation.y=xxx（自转）
+- 点击后不是瞬移过去，是过度运动。结合 Tween.js。
+- 单指滑动有阻尼效果（手停了，但还在惯性运动），理解了“帧”的概念自然就会明白。
+
+#### 基础示例
+
+以单指滑动为例子，结合代码讲一下。为了大多数人一下就能看懂就还是用原生的 touch。涉及较多的手势和运动时，结合 hammer，camera 的运动大家举一反三啦。
+
+```js
+import { Vector2 } from "three";
+
+/**
+ * 自定义控制器
+ * 单指滑动，水平分量负责绕y轴旋转，垂直分量负责y轴方向平移
+ * object 就是相机
+ * domElement 就是 canvas
+ */
+class CustomControls {
+  constructor(object, domElement) {
+
+    /* ==================== 实例属性 ==================== */
+    // 控制的对象
+    this.object = object;
+    // canvas
+    this.domElement = domElement;
+    this.domElement.style.touchAction = "none"; // 禁用默认行为
+    // 旋转速度
+    this.rotateSpeed = 0.5;
+    // 位移速度
+    this.panSpeed = 5;
+    // 控制的对象位移的最高位置
+    this.panRangeMax = 5;
+    // 控制的对象位移的最低位置
+    this.panRangeMin = 0;
+    // 阻尼系数 越小惯性越大 1的时候没有惯性效果
+    this.dampingFactor = 0.05;
+    // false的时候禁用controller
+    this.enabled = true;
+
+    /* ==================== 内部变量和方法 ==================== */
+
+    const scope = this;
+    let deltaPan = 0; //实时平移量
+    let deltaRotate = 0; //实时旋转量
+    let pointStart = new Vector2(); //上一次的touch位置
+
+    function getSafePosY(oldY, panOffset) {
+      if (oldY + panOffset > scope.panRangeMax) {
+        return scope.panRangeMax;
+      }
+      if (oldY + panOffset < scope.panRangeMin) {
+        return scope.panRangeMin;
+      }
+      return oldY + panOffset;
+    }
+
+    function onTouchStart(e) {
+      if (scope.enabled === false) return;
+      if (e.touches.length !== 1) return;
+      scope.domElement.addEventListener("touchmove", onTouchMove);
+      scope.domElement.addEventListener("touchend", onTouchEnd);
+      const touch = e.touches[0];
+      const { pageX, pageY } = touch;
+      pointStart.x = pageX;
+      pointStart.y = pageY;
+    }
+
+    function onTouchMove(e) {
+      if (scope.enabled === false) return;
+      if (e.touches.length !== 1) return;
+      const touch = e.touches[0];
+      const { pageX, pageY } = touch;
+      const pointerMove = new Vector2(pageX, pageY);
+      const deltaMove = new Vector2().subVectors(pointerMove, pointStart);
+
+      deltaPan +=
+        scope.panSpeed * ((deltaMove.y / scope.domElement.clientHeight) * 1); //速度为1时，竖向滑动为一屏距离则可以移动一米
+      deltaRotate +=
+        scope.rotateSpeed *
+        ((deltaMove.x / scope.domElement.clientHeight) * 2 * Math.PI); //速度为1时，横向滑动为一屏距离则可以转一圈
+
+      pointStart.copy(pointerMove);
+    }
+
+    function onTouchEnd(e) {
+      scope.domElement.removeEventListener("touchmove", onTouchMove);
+      scope.domElement.removeEventListener("touchend", onTouchEnd);
+    }
+
+    scope.domElement.addEventListener("touchstart", onTouchStart);
+
+    this.update = function() {
+      // console.log(deltaPan, deltaRotate);
+
+      const stepPan = scope.dampingFactor * deltaPan; //当前帧位移
+      const stepRo = scope.dampingFactor * deltaRotate;
+      scope.object.position.y = getSafePosY(scope.object.position.y, stepPan);
+      scope.object.rotateY(stepRo);
+      deltaPan *= 1 - scope.dampingFactor;
+      deltaRotate *= 1 - scope.dampingFactor;
+    };
+
+    this.update();
+  }
+}
+
+export default CustomControls;
+```
+
 - 阻尼
 - scrollY
 
