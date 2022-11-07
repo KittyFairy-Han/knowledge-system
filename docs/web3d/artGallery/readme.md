@@ -15,6 +15,7 @@
 - update 函数 帧的概念
 - 物体 position、rotation
 - camera position、rotation
+- 加载外部模型 loader
 
 #### 3d 空间中的物体
 
@@ -197,21 +198,25 @@ class CustomControls {
     }
 
     function onTouchStart(e) {
-      if (scope.enabled === false) return;
+      // 非单指则不继续监听move和end事件，不触发后续相机运动的逻辑
       if (e.touches.length !== 1) return;
       scope.domElement.addEventListener("touchmove", onTouchMove);
       scope.domElement.addEventListener("touchend", onTouchEnd);
       const touch = e.touches[0];
+      // 取出初始触控点，
       const { pageX, pageY } = touch;
+      // 记录到pointStart中，作为初始向量
       pointStart.x = pageX;
       pointStart.y = pageY;
     }
 
     function onTouchMove(e) {
-      if (scope.enabled === false) return;
+      // 非单指则停止更新内部变量，相机运动也停止
       if (e.touches.length !== 1) return;
       const touch = e.touches[0];
+      // 取出当前 move 时的触控点
       const { pageX, pageY } = touch;
+      // 当前触控点  m
       const pointerMove = new Vector2(pageX, pageY);
       const deltaMove = new Vector2().subVectors(pointerMove, pointStart);
 
@@ -220,7 +225,7 @@ class CustomControls {
       deltaRotate +=
         scope.rotateSpeed *
         ((deltaMove.x / scope.domElement.clientHeight) * 2 * Math.PI); //速度为1时，横向滑动为一屏距离则可以转一圈
-
+      // 更新 pointStar 的值，为下次进入 move 事件做准备
       pointStart.copy(pointerMove);
     }
 
