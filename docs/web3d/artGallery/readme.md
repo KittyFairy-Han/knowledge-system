@@ -126,28 +126,26 @@
 
 ### 项目中的应用
 
-实际项目中实现的操作对应相机的运动：
-单指上下滑动平移(类似移动端的长页面浏览)，单指左右滑动环顾四周，点击相框相机朝对应位置移动并面向相框。![扫码体验一下](../artGallery/assets/p3_exmaple.png)  
-手势操作与相机运动对应起来就是：
+实际项目中的交互可能无法复用 OrbitControl 等 three 封装好的组件，不过定义一套交互系统无外乎两个关键点。
+
+- 移动端监听 touch 事件、pc 端监听鼠标键盘事件
+- 控制相机运动
+
+下面就用
 
 - 单指水平滑动：相机原地自转
 - 单指垂直滑动：相机沿着平行于 y 轴的方向平移
 - 斜着滑：以上两种运动结合
-- 点击某一画框：相机平移到该位置并自转面向画框
-- 双指扩张收缩：
 
-可以看出要实现的交互系统和 orbitControl 有很大区别，所以还是自己写了一套交互系统。
+这种效果结合代码举个例子
 
-#### 关键技术点
 
-- 移动端手势识别推荐 hammer.js , 原生 js 监听 touch 事件也 ok，就是双指操作计算麻烦点。
-- 相机运动主要就用到 three Object 的两个属性的设置：camera.position.y=xxx（平移）、camera.rotation.y=xxx（自转）
-- 点击后不是瞬移过去，是过度运动。结合 Tween.js。
-- 单指滑动有阻尼效果（手停了，但还在惯性运动），理解了“帧”的概念自然就会明白。
 
 #### 基础示例
 
-以单指滑动为例子，结合代码讲一下。为了大多数人一下就能看懂就还是用原生的 touch。涉及较多的手势和运动时，结合 hammer，camera 的运动大家举一反三啦。
+以  
+单指左右滑动旋转，上下滑动平移  
+为例子，结合代码讲一下。为了大多数人一下就能看懂就还是用原生的 touch。
 
 ```js
 import { Vector2 } from "three";
@@ -160,7 +158,6 @@ import { Vector2 } from "three";
  */
 class CustomControls {
   constructor(object, domElement) {
-
     /* ==================== 实例属性 ==================== */
     // 控制的对象
     this.object = object;
@@ -254,8 +251,28 @@ class CustomControls {
 export default CustomControls;
 ```
 
-- 阻尼
+- 单指滑动有阻尼效果（手停了，但还在惯性运动），理解了“帧”的概念自然就会明白。
 - scrollY
+
+### 扩展
+实际的移动端web应用交互会更复杂一些，欢迎体验  
+![扫码体验一下](../artGallery/assets/p3_exmaple.png)  
+
+手势操作与相机运动对应起来就是：
+
+- 单指水平滑动：相机原地自转
+- 单指垂直滑动：相机沿着平行于 y 轴的方向平移
+- 斜着滑：以上两种运动结合
+- 点击某一画框：相机平移到该位置并自转面向画框
+- 双指扩张收缩：相机拉近拉远
+
+关键技术点还是touch事件和控制相机运动，具体的实现可以结合一些第三方库，开发更便捷，体验更友好：  
+
+- 移动端手势识别推荐 [hammer.js](https://hammerjs.github.io/) 代替原生 touch。
+- 相机运动主要就用到 three Object 的两个属性的设置：camera.position.y=xxx（平移）、camera.rotation.y=xxx（自转）
+- 点击后不是瞬移过去，是过度运动，需要结合 Tween.js，three里面集成了Tween.js，可以直接引用到。import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
+
+
 
 ## 加载优化
 
