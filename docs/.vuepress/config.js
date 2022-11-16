@@ -158,7 +158,8 @@ module.exports = {
         
       ],
       "/web3d/": [
-        ["/web3d/artGallery/", "art-gallery"],
+        ["/web3d/artGallery/", "3d入门之空间与模型"],
+        ["/web3d/agInteraction/", "3d入门之交互"],
       ],
     },
   },
