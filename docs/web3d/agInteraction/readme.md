@@ -1,5 +1,11 @@
 这篇是接着上一篇的，如果没有开发基础，建议先把上一篇前面两小节看过再来看～
 
+#### 说在前面
+
+真实案例线上预览:![网易星球数字藏品馆](./assets/ch0-1.png)
+demo 预览:![网易星球数字藏品馆](./assets/ch0-2.png)  
+[demo 完整代码](https://codesandbox.io/p/sandbox/green-sunset-xsps3f)
+
 ## 交互：相机运动
 
 首先要有一个基础认知那就是在 3D 空间浏览场景通常是相机运动而不是模型运动，所以主体思路就是识别移动端的手势（在 pc 端就是鼠标操作），根据手势和滑动距离来计算相机的运动方式与运动距离。  
@@ -36,7 +42,7 @@
 - 单指垂直滑动：相机沿着平行于 y 轴的方向平移
 - 斜着滑：以上两种运动结合
 
-举例子。 [结合 demo 效果和完整代码看更好理解](https://codesandbox.io/p/sandbox/green-sunset-xsps3f)，别忘记调为手机模式哦～
+举例子。 结合 demo 效果和[结合 demo 效果和完整代码看更好理解](https://codesandbox.io/p/sandbox/green-sunset-xsps3f)，别忘记调为手机模式哦～
 
 #### 流程
 
@@ -240,28 +246,70 @@ class CustomControls {
 
 ### 射线检测
 
-3d 空间的物体不像 dom 可以绑定各种事件监听（比如点击），而是用射线检测对物体进行拾取。  
-下面是一个基础示例：
+3d 空间的物体不像 dom 可以绑定各种事件监听，而是用射线检测对物体进行拾取。  
+关键代码就两行：
 
-```js
+```JS
+const raycaster = new Raycaster(); //射线
+raycaster.setFromCamera(pointer, camera); //由相机发出射线
+const intersects = raycaster.intersectObjects(targetObjects, false); // 检测
 ```
 
-- scrollY
+结合我们的 demo，传入对应的参数，就可以捕获场景中的作品了。详见 demo
 
-## 实际项目中的应用
+```js
+class PickHelper {
+  /**
+   * @targetDom 一般是canvas元素
+   * @camera {THREE.Object3D} 3d场景中的相机
+   * @targetObjects {Array} 3d场景中需要捕获的群体
+   * @handlePick {Function} 拾取后回调
+   */
+  constructor({ targetDom, camera, targetObjects, handlePick = () => {} }) {
+    // 实例属性和方法 ================================
+    this.enabled = true; // 是否启用拾取
 
-实际的移动端 web 应用交互会更复杂一些，再次欢迎体验  
-![扫码体验一下](./assets/ch0-1.png)
+    // 内部变量 =====================================
+    const raycaster = new Raycaster(); //射线
+    const pointer = new Vector2(); //用来存click点的数据
+    const handleTrigger = (e) => {
+      // console.log(e)
+      if (!this.enabled) {
+        return;
+      }
+      // 记录了归一化的鼠标位置,无论画布的尺寸，
+      pointer.x = (e.clientX / e.target.clientWidth) * 2 - 1;// 我们需要一个从左到右，落入区间（-1，1）的值，
+      pointer.y = -(e.clientY / e.target.clientHeight) * 2 + 1;// 类似的，也需要一个从下到上，落入区间（-1，1）的值。
+      // ==========================
+      // 如果用了hammer,e是hammer包装过一层的，标准的取值应该是e.srcEvent.pageY,而不是用e.center.y
+      // 因为如果 e.target 有滚动（有scrollY）那么只能用pageY；水平方向同理
+      // 需要注意的是100vh有时候会超过window.innerHeight，这样就有了scrollY，比如Safari浏览器
+      // ==========================
+      raycaster.setFromCamera(pointer, camera); //由相机发出射线
+      const intersects = raycaster.intersectObjects(targetObjects, false); // 检测
+      if (intersects.length <= 0) {
+        return;
+      }
+      const [firstPickOne] = intersects.map((item) => item.object); //结果传给回调函数
+      handlePick(firstPickOne);
+    };
 
-手势操作与相机运动对应起来就是：
+    // 构造函数逻辑，注册点击事件
+    targetDom.addEventListener("click", handleTrigger);
+    // 实例方法
+    this.destroy = () => {
+      targetDom.removeEventListener("click", handleTrigger);
+    };
+  }
+}
+```
 
-- 单指水平滑动：相机原地自转
-- 单指垂直滑动：相机沿着平行于 y 轴的方向平移
-- 斜着滑：以上两种运动结合
-- 点击某一画框：相机平移到该位置并自转面向画框
-- 双指扩张收缩：相机拉近拉远
+大概效果就是  
+![](./assets/ch2.gif)
 
-关键技术点还是 touch 事件和控制相机运动，具体的实现可以结合一些第三方库，开发更便捷，体验更友好：
+## 扩展
 
-- 移动端手势识别推荐 [hammer.js](https://hammerjs.github.io/) 代替原生 touch。
-- 点击后不是瞬移过去，是过度运动，需要结合 Tween.js，three 里面集成了 Tween.js，可以直接引用到。import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
+- 实际的移动端 web 应用交互会更复杂一些，如果涉及手势识别比较多的建议用 hammer.js
+- 点击后需要相机做过度运镜可以结合 Tween.js
+- 使用 hammer.js 注册事件，捕获物体时，需要用原生的 e.target.pageX,e.targe.pageY。否则有些浏览器会捕获不准。详见代码注释
+- 捕获对象发生改变时候（比如更新图片了），需要更新 picker 中的 targeObjects
