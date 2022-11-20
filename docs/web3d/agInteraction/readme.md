@@ -4,7 +4,7 @@
 
 真实案例线上预览:![网易星球数字藏品馆](./assets/ch0-1.png)
 demo 预览:![网易星球数字藏品馆](./assets/ch0-2.png)  
-[demo 完整代码](https://codesandbox.io/p/sandbox/green-sunset-xsps3f)
+[demo 完整代码](https://codesandbox.io/p/sandbox/pedantic-pascal-06ugc1)
 
 ## 交互：相机运动
 
@@ -42,7 +42,7 @@ demo 预览:![网易星球数字藏品馆](./assets/ch0-2.png)
 - 单指垂直滑动：相机沿着平行于 y 轴的方向平移
 - 斜着滑：以上两种运动结合
 
-举例子。 结合 demo 效果和[结合 demo 效果和完整代码看更好理解](https://codesandbox.io/p/sandbox/green-sunset-xsps3f)，别忘记调为手机模式哦～
+举例子。 结合 demo 效果和[结合 demo 效果和完整代码看更好理解](https://codesandbox.io/p/sandbox/pedantic-pascal-06ugc1)，别忘记调为手机模式哦～
 
 #### 流程
 

@@ -106,7 +106,7 @@ class App3dScene {
 - 动态数据与模型融合：动态数据指用户上传的图片，画框是模型中的一部分。上传后两者要相互适应，图片数据融合进模型。
 - 交互系统：单指滑动浏览，点击与画框交互。
 
-[技术点集合写了个完整的 demo，源码点这里](https://codesandbox.io/p/sandbox/green-sunset-xsps3f?file=%2Fsrc%2FApp.jsx),扫码可体验（国外网站，稍安勿躁）：  
+[技术点集合写了个完整的 demo，源码点这里](https://codesandbox.io/p/sandbox/pedantic-pascal-06ugc1),扫码可体验（国外网站，稍安勿躁）：  
 ![demo预览二维码](../artGallery/assets/ch0-2.png)
 
 ## 模型显示
@@ -309,7 +309,7 @@ function getTexture(imgUrl) {
 ```
 
 剩下的就是拿到这些信息去创建画作了，比较简单就不放代码了。
-[demo 完整源码点这里](https://codesandbox.io/p/sandbox/green-sunset-xsps3f?file=%2Fsrc%2FApp.jsx)
+[demo 完整源码点这里](https://codesandbox.io/p/sandbox/pedantic-pascal-06ugc1)
 
 ### 更多思考
 
