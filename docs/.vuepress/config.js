@@ -161,7 +161,7 @@ module.exports = {
         ["/web3d/demoStart/", "3d入门之空间与模型"],
         ["/web3d/demoInteraction/", "3d入门之交互"],
         ["/web3d/PORender/", "web3d性能优化-渲染"],
-        ["/web3d/POLoader/", "web3d性能优化-加载"],
+        ["/web3d/POLoad/", "web3d性能优化-加载"],
       ],
     },
   },

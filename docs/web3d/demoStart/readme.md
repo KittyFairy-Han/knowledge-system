@@ -1,7 +1,7 @@
 # 带你入门 web3d 开发
 
 真实案例欢迎扫码体验：  
-![扫码体验一下](../artGallery/assets/ch0-1.png)  
+![扫码体验一下](../demoStart/assets/ch0-1.png)  
 里面主要就涉及模型显示、数据与模型结合、场景交互三部分内容。本文也是从这三个点出发，举简单的例子带大家入入门。
 
 ## three api
@@ -107,7 +107,7 @@ class App3dScene {
 - 交互系统：单指滑动浏览，点击与画框交互。
 
 [技术点集合写了个完整的 demo，源码点这里](https://codesandbox.io/p/sandbox/pedantic-pascal-06ugc1),扫码可体验（国外网站，稍安勿躁）：  
-![demo预览二维码](../artGallery/assets/ch0-2.png)
+![demo预览二维码](../demoStart/assets/ch0-2.png)
 
 ## 模型显示
 
