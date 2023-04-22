@@ -10,15 +10,15 @@ module.exports = {
   base: "/knowledge-system/",
   dest: "../dist", // 设置输出目录
   head: [["link", { rel: "icon", href: "image/logo.png" }]],
-  plugins: [
-    ['image']
-  ],
+  plugins: [["image"]],
   themeConfig: {
     sidebarDepth: 2, //提取到 h3
     nav: [
       { text: "Home", link: "/" },
       { text: "CSS", link: "/CSS/layout/" },
       { text: "JS", link: "/JS/" },
+      { text: "React", link: "/React/" },
+      { text: "Vue", link: "/Vue/" },
       { text: "浏览器", link: "/broswer/work/" },
       { text: "工程化", link: "/engineering/" },
       { text: "其他", link: "/scene/lottieUsage/" },
@@ -35,9 +35,9 @@ module.exports = {
       ],
       "/JS/": [
         {
-          title: "数据类型", // 必要的
-          path: "/JS/basic/Type", // 可选的, 标题的跳转链接，应为绝对路径且必须存在
-          collapsable: false, // 可选的, 默认值是 true,
+          title: "数据类型", 
+          path: "/JS/basic/Type", 
+          collapsable: false, 
           children: [
             ["/JS/basic/Type/Boolean-undefined-null-NaN", "特殊值"],
             ["/JS/basic/Type/Number", "Number"],
@@ -47,8 +47,8 @@ module.exports = {
           ],
         },
         {
-          title: "ES6", // 必要的
-          collapsable: false, // 可选的, 默认值是 true,
+          title: "ES6", 
+          collapsable: false, 
           children: [
             ["/JS/basic/ES6/Proxy+Reflect", "Proxy和Reflect"],
             ["/JS/basic/ES6/fetch", "fetch"],
@@ -56,8 +56,8 @@ module.exports = {
           ],
         },
         {
-          title: "闭包、作用域和 this 关键字", // 必要的
-          collapsable: false, // 可选的, 默认值是 true,
+          title: "闭包、作用域和 this 关键字", 
+          collapsable: false, 
           children: [
             ["/JS/Closure-scope-context/Closure", "闭包"],
             ["/JS/Closure-scope-context/scope", "作用域"],
@@ -65,17 +65,17 @@ module.exports = {
           ],
         },
         {
-          title: "原型链、类和继承", // 必要的
-          collapsable: false, // 可选的, 默认值是 true,
+          title: "原型链、类和继承", 
+          collapsable: false, 
           children: [
             ["/JS/prototype-chain-class-extends/prototype-chain", "原型链"],
             ["/JS/prototype-chain-class-extends/class-extends", "继承"],
           ],
         },
         {
-          title: "单线程、异步和事件轮询", // 必要的
+          title: "单线程、异步和事件轮询", 
           path: "/JS/single-thread-async-event-loop",
-          collapsable: false, // 可选的, 默认值是 true,
+          collapsable: false, 
           children: [
             ["/JS/single-thread-async-event-loop/async", "异步"],
             ["/JS/single-thread-async-event-loop/event-loop", "事件轮询"],
@@ -83,8 +83,8 @@ module.exports = {
           ],
         },
         {
-          title: "通信(跨域)、Ajax 和存储", // 必要的
-          collapsable: false, // 可选的, 默认值是 true,
+          title: "通信(跨域)、Ajax 和存储", 
+          collapsable: false, 
           children: [
             ["/JS/communication-AJAX-storage/communication", "通信"],
             ["/JS/communication-AJAX-storage/storage", "存储"],
@@ -95,39 +95,48 @@ module.exports = {
         ["/JS/DOM/", "文档对象"],
         ["/JS/monitor-security/", "错误监控"],
       ],
+      "/React/": [
+        {
+          title: "七七八八",
+          collapsable: false,
+          children: [
+            [
+              "/React/7788/set-interval",
+              "functional component 中的 setInterval",
+            ],
+            ["/React/7788/react-etc", "react相关技术栈"],
+          ],
+        },
+        {
+          title: "状态管理",
+          collapsable: false,
+          path: "/React/state-management/",
+          children: [
+            ["/React/state-management/context-vs-redux", "redux基础"],
+            [
+              "/React/state-management/redux-combine-and-saga",
+              "redux的combineReducer和中间件",
+            ],
+            ["/React/state-management/recoil", "recoil"],
+            // ["/React/state-management/mobx", "mobx"],
+            ["/React/state-management/zustand", "zustand"],
+          ],
+        },
+      ],
+      "/Vue/": [
+        ["/Vue/use", "使用"],
+        ["/Vue/principle", "原理"],
+        ["/Vue/Vue3", "Vue3"],
+        ["/Vue/how-about-Vue3", "how-about-Vue3"],
+      ],
       "/engineering/": [
         {
-          title: "模块化、组件化和设计模式", // 必要的
-          collapsable: false, // 可选的, 默认值是 true,
+          title: "模块化、组件化和设计模式",
+          collapsable: false,
           children: [
             ["/engineering/design/modularity", "模块化"],
             ["/engineering/design/componential", "组件化"],
             ["/engineering/design/design-pattern", "设计模式"],
-          ],
-        },
-        {
-          title: "Vue",
-          collapsable: false,
-          path: "/engineering/Vue/",
-          children: [
-            ["/engineering/Vue/use", "使用"],
-            ["/engineering/Vue/principle", "原理"],
-            ["/engineering/Vue/Vue3", "Vue3"],
-            ["/engineering/Vue/how-about-Vue3", "how-about-Vue3"],
-          ],
-        },
-        {
-          title: "React",
-          collapsable: false,
-          // path:"/engineering/React/",
-          children: [
-            [
-              "/engineering/React/set-interval",
-              "functional component中的setInterval",
-            ],
-            ["/engineering/React/react-etc", "react相关技术栈"],
-            ["/engineering/React/react-data-flow", "react数据流管理"],
-            ["/engineering/React/redux-combine-and-saga","redux的combineReducer和中间件"]
           ],
         },
 
@@ -135,7 +144,7 @@ module.exports = {
         {
           title: "webpack",
           path: "/engineering/webpack/",
-          collapsable: true,
+          collapsable: false,
           children: [
             ["/engineering/webpack/main-flow", "主流程（主线剧情）"],
             ["/engineering/webpack/chunk", "chunk"],
@@ -155,9 +164,8 @@ module.exports = {
       ],
       "/scene/": [
         ["/scene/lottieUsage", "lottie的应用场景"],
-        ["/scene/screenshoots","前端截屏方案"],
-        ["/scene/modelViewer","modelViewer"],
-        
+        ["/scene/screenshoots", "前端截屏方案"],
+        ["/scene/modelViewer", "modelViewer"],
       ],
       "/web3d/": [
         ["/web3d/demoStart/", "3d入门之空间与模型"],
@@ -167,5 +175,4 @@ module.exports = {
       ],
     },
   },
-  
 };
