@@ -172,6 +172,7 @@ module.exports = {
         ["/web3d/demoInteraction/", "3d入门之交互"],
         ["/web3d/PORender/", "web3d性能优化-渲染"],
         ["/web3d/POLoad/", "web3d性能优化-加载"],
+        ["/web3d/ARStart/", "入门AR"],
       ],
     },
   },
