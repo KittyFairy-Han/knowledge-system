@@ -6,7 +6,7 @@
   "author": "鱼小柔",
   "license": "MIT",
   "devDependencies": {
-    "vuepress": "^1.7.1"
+    "vuepress": "^1.9.9"
   },
   "scripts": {
     "docs:dev": "vuepress dev docs",
