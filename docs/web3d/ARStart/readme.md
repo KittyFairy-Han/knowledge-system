@@ -20,7 +20,7 @@ AR 增强现实，是指在真实世界的基础上，通过计算机生成的�
 
 ![5.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/dd1875af0b6d45e68a5e19c5b62a412d~tplv-k3u1fbpfcp-watermark.image?)
 
-### 读取
+### 🍚 读取
 
 - 浏览器中：WebRTC.js，最关键的 API 方法是 getUserMedia() ，实时获取摄像头的视频流
 
@@ -28,7 +28,7 @@ AR 增强现实，是指在真实世界的基础上，通过计算机生成的�
 
 > [微信官方总结两者区别](https://developers.weixin.qq.com/community/develop/article/doc/0008ae6f288ee85cb1f7344f35b413)
 
-### 识别与跟踪
+### 🥬 识别与跟踪
 
 浏览器中可用的库 ： JSARToolKit、Tracking.js、jsFeat、js-aruco
 
@@ -40,7 +40,7 @@ AR 增强现实，是指在真实世界的基础上，通过计算机生成的�
 - Vision Kit 是一个使用一些深度学习框架 （如 TensorFlow） 进行深度学习的训练和推断，结合一些计算机视觉算法（如 OpenCV），形成的识别追踪库。具备：平面检测、人脸识别、手势识别、跟踪等能力。
   > AR 中最难部分就是跟踪
 
-### 渲染
+### 🍽️ 渲染
 
 浏览器中可用的库：Three.js、Babylon.js、playCanvas、pixi.js(2d)
 
@@ -54,7 +54,7 @@ AR 增强现实，是指在真实世界的基础上，通过计算机生成的�
 - [threejs-miniprogram](https://github.com/wechat-miniprogram/threejs-miniprogram)
 - [threejs-wx](https://github.com/amorwilliams/threejs-wx)
 
-### 技术方案 🍱
+### 🍱 技术方案
 
 在 web 端（包括小程序）实现完整的 AR 能力，有哪些技术方案呢？
 
@@ -85,7 +85,7 @@ v2 肯定比 v1 多喽～
 - v1 只能检测水平面
 - v2 除了水平面，也可以识别竖平面
 
-#### ⛓ 稳定性
+#### ⚖ 稳定性
 
 v1 版本不如 v2 版本稳定。
 
@@ -96,7 +96,7 @@ v1 版本不如 v2 版本稳定。
 > V1 版，当手机摄像头没有朝向地面时，3D 模型会漂移、忽大忽小、无法停留在开始的位置。原因是 AR 以地面为跟踪目标，如果地面从手机画面中消失，V1 版 AR 就无法正常运行。\
 > V2 版，AR 以房间环境为跟踪目标，不会因为手机姿态造成 3D 模型漂移。但遮住手机摄像头，V2 版 AR 也无法正常运行。
 
-#### 准确性与成功率
+#### ✌🏻 准确性与成功率
 
 v2 检测准确性高于 v1，但成功率低于 v1，具体难度取决于手机。  
 通过项目实践的经验，个人认为原因是：
@@ -104,7 +104,7 @@ v2 检测准确性高于 v1，但成功率低于 v1，具体难度取决于手�
 - v2 是真的检测现实中的平面，如果对准的位置是墙，那一定是检测不到的（准确高），但有些手机对准地面可能需要手机放平才检测到（难度高）。
 - v1 之所以容易，是因为 v1 并没有识别现实场景，而是直接去生成一个水平面。所以 v1 几乎每次都成功（难度低），但手机不对着地面的时候，模型会悬空（准确低）。
 
-#### 兼容性
+#### 🔌 兼容性
 
 开发期间调研，iphone 8 以上均支持 v2 版本，Android 很少部分支持 v2。（项目线上数据待统计，不知道能否公开）
 
@@ -127,7 +127,7 @@ v2 检测准确性高于 v1，但成功率低于 v1，具体难度取决于手�
 （下面的代码都视作伪代码）  
 scene - 场景；renderer - 渲染器；modelGroup - 模型和模型阴影； light - 灯光；
 
-### 模型效果（阴影等）
+### 👗模型效果（阴影等）
 
 - 阴影对象
 
@@ -197,7 +197,7 @@ model.castShadow = true;
 model.receiveShadow = true;
 ```
 
-### 向后兼容
+### 🪜向后兼容
 
 - 由于我们是线下活动，人来人往，对稳定性要求极高，否则模型经常飘走无法完成拍照功能，所以我们需要优先使用 v2。
 - 但由于部分手机（比如 iphone13 mini）检测成功率低，总是无法放置模型体验也不好，所以我们做了版本降级的逻辑：当 v2 连续 x 次检测不到时，切换为 v1 版本。
@@ -264,8 +264,9 @@ function setErrSupportVK() {
   Taro.setStorageSync(VK_STORAGE_KEY, VkVersion.Error); //本地存储
 }
 ```
-
-### 内存问题解决
+想要更好的体验，只能期待(*❦ω❦)vision kit和硬件升级🥺
+### 🚀内存问题解决
+打开页面的次数增多，会造成小程序闪退，我们从内存释放角度解决。
 
 - AR 场景
 
@@ -277,8 +278,8 @@ if (session) {
 }
 ```
 
-- 3d 渲染\
-   three.js 会创建在渲染中所必需的特定对象，这些对象并不会被自动释放；相反，应用程序必须使用特殊的 API 来释放这些资源。[官方说明在这里](https://threejs.org/docs/index.html#manual/zh/introduction/How-to-dispose-of-objects)\
+- 3d 渲染  
+   three.js 会创建在渲染中所必需的特定对象，这些对象并不会被自动释放；相反，应用程序必须使用特殊的 API 来释放这些资源。[官方说明在这里](https://threejs.org/docs/index.html#manual/zh/introduction/How-to-dispose-of-objects)
 
 ```js
 // mesh 释放
@@ -325,7 +326,7 @@ if (renderer) {
 
 > 做了以上这些卸载，有一定作用，但是加载模型还是会有内存问题，希望大佬们在评论区给些建议
 
-### 重置（平面检测后重新放置模型）与平移
+### 💫重置（平面检测后重新放置模型）与平移
 
 开发过程中遇到，重置与平移功能无法完美共存的问题。以手指向左滑动，模型左移为例子来进行下面的说明。
 
