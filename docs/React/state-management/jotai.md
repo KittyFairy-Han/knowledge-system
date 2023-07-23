@@ -1,3 +1,8 @@
+---
+theme: channing-cyan
+highlight: an-old-hope
+---
+
 状态管理的学习又续上了，死磕 React 状态管理到底！ jotai 现在也获得了很多人的喜爱，是 React-context 的完善版（解决 Provider 嵌套和 re-render），是 Recoil 的简化版。和 Recoil 理念一致，都是“原子化”。现在开始！！！
 [完整示例](https://codesandbox.io/s/react-zhuang-tai-guan-li-xue-xi-dglmj8?file=/src/by-zustand/main.tsx)
 
@@ -5,38 +10,39 @@
 
 #### 用起来感觉（和 zustand 比好的 ✔️，差的 ✖️）
 
-- 🤗 与时俱进：积极拥抱 hooks
-- 🫧 简洁无比：不需要使用 context providers 包裹应用、✔️ 不用 selector 映射 state
-- 😊 门槛低：心智负担比较低 atom、useAtom 够用，又神似 useState
-- ⚛️ 原子化：✔️ 天然 re-render 优化，不需要借助外部在组件中手动处理
-- 💝 可以持久化（存到 localStorage）
-- 🔌 可扩展（插入中间件）
-- 🚧 ✖️ 外部不可用，只能组件中用
-- 📑 没有 action 的概念，✖️ 复用性差一些
+*   🤗 与时俱进：积极拥抱 hooks
+*   🫧 简洁无比：不需要使用 context providers 包裹应用、✔️ 不用 selector 映射 state
+*   😊 门槛低：心智负担比较低 atom、useAtom 够用，又神似 useState
+*   ⚛️ 原子化：✔️ 天然 re-render 优化，不需要借助外部在组件中手动处理
+*   💝 可以持久化（存到 localStorage）
+*   🔌 可扩展（插入中间件）
+*   🚧 ✖️ 外部不可用，只能组件中用
+*   📑 没有 action 的概念，✖️ 复用性差一些
 
 #### 原理架构上
 
 与 redux、zustand 完全不同的设计理念，基于 react-context 的穿透能力把状态以原子形式分散到 React 内部全局。而 Zustand 状态 在 React 之外的 store 中，通过 hook 进行外部与 React 的连接。
 
-- atom.ts 导出 atom 方法，用来存入状态配置即“原子”。
-- store.ts 是实际的状态管理层，实现“原子”到状态的映射，管理状态之间的依赖关系，实现状态的增删改逻辑。向外部暴露状态的读 get、写 set、订阅 sub 的方法。
-- useAtomValue.ts 执行 sub 注册 listener，通过 rerender 对组件进行重渲染。
-- useSetAtom.ts 主要逻辑就是返回 store.set 的能力。
-- useAtom.ts 就是返回 [useAtomValue(),useSetAtom()] 了啦。
+*   atom.ts 导出 atom 方法，用来存入状态配置即“原子”。
+*   store.ts 是实际的状态管理层，实现“原子”到状态的映射，管理状态之间的依赖关系，实现状态的增删改逻辑。向外部暴露状态的读 get、写 set、订阅 sub 的方法。
+*   useAtomValue.ts 执行 sub 注册 listener，通过 rerender 对组件进行重渲染。
+*   useSetAtom.ts 主要逻辑就是返回 store.set 的能力。
+*   useAtom.ts 就是返回 \[useAtomValue(),useSetAtom()] 了啦。
 
 ## 使用
 
 #### 类型
 
 atom 可以细分为以下几种类型：  
-![类型的图](./static/jotai-atom-types.png)  
+
+![jotai-atom-types.png](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/c3fb69a8e52a4f7991f697f2a18df62b~tplv-k3u1fbpfcp-watermark.image?)
 具体区别要结合下面定义和使用 atom 的代码来看
 
 #### 定义 atom
 
-每一种 atom 定义的时候都有一个固定的格式
+每一种 atom 定义的时候都有一个固定的格式，具体看注释
 
-- todoStore.js
+*   todoStore.js
 
 ```ts
 import { atom } from "jotai";
@@ -59,9 +65,9 @@ export const testDriveReadAndWrite = atom(
 
 #### 使用 atom
 
-使用的时候也有固定格式
+使用的时候也有固定格式，具体看注释
 
-- List 列表组件
+*   List 列表组件
 
 ```tsx
 const List = () => {
@@ -89,34 +95,14 @@ const List = () => {
 
   return (
     <section>
-      <span>（共{todoTotal}条）</span>
-      <ul>
-        {todoList.map((item) => (
-          <li key={item.id}>
-            <span>{item.content}</span>
-            <button
-              onClick={() => {
-                deleteTodoItem(item.id);
-              }}
-            >
-              ✔️
-            </button>
-            <button
-              onClick={() => {
-                editTodoItem(item.id);
-              }}
-            >
-              ✏️
-            </button>
-          </li>
-        ))}
-      </ul>
+      <!-- 省略，可看完整示例 -->
+      <!-- 对todo进行删除、修改操作 -->
     </section>
   );
 };
 ```
 
-- Header 用来新增 todo
+*   Header 用来新增 todo
 
 ```tsx
 const HeaderOne = () => {
@@ -137,7 +123,7 @@ const HeaderOne = () => {
 };
 ```
 
-- Root
+*   Root
 
 ```tsx
 const rootElement = document.getElementById("root");
@@ -160,12 +146,12 @@ root.render(
 
 ## 源码分析
 
-学艺不精呀，只能了解一个粗略的流程，没办法实现一个简易版的 jotai  
+学艺不精呀，只能了解一个粗略的流程，没办法实现一个简易版的 jotai
 
-1. 调用 atom
+1.  调用 atom
 
-- - 接收两个参数，分别用于 ① 读取/初始状态 ② 写入状态相关（下文简称 readFn/initialValue，writeFn）
-- - 得到一个状态配置，下文简称 **“原子”**
+*   *   接收两个参数，分别用于 ① 读取/初始状态 ② 写入状态相关（下文简称 readFn/initialValue，writeFn）
+*   *   得到一个状态配置，下文简称 **“原子”**
 
 ```ts
 export function atom<Value, Args extends unknown[], Result>(
@@ -194,13 +180,13 @@ export function atom<Value, Args extends unknown[], Result>(
 }
 ```
 
-2. 组件中调用 useAtom 或 useAtomValue 或 useSetAtom
+2.  组件中调用 useAtom 或 useAtomValue 或 useSetAtom
 
-- - 传入刚刚定义的“原子”
+*   *   传入刚刚定义的“原子”
 
-3. 内部经过 useAtomValue/useSetAtom/依次调用 useAtomValue 和 useSetAtom -> useStore -> useContext 的逐层调用拿到 store（真正的状态容器）
-4. 如果 store 里没数据，说明是首次调用，继续调用 createStore 进行 store 的初始化；否则直接到 step 6.
-5. store 中用 WeakMap 这种数据类型来维护原子到状态的映射，store 暴露给外部 get、set、sub 方法
+3.  内部经过 useAtomValue/useSetAtom/依次调用 useAtomValue 和 useSetAtom -> useStore -> useContext 的逐层调用拿到 store（真正的状态容器）
+4.  如果 store 里没数据，说明是首次调用，继续调用 createStore 进行 store 的初始化；否则直接到 step 6.
+5.  store 中用 WeakMap 这种数据类型来维护原子到状态的映射，store 暴露给外部 get、set、sub 方法
 
 ```ts
 export const createStore = () => {
@@ -221,7 +207,7 @@ export const createStore = () => {
 };
 ```
 
-6. 拿到有数据的 store ，如果组件中调用的是 useAtomValue 则通过 store.get 拿到状态的值；如果组件中调用的是 useSetAtom 则返回 store.set ；如果调用的是 useAtom 则依次进行前两种逻辑
+6.  拿到有数据的 store ，如果组件中调用的是 useAtomValue 则通过 store.get 拿到状态的值；如果组件中调用的是 useSetAtom 则返回 store.set ；如果调用的是 useAtom 则依次进行前两种逻辑
 
 ```ts
 export function useAtomValue<Value>(atom: Atom<Value>, options?: Options) {
@@ -273,8 +259,8 @@ export function useSetAtom<Value, Args extends any[], Result>(
 }
 ```
 
-- - 到这里 const\[value,setValue\] = useAtom(xxx) 的 value 和 setValue 都拿到了
+*   *   到这里 const\[value,setValue] = useAtom(xxx) 的 value 和 setValue 都拿到了
 
-7. 组件中调用 setValue 改变了状态，内部经过 store.set -> writeAtom -> writeAtomState -> atom.write 的逐层调用改变状态
-   > [store.ts](https://github.com/pmndrs/jotai/blob/main/src/vanilla/store.ts#L156) 中的逻辑是最复杂的，也是代码量最多的一个文件，不过作为使用者基本不用关心内部实现，因为我们是没有直接调用的 store 的。
-8. 更新
+7.  组件中调用 setValue 改变了状态，内部经过 store.set -> writeAtom -> writeAtomState -> atom.write 的逐层调用改变状态
+    > [store.ts](https://github.com/pmndrs/jotai/blob/main/src/vanilla/store.ts#L156) 中的逻辑是最复杂的，也是代码量最多的一个文件，不过作为使用者基本不用关心内部实现，因为我们是没有直接调用的 store 的。
+8.  更新

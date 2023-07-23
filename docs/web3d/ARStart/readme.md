@@ -3,6 +3,8 @@ theme: fancy
 highlight: an-old-hope
 ---
 
+这篇文章的重点在于需要实现平面检测的 AR 项目选择技术方案的可能性、微信小程序 visiokit 平面检测能力的具体介绍，希望可以帮助大家在前期技术调研上省时省力些。
+
 AR 增强现实，是指在真实世界的基础上，通过计算机生成的虚拟信息，将虚拟信息与真实世界进行融合，从而达到增强现实的效果。
 
 ## 核心技术及相关技术栈
@@ -66,10 +68,36 @@ AR 增强现实，是指在真实世界的基础上，通过计算机生成的�
 | 微信小程序 vision kit + threejs-miniprogram             | ✔️           | ✔️       | ✔️   |
 | 其他小程序                                              | ？           | ？       | ？   |
 
+- 陀螺仪（伪 AR）  
+  效果类似小程序官方 threedof 示例,demo 路径：交互动画-xframe-总览-AR 能力-ThreeDof AR 相机旋转  
+  ![小程序demo.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/9d8a80987a5b4a3eb178725931cf2b7a~tplv-k3u1fbpfcp-watermark.image?)
+
+- 特定图像识别（AR.js 官网示例
+  如左图，二维码就是一个约定好的标记；如右图平放的恐龙图片也是一个约定好的标记。（中间展示的是地理位置识别）。
+  ![特定图像识别](https://ar-js-org.github.io/AR.js-Docs/intro-image.gif)
+- 特征检测
+  下面会详细介绍平面检测，就不放图啦
+
 ## 项目实践
 
-关键点：① 识别现实世界中的平面，将一个 3D 人物模型“放置”在平面上。 ②3D 经灯光照射有阴影效果，③ 对 3D 模型可进行简单的平移、旋转、缩放操作以便于完成虚拟人物与现实中的人合影。  
-因为需要 “识别现实世界中的水平面”，也就是说需要特征检测，所以最（wu🤷🏻‍♀️）后（nai🤷‍♂️）选择了微信小程序，采用 vision kit + threejs-miniprogram 的技术方案。
+### 关键点：
+
+- 识别现实世界中的平面，将一个 3D 人物模型“放置”在平面上。
+- 可以反复多次识别，重置模型位置。
+- 对 3D 模型可进行简单的平移、旋转、缩放操作以便于完成虚拟人物与现实中的人合影。
+
+#### 演示
+
+![小程序码](./assets/6.jpg)
+<video src="./assets/7.mp4" width="300px" autoplay controls> </video>
+
+#### 玩法流程
+
+![流程图](./assets/8.png)
+
+### 技术方案确定：
+
+因为需要 “识别现实世界中的水平面”，也就是说需要特征检测，所以明（wu🤷🏻‍♀️）智（nai🤷‍♂️）の选择了微信小程序，采用 vision kit + threejs-miniprogram 的技术方案。
 
 ## 微信小程序中的 AR 平面检测能力
 
@@ -106,7 +134,7 @@ v2 检测准确性高于 v1，但成功率低于 v1，具体难度取决于手�
 
 #### 🔌 兼容性
 
-开发期间调研，iphone 8 以上均支持 v2 版本，Android 很少部分支持 v2。（项目线上数据待统计，不知道能否公开）
+距线上数据统计，**支持 v2 版本的用户 ： 仅支持 v1 版本的用户 ≈ 5 ：1**
 
 > 官方数据：
 > [对微信版本要求、不同手机支持程度](https://zhuanlan.zhihu.com/p/544052686)
@@ -116,122 +144,25 @@ v2 检测准确性高于 v1，但成功率低于 v1，具体难度取决于手�
 - v1 以识别成功的平面中心点，为世界坐标系原点。也就是说每次 hitTest 世界坐标的原点都更新了。
 - v2 以手机相机的开始位置，为世界坐标系原点。也就是说 createVkSession 运行成功的瞬间，出现相机画面，屏幕中心点为世界坐标原点。后面 hitTest 再也不变了。
 
-## 代码流程
+## 🪜 难点之向后兼容
 
-针对[官方代码](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/visionkit/base.html)流程画个图吧，我们的项目相比较官方示例，在模型效果和交互上有一些提升。AR 部分的核心代码一样的。
+（下面的代码都视作伪代码）
 
-![3.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/943bfbc4603f46ae9a8ea4e64da150aa~tplv-k3u1fbpfcp-watermark.image?)
+### 原文
 
-## 难点 or 坑点
+VK_STORAGE_KEY -- 本地存储中代表当前用户使用的平面检测版本  
+HIT_FAIL_STORAGE_KEY -- 本地存储中代表连续检测失败的次数
 
-（下面的代码都视作伪代码）  
-scene - 场景；renderer - 渲染器；modelGroup - 模型和模型阴影； light - 灯光；
+#### 原则
 
-### 👗模型效果（阴影等）
-
-- 阴影对象
-
-```js
-// 获取模型的边界框
-const boundingBox = new THREE.Box3().setFromObject(model);
-// 定义平面的尺寸和中心点
-const planeWidth = 3;
-const planeHeight = 3;
-
-// 计算平面的位置
-const planePosition = new THREE.Vector3(
-  (boundingBox.max.x + boundingBox.min.x) / 2,
-  -0.05, //y的位置固定取值，前提是与模型设计师沟通好，人脚低的位置在y轴0点
-  (boundingBox.max.z + boundingBox.min.z) / 2
-);
-
-// 计算平面的旋转角度（与地面平行）
-const planeRotation = new THREE.Euler(-Math.PI / 2, 0, 0);
-
-// 创建了一个半径为1、分成32个段的圆形
-const geometry = new THREE.CircleBufferGeometry(1, 32);
-const material = new THREE.MeshStandardMaterial({
-  color: 0xffffff,
-  transparent: true,
-  opacity: 0.1, // 透明度不能为0 否则无法接收阴影
-});
-const plane = new THREE.Mesh(geometry, material);
-plane.receiveShadow = true;
-plane.castShadow = true;
-plane.position.copy(planePosition);
-plane.rotation.copy(planeRotation);
-```
-
-- render 设置
-
-```js
-renderer = new THREE.WebGLRenderer({
-  antialias: !isIOS, //抗锯齿 IOS需关闭
-  alpha: true,
-  shadowMapEnabled: true, //使渲染器支持阴影贴图
-});
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-```
-
-- 灯光设置
-
-```js
-light = new THREE.DirectionalLight(0xffffff, 1);
-light.position.set(-3, 10, -4); //设置灯光位置
-scene.add(light); //添加到场景
-light.castShadow = true; //设置灯光生成阴影
-// 设置阴影映射参数
-light.shadow.mapSize.width = 1024 * 4;
-light.shadow.mapSize.height = 1024 * 4;
-light.shadow.camera.near = 0.5;
-light.shadow.camera.far = 80;
-light.shadow.opacity = 1; // 设置阴影不透明
-```
-
-- 模型上的设置
-
-```js
-//设置模型生成阴影并接收阴影
-model.castShadow = true;
-model.receiveShadow = true;
-```
-
-### 🪜向后兼容
-
-- 由于我们是线下活动，人来人往，对稳定性要求极高，否则模型经常飘走无法完成拍照功能，所以我们需要优先使用 v2。
-- 但由于部分手机（比如 iphone13 mini）检测成功率低，总是无法放置模型体验也不好，所以我们做了版本降级的逻辑：当 v2 连续 x 次检测不到时，切换为 v1 版本。
+- 由于我们是线下活动，人来人往，对稳定性要求极高，否则模型经常飘走无法完成最终的打卡拍照功能，所以我们需要优先使用 v2。
+- 但由于部分手机（比如 iphone13 mini）检测成功率低，总是无法放置模型体验也不好，所以我们做了版本降级的逻辑：当 v2 连续第 6 次检测不到时，切换为 v1 版本。
 - 对于根本无法支持 AR 功能的情况，我们提供了自拍模式，用相机画面+动态贴图的方式来实现合影。
   > 有些手机，系统版本支持，但是硬件不支持，无法通过版本提前预判，只能在创建 AR 会话的回调函数中感知。
 
+#### 兼容逻辑
+
 ```ts
-function compareVersion(targetVersion) {
-  let fn = Taro.getAppBaseInfo ? Taro.getAppBaseInfo : Taro.getSystemInfoSync;
-  let cur = fn().SDKVersion as string;
-  let v1 = cur.split(".");
-  let v2 = targetVersion.split(".");
-  const len = Math.max(v1.length, v2.length);
-
-  while (v1.length < len) {
-    v1.push("0");
-  }
-  while (v2.length < len) {
-    v2.push("0");
-  }
-
-  for (let i = 0; i < len; i++) {
-    const num1 = parseInt(v1[i]);
-    const num2 = parseInt(v2[i]);
-
-    if (num1 > num2) {
-      return 1;
-    } else if (num1 < num2) {
-      return -1;
-    }
-  }
-
-  return 0;
-}
 enum VkVersion {
   V0 = "v0",
   V1 = "v1",
@@ -241,115 +172,102 @@ enum VkVersion {
 }
 function setSupportVK() {
   let canUseV;
+  // compareVersion 用来比较 当前微信基础库版本与目标基础库版本，微信官方提供了类似的方法，不写了
   if (compareVersion("2.20.0") < 0) {
-    console.log("系统版本低，不支持 ar");
+    //①系统不支持 AR
     canUseV = VkVersion.V0;
-    showCantArToast(); //toast 提示用户不支持 AR
+    showCantArToast(); // toast 提示
   } else {
     if (compareVersion("2.22.0") >= 0 && Taro.isVKSupport(VkVersion.V2)) {
-      console.log({ title: "当前系统支持高版本AR", icon: "success" });
+      // ②系统支持 v2
       canUseV = VkVersion.V2;
     } else {
-      console.log("系统支持低版本 ar");
+      // ③系统仅支持 V1
       canUseV = VkVersion.V1;
       showLowVersionModal(); //弹窗 提示用户使用低版本或使用自拍
     }
   }
-  Taro.setStorageSync(VK_STORAGE_KEY, canUseV); //本地存储
+  Taro.setStorageSync(VK_STORAGE_KEY, canUseV);
   return canUseV;
 }
+// ④系统支持 AR，但设备不支持 AR
+// session.start 回调 error 时执行这个方法
 function setErrSupportVK() {
-  console.log("微信 api 识别支持，但是创建 ar 失败了");
-  showCantArToast(); //toast 提示用户不支持 AR
-  Taro.setStorageSync(VK_STORAGE_KEY, VkVersion.Error); //本地存储
+  showCantArToast(); // toast 提示
+  Taro.setStorageSync(VK_STORAGE_KEY, VkVersion.Error);
 }
-```
-想要更好的体验，只能期待(*❦ω❦)vision kit和硬件升级🥺
-### 🚀内存问题解决
-打开页面的次数增多，会造成小程序闪退，我们从内存释放角度解决。
-
-- AR 场景
-
-```js
-if (session) {
-  webglBusiness.dispose();
-  session.destroy();
-  session = null;
-}
-```
-
-- 3d 渲染  
-   three.js 会创建在渲染中所必需的特定对象，这些对象并不会被自动释放；相反，应用程序必须使用特殊的 API 来释放这些资源。[官方说明在这里](https://threejs.org/docs/index.html#manual/zh/introduction/How-to-dispose-of-objects)
-
-```js
-// mesh 释放
-if (modelGroup) {
-  modelGroup.traverse((object) => {
-    if (object.isMesh) {
-      const { geometry, material, skeleton } = object;
-      geometry.dispose(); //几何体释放
-      material.dispose(); //材质释放
-      Object.keys(material).forEach((propName) => {
-        const propValue = material[propName];
-        if (propValue && propValue.isTexture) {
-          propValue.dispose(); //纹理释放
-        }
-      });
-      if (skeleton && skeleton.boneTexture) {
-        skeleton.boneTexture.dispose(); //骨骼纹理释放
-      }
+// 用户在使用过程中，由于检测频繁失败，从 v2 降级到 v1
+// 每次 session.hitTest 之后都执行这个方法进行记录次数
+export const checkUseLowVersion = (success: boolean) => {
+  const hitFailCount = Number(Taro.getStorageSync(HIT_FAIL_STORAGE_KEY));
+  if (success) {
+    Taro.setStorageSync(HIT_FAIL_STORAGE_KEY, 0);
+  } else {
+    Taro.setStorageSync(HIT_FAIL_STORAGE_KEY, hitFailCount + 1);
+    if (hitFailCount === 5) {
+      // ⑤ v2 降级为 v1
+      showLowVersionModal(); //降级通知弹窗
+      Taro.setStorageSync(VK_STORAGE_KEY, VkVersion.V1);
     }
-  });
-  scene.remove(modelGroup);
-  modelGroup = null;
-}
+  }
+};
+```
 
-// 灯光阴影
-if (light) {
-  light.shadow.map.dispose();
-  scene.remove(light);
-  light = null;
-}
+想要更好的体验，只能期待(\*❦ω❦)vision kit 和硬件升级 🥺
 
-// 清除场景本身
-if (scene) {
-  scene.dispose();
-  scene = null;
-}
+### 20230723
 
-// render 释放
-if (renderer) {
-  renderer.dispose();
-  renderer = null;
+除了这个标题下，其他都是 6 月底的原文。项目结束后，针对版本兼容的优化没有停止，有收获！！！所以来补充。  
+两个思路，（一）是从提高 v2 的检测成功率入手；（二）是从提高 v1 的稳定性入手。虽然无法从根本解决问题，但是通过优化业务流程间接的解决了（一）！那就是实时检测平面，而不是用户点击的时候去检测。
+
+#### 流程图对比：
+
+![对比](./assets/9.png)
+
+#### 效果图比：
+
+<div style="flex">
+<video src="./assets/10.mp4" width="300px" autoplay controls> </video>  
+<video src="./assets/11.mp4" width="300px" autoplay controls> </video>
+</div>
+
+#### 核心代码
+
+- detecting 表示当前是否为重置模式
+- reticle 为光圈对象
+- currentAnchor 用来存储当前变换矩阵的信息
+
+代码上的变化就是：
+
+- 每一帧都调用 hitTest。
+- 用户点击确认后，不进行 hitTest 而是直接使用 currentAnchor 来为模型做矩阵变换。
+
+```ts
+// 主渲染函数增加逻辑：
+if (detecting && reticle) {
+  const hitTestRes = session.hitTest(0.5, 0.5);
+  if (hitTestRes.length) {
+    // 应用变换的逻辑
+    // ...
+    // 应用变换的逻辑
+    if (reticle.position.z != 0) {
+      reticle.visible = true;
+      currentAnchor = anchor;
+    } else {
+      reticle.visible = false;
+    }
+  } else {
+    reticle.visible = false;
+  }
 }
 ```
 
-> 做了以上这些卸载，有一定作用，但是加载模型还是会有内存问题，希望大佬们在评论区给些建议
+## 其他坑点
+没有得到完美解决，就当给大家打个预防针吧  
 
-### 💫重置（平面检测后重新放置模型）与平移
+- 重置与平移功能不兼容
+  市面上的小程序也没有重置和平移功能并存的，基本上都是重置+旋转+缩放，可能大家都发现了这个问题吧。在体验的过程中，使用重置功能后，平移方向会不对。正常来说应该在渲染函数中拿到 ar 相机的位置，然后基于它去计算模型的平移，但实际上拿不到正常的 ar 相机位置，目前分析是 vksession 没有这个能力或者是个 bug。
+- 内存问题
+  小程序 AR 普遍存在内存问题，我们的小程序也是，代码层面已经做了 vksession 的卸载，还有 3d 虚拟场景的卸载，但问题仍然没有完全解决。不知道是不是小程序的 three 或者 vksession 本身有内存问题，还有待研究。
 
-开发过程中遇到，重置与平移功能无法完美共存的问题。以手指向左滑动，模型左移为例子来进行下面的说明。
 
-#### 问题描述
-
-相机打开瞬间（朝向正东方）创建了世界坐标系，模型刚好朝着相机，监听 onTouchMove，获取手指滑动距离 dir，调用 model.position.x=model.position.x-dir。模型的表现为向左平移。  
-当手机姿态发生改变，比如朝向正西方，放置模型。模型会朝着相机，但是手指向左滑动时，模型向右移动。
-
-#### 解决方案
-
-- 实时计算正确方位
-
-拿到相机和模型在 3d 空间的坐标，根据模型与相机的位置关系实时计算模型应该移动的方向。以模型位置指向相机位置的向量为模型的前方，后、左、右依次类推。手指上、下、左、右滑动时，对应的模型平移方向分别为前方，后、左、右。
-然后踩坑了，相机和模型拿到的位置坐标永远都是 0 0 0，大无语。
-
-- 反复销毁创建 AR 场景
-
-每次放置模型时，都重新创建 AR 场景，创建完立刻执行 hitTest，把模型加到场景中。方向是对了。\
-但是！销毁创建会导致画面闪烁，并且那些不容易检测的手机再也检测不到平面了。
-
-- 刷新
-
-一切重来！对模型数据进行缓存，每次放置模型时都刷新一次页面，重新创建 AR 场景，创建完立刻执行 hitTest。方向肯定是对的啦，也不会画面闪烁。
-但那些不容易检测的手机还是再也检测不到平面。
-
-#### 最优解：毁灭吧！
