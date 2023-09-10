@@ -168,6 +168,7 @@ module.exports = {
         ["/scene/screenshoots", "前端截屏方案"],
         ["/scene/modelViewer", "modelViewer"],
         ["/scene/framerMotion", "动画库"],
+        ["/scene/cli", "脚手架工具"],
       ],
       "/web3d/": [
         ["/web3d/demoStart/", "3d入门之空间与模型"],
