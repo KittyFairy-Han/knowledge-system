@@ -123,6 +123,14 @@ module.exports = {
             ["/React/state-management/jotai", "jotai"],
           ],
         },
+        {
+          title: "动画库",
+          collapsable: false,
+          path: "/React/animate/",
+          children: [
+            
+          ],
+        },
       ],
       "/Vue/": [
         ["/Vue/use", "使用"],

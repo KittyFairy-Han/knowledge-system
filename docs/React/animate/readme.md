@@ -6,8 +6,8 @@
 
 ##### 调研了一下 star >≈10k、仍在维护的动画库在 npm 上的情况如下
 
-![图一](./static/framer-motion-npm_1.png)
-![图二](./static/framer-motion-npm_2.png)
+![图一](./static/all-npm_1.png)
+![图二](./static/all-npm_2.png)
 
 > react-transition-group 的下载量是远超于其他库的
 
@@ -66,7 +66,7 @@ react 项目中，
 ## 用法对比
 
 列出一些基础用法，maybe 可以从使用上感觉到框架设计风格的迥异，在能够达到需求的基础上选择自己喜欢的框架～
-> !!! React Spring 和 Framer Motion 都很厉害，一下子学不完，再次强调这篇就是 基础用法 感受风格 ！！！
+>  React Spring 和 Framer Motion 都很厉害，一下子学不完，再次强调这篇就是 基础用法 感受风格 
 
 ### react-transition-group
 
@@ -217,13 +217,13 @@ export default function App() {
 }
 ```
 
-**vs？**
-- React Spring 和 Framer Motion 有一些相似之处，比如 animated.xxx 和 motion.xxx 就有异曲同工之妙，都可以通过绑定属性变化来触发运动
-- 对于弹簧的运动方式，都支持配置一系列的物理参数。此时 duration 的使用是有限制性的
-- 都不依赖 React 渲染
-- 写法上 Framer Motion 好像更简洁，更偏向配置，甚至可以直接通过 whilexxx 配置交互
-- Framer Motion 除了弹簧模式，还有补间和惯性的方式
-- React Spring 简单用法通过 useSpring 返回的 props 可以拿到变化中的值，Framer Motion 的简单用法变化中的值是个黑盒，不过 Framer Motion 的一些高级 hook 可以拿到
+**vs 一下 ？**
+- 🎼 React Spring 和 Framer Motion 有一些相似之处，比如 animated.xxx 和 motion.xxx 就有异曲同工之妙，都可以通过绑定属性变化来触发运动
+- ⚙️ 对于弹簧的运动方式，都支持配置一系列的物理参数。此时 duration 的使用是有限制性的
+- ☝️ 都不依赖 React 渲染
+- 🧶 🪢 写法上 Framer Motion 好像更简洁，更偏向配置，甚至可以直接通过 whilexxx 配置交互
+- 🎵 🎶 Framer Motion 除了弹簧模式，还有补间和惯性的方式
+- 📨 📧 React Spring 简单用法通过 useSpring 返回的 props 可以拿到变化中的值，Framer Motion 的简单用法变化中的值是个黑盒，不过 Framer Motion 的一些高级 hook 可以拿到
 - 再对比 transition-group，transition-group的动画触发条件都是数据的变化->元素的渲染与卸载，使用面更窄，没有物理和交互的能力。
 
 
