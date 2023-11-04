@@ -175,7 +175,6 @@ module.exports = {
         ["/scene/lottieUsage", "lottie的应用场景"],
         ["/scene/screenshoots", "前端截屏方案"],
         ["/scene/modelViewer", "modelViewer"],
-        ["/scene/framerMotion", "动画库"],
         ["/scene/cli", "脚手架工具"],
       ],
       "/web3d/": [
