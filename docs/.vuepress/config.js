@@ -176,6 +176,7 @@ module.exports = {
         ["/scene/screenshoots", "前端截屏方案"],
         ["/scene/modelViewer", "modelViewer"],
         ["/scene/cli", "脚手架工具"],
+        ["/scene/vscode-extension", "vscode插件"],
       ],
       "/web3d/": [
         ["/web3d/demoStart/", "3d入门之空间与模型"],
