@@ -177,6 +177,7 @@ module.exports = {
         ["/scene/modelViewer", "modelViewer"],
         ["/scene/cli", "脚手架工具"],
         ["/scene/vscode-extension", "vscode插件"],
+        ["/scene/pay", "支付"],
       ],
       "/web3d/": [
         ["/web3d/demoStart/", "3d入门之空间与模型"],
