@@ -13,6 +13,7 @@
     "docs:build": "vuepress build docs"
   },
   "dependencies": {
-    "@markspec/vuepress-plugin-image": "^1.1.3"
+    "@markspec/vuepress-plugin-image": "^1.1.3",
+    "@star/tools": "^0.0.5-alpha.0"
   }
 }

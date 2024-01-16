@@ -1,134 +1,310 @@
-笔者一直以来前端工具这块欠缺，这不，想继续解锁个新技能 ————> 学习做个 vscode 插件。  
-这篇另一个功能就是为我积攒了一年的焦虑做个出口。。。不想看碎碎念的提前预警了喔。
+## 需求
 
-## 做个 vscode 主题
+实现一个工具函数库，可以通过 npm 包和 vscode 插件两种方式使用
 
-做插件的流程不难，官方文档还有很多其他人的经验，我这里就不赘述了。我这里记录一下遇到的奇怪问题和解<i style="font-size:12px">（凑）</i>决<i style="font-size:12px">（字）</i>的<i style="font-size:12px">（数）</i>心<i style="font-size:12px">（就）</i>路<i style="font-size:12px">（用）</i>历<i style="font-size:12px">（流）</i>程<i style="font-size:12px">（水）</i>吧<i style="font-size:12px">（账）</i>。
+#### 工具函数库目录结构：
 
-#### 问题一 没有用于调试 JSON with Comments 的扩展
+- star-tools
+  - validators
+    - index.ts 计划把验证函数都放到这一个文件中
+  - 3d
+    - control1.ts 因为 3d 类似 control 这种代码会比较长，是一个类，所以单独用文件
+    - control2.ts
+    - index.ts 引入 control1、control2 等然后统一导出
+  - ...
+    - ...
+    - index.ts
 
-安装 yo 和 yo code 之后，生成模板代码，按下 f5 调试，报错了，说没有用于调试 JSON with Comments 的扩展。
+#### 期望的 npm 包使用方式：
 
-<img src="./static/vscode-ext-theme-q.png" width="300">
+```js
+import {control1} 'star-tools/3d'
+```
 
-1.  根据 vscode 的提示（报错弹窗中的蓝色按钮），直接搜索插件，看着都不靠谱，就没安装。
-2.  去 google 一下，有人说安装一个 c++ 的插件，然后我发现那个插件已经弃用了，安装了看起来一样功能的插件，还是同样的报错。
-3.  问 chatgpt，也是说安装插件。。。
-4.  好吧，只能问同事了。人家就是正常的流程，丝滑的启动了调试窗口，他说这是默认就有的能力，应该不用额外装插件。
-5.  忽然想起了，刚安装 vscode 的时候我好像删过一些插件，可能是让我瞎删了。我的 mac 有两个号，vscode 配置不共享，我用另一个号，果然可以启动调试！！！虽然不知道原因，但估计重装一下就能解决问题了。
-6.  把另一个账号的 vscode 配置同步过来，重启 vscode，重新生成模板代码，按下 f5 调试 OK！。
-7.  再不好使，我真的只能重装大法了。
+control1 拿到的就是 ts 源码
 
-#### 问题二 调试窗口未应用主题
+#### 期望通过 vscode 插件使用的方式
 
-1. 虽然调试窗口启动了,但应用不是正在开发的主题。。。
-2. 关掉调试，重新启动，好了。。。莫名其妙。。。
+1. 调出 vscode 命令面板
+2. 每个函数对应一个命令，比如输入 star-tools:3d/control1，找到这个命令
+3. 选中命令后 enter
+4. control1.ts 中的代码插入到当前工作区的 focus 处
 
-#### 技巧一 自己配色太难了
+## 项目目录制定
 
-1. 打开文件系统，command+shift+. 隐藏文件可见。
-2. 找到一个自己觉得还不错的主题（我找的是 monokai pro（filter Machine）.json
-3. 配色如何对应到 json 中的字段，按下图操作  
-   <img src="./static/vscode-ext-theme-q2.png">
+两种方式在一个项目中，共用一份源码，主要是为了不维护双份的工具函数  
+如果不考虑两种方式共用一个项目，
 
-#### 技巧二 a little 奇怪的思路
+#### 对于 npm 包引用的方式，目录结构：
 
-1. 我就图省事，直接把 json 文件复制到 monokai pro 的 themes 文件夹下了
-2. 改一下 monokai pro 的 package.json，然后重启 vscode 应用了自己主题 hhh
-   <img src="./static/vscode-ext-theme-q3.png">
-   <img src="./static/vscode-ext-theme-q4.png">
+- star-tools
+  - validators、3d、... 目录不变
+  - .gitignore
+  - package.json
 
-#### [官方可以在线做主题了](https://themes.vscode.one/)
+直接 publish 源码，install 的就是源码，可以 import {control1} 'star-tools/3d' 引用到
 
-### impression
+#### vscode 插件目录结构
 
-so easy 是真的，但对于我来说 so hard 更是真的，再次被自己的短板狠狠地抽打了。不过最后搞出来还是挺开心的 (#^.^#) 。
+- star-tools
+  - src
+    - extension.ts 插件的入口文件，主要是插件的逻辑代码
+  - tools
+    - 省略，就是把三个分类文件夹直接移动过来
+  - .gitignore
+  - package.json
+  - tsconfig.json
 
-## 做个 vscode 插件
+#### 结论
 
-#### 问题一 命令错误
+显而易见了，就直接用 vscode 插件的目录结构，这样直接 publish 源码仍然可以引用到工具函数，并且两种方式共用同一份 tools
 
-安装 yo 和 yo code 之后，生成模板代码，按下 f5 调试，窗口打开了，然后运行 hello world 长这样。
+> 目前来看，这样的目录结构虽然 ok，但是会有不合理的地方，比如要把只和 vscode 相关的部分也发布到了 npm，这个会在稍后解决。
 
-<img src="./static/vscode-ext-q.png" width="300">
+## 前置知识恶补
 
-和无调试工具换汤不换药，配置同步过来就好了。
+整个开发过程其实很不顺利，开发之前要先做一些调研，有一些前置知识会少走弯路。但很矛盾的是，一开始根本没有头绪，都不知道要先掌握哪些基本的前置知识。希望我总结的这些前置知识可以让你少走弯路咯 ~
 
-#### 问题二 vsce command not found
+### 各种有用的配置文件
+
+- package.json : 配置主入口、依赖、scripts 等、开发和发布后都要用到
+- tsconfig.json : 负责把 ts 编译 为 js。vscode 插件运行时只能是 js，如果插件源码是 ts，tsconfig 是必要的（或者用一些其他的打包工具内部集成了 ts 编译为 js 的能力）
+- .vscode 目录下的配置文件是用来配置 vscode 调试功能的，插件发布后无关。
+- .npmignore 用来过滤发布到 npm 的文件。
+- .vscodeignore 用来过滤发布到 [marketplace](https://marketplace.visualstudio.com/) 的文件。
+
+### F5 调试插件时 干嘛了
+
+调试的入口文件为 .vscode/launch.json，一般情况下，vscode 左侧 debugger 工具面板都会自动定位到 .vscode/launch.json 中的 第一个命令  
+![](./static/vscode-ext-1.png)  
+按下 f5 时，先经历了这样的过程，然后再把调试窗口启动  
+![](./static/vscode-ext-2.png)  
+原来 f5 并不神秘，就是 npm run dev 哇，实际执行的脚本在 star-tools 中是
 
 ```bash
-yarn global add vsce # 安装后有 .yarn/bin/vsce，但是 vsce command not found
-npm install -g vsce # OK！！
+yarn run remove-out && tsc && yarn run move-src && node ./build/genVscdPkg.js
 ```
 
-1. 一开始用 yarn 安装，安装成功
-2. 使用命令报找不到
-3. google 搜过、chatgpt 聊过，总结起来就是检查一下本地全局的 node_modules 有没有
-4. 跟着一些命令行操作都确认了，确实全局有在.yarn/bin/vsce
-5. 实在无奈就换 npm 了，就好了
+只看 tsc，它是负责把 ts 编译为 js 的，之后插件才能在 vscode 的环境中运行起来。编译之前会先读取 tsconfig.json 中的配置，然后开始编译并输出编译后的代码。
+（remove-out、move-src、node ./build/genVscdPkg.js 先不管，这些都属于对目录和文件内容的定制化处理。）  
+![](./static/vscode-ext-3.png)
 
-#### 问题三 发布成功但搜不到
+- 一般情况下 rootDir 都等同于当前目录所以是 './'
+- 对于 star-tools 来说工具函数是不需要编译的，因为 star-tools 不参与运行，充当代码片段的作用。和插件相关的逻辑代码才需要编译，逻辑代码都在 src 下。所以配置了 includes
+- 编译后输出到 out 目录下，out 目录下的文件与 src 下的对应
+- 配置 mapSource 为 true 方便调试，所以可以看到 out 目录下都有对应 .map.js
 
-1. [markplace 平台使用](https://marketplace.visualstudio.com/manage/publishers)，像我这样跟着操作都能搞下来，估计没人会遇到问题了。
-2. 我没改模板代码中的内容，就直接发布了，先试试流程。
-3. 到 vscode 扩展市场搜索
-4. 咱也搞不懂为啥用插件名搜不到，要用组织名才行。。[官方说修复过](https://github.com/Microsoft/vscode/issues/42890#event-5181377526)
+================== ok！上面编译阶段就完成了， ====================  
+这时 vscode 就会把编译窗口启动，开始运行代码，再次看 package.json。其中 main 选项配置的文件就是运行时的入口文件
 
-![搜插件的正确姿势](./static/vscode-ext-q3.png)
-
-#### 问题四 最基本的关联关系
-
-执行插件的具体命令和命令反馈  
-![最简单的例子](./static/vscode-ext-q4.png)  
-需要：
-
-1. package.json 配置命令
-
-```JSON
-"contributes": {
-        "commands": [
-            {
-                "command": "fariy-test-ext.helloWorld",//类似命令 id
-                "title": "Hello World" //ctrl+shift+p 时显示的命令名称
-            }
-        ]
- }
+```json
+"main": "./out/main.js",
 ```
 
-2. 命令反馈
+运行时就是插件的逻辑了，取决于插件的功能啦，star-tools 最开始的逻辑就是把每个工具函数都注册为命令，然后巴拉巴拉...(后面讲具体功能再说)
 
-```JS
-const handleHelloWord = () => {
-		vscode.window.showInformationMessage('Hello World from fariy-test-ext!'); //显示消息弹窗
+### vsce publish 干嘛了 ？
+
+运行 vsce publish 命令后，经历了这样的过程：  
+![ vsce publish 干嘛了 ](./static/vscode-ext-4.png)
+
+- 使用 yarn run esbuild-base 来编译，是因为 esbuild 在 tsc 的基础上有一些扩展功能比如压缩等，编译之前也读取了 tsconfig 的配置。我这里其实只是强迫症想合并到一个文件。
+- 编译打包之后输出到 out 文件夹
+
+============= 发布准备结束！下面就到发布阶段了 ==============  
+（其实上面的流程也是编译阶段，和开发调试时不一样在于配置不同输出不同）
+
+- 读取 .vscodeignore 对文件进行过滤
+- 发布到 marketplace
+
+### 安装插件 又干嘛了 ？
+
+点击安装 => 下载发布到 marketplace 的插件源码 => 根据 package.json 中的 dependencies（‼️ 注意 ，要考的）安装依赖  
+![安装vscode后](./static/vscode-ext-5.png)  
+什么时候运行呢？由 package.json 中的配置项 activationEvents 决定
+
+- 不配置或者为 [] ：当在命令面板中选择插件相关的命令时开始进入运行时
+- 配置为 \* 号 ： vscode 启动就进入运行时
+
+======================= 安装阶段 🔚 =========================
+
+运行时入口文件是 package.json 中的 main，接下来同开发调试时啦
+
+### npm publish 比 vsce publish 简单多了
+
+![npm publish](./static/vscode-ext-6.png)
+
+- 不需要 tsc 编译了，因为就是发布源码，直接引用。（至于 node ./build/genNpmPkg 先不管，也是属于对目录和文件内容的定制化处理）
+
+### npm install
+
+过滤后安装的包结构：
+
+```
+- star-tools
+  - tools
+    - ... 源码结构
+  - package.json
+  - readme.md
+```
+
+
+### 注意
+
+- 发布时版本号要更新
+
+### 开发插件第一阶段 各种配置
+
+#### 工具函数那么多，每个命令都手动注册一下太累了
+
+应该直接读取文件目录，和 tools/xxx/index.ts,然后拿到函数名称，循环注册。package.json 中 commands 的配置就先手动配，后面会改成图形界面的，就不用一一列在 commands 的数组里了
+
+#### fs.require 没办法读取 tools 下的 ts 源码
+
+本来通过 fs.require(tools/xxx/index.ts) 去读文件内容，然后拿到文件的对象，进而到函数名，但 fs.require 没办法读 ts 文件内容。
+我去问了 gpt，gpt 提供了几个方法，然后全踩坑了。。。其中花时间最多的就是 gpt 说用 babel，babel 配置就搞了 3 小时，最后知道了 gpt 少说了一个依赖。  
+真的不要太相信 gpt 了。。
+babel 终于能运行了，但实际上 ts 还是被编译成 js，fs.require 读到的也是编译之后的了，所以一开始思路就是错的。
+真正的解法是通过 ast 语法树去解析拿到函数代码片段
+
+#### 打包目录整理
+
+一开始没加入 ast 的逻辑，就先试试能不能直接读取源码，整个源码文件内容全部拿出来然后插入到用户的编辑器中。在默认的配置下（vscode 插件代码模板的配置），打包失败，因为 tsconfig 的 rootDir 是 src，但是 extension 逻辑中要读取 src 同级 tools 目录下的内容。所以要修改 rootDir 为’./‘。然后打包之后目录
+
+- star-tools
+  - src
+    - extension.ts
+  - tools
+    - 省略，就是把三个分类文件夹直接移动过来
+  - out
+    - src
+      - extension.js
+      - ...
+  - package.json
+  - .gitignore
+  - tsconfig.json
+  - ...
+    这个也不符合预期，gpt 说用脚本把 src 里的东西拿出来到 out 下，然后我就写了 node 脚本文件名为 move-src.js，然后再 package.json 中直接配置 node move-src.js 来完成移动操作，
+    npm run compile && node-move-src.js ,先编译再移动，注意&&是同步操作，&是异步操作。需要前面完成了再进行后面的就得用&&
+    确实可以。然后 out 部分就变成了
+- out
+  - extension.js
+  - ...
+    然后发布插件了
+
+#### 安装插件之后缺少 tools 目录
+
+虽然本地调试没问题了，但是用另一个电脑搜索安装插件，命令不存在，我看了一下 .vscode/extensions/star-tools/ 发现插件目录是
+
+- star-tools
+  - out
+    - extension.js
+    - ...
+  - package.json
+  - ...
+    tools 文件夹没有了，那行吧那就打包的时候把 tools 拷贝到 out 下面吧
+
+#### 打包目录继续整理
+
+这次 gpt 教了一个办法安装一个开发时的依赖，package.json 中直接配置脚本就行，不用自己写一个脚本。依赖是 copyfiles，配命令也是试了好几次，因为看不懂参数，就靠蒙。终于拷贝成功了。
+本地看 out 目录变成了，每次改目录都得记得检查 package.json 中的 main 和 extension.ts 中的逻辑是不是要改路径
+
+- out
+  - extension.js
+  - ...
+  - tools
+
+然后强迫症的我觉得这样比较乱就又想改目录了，改成这样
+
+- out - core - extension.js - ... - tools
+  我寻思移动文件可不可以直接用 copyfiles 这样的依赖不自己写 node 脚本，问了半天试了几次不靠谱的办法，发现直接配置 mv 命令就行，linux 和 unix 本身支持，windows 上用 move
+  "move-src": "mv out/src/\*\* out && rm -rf out/src",
+  本地调试可以了，然后发布
+
+#### 安装插件之后缺少 tools 目录
+
+还是没有 tools，然后发现是 vsce publish 的时候过滤掉了 ts 文件。我忘记我咋知道的了。配置一下 .vscodeignore 把 ts 那条删掉。
+那也就是说其实不用 copyfiles 了，直接能读取源码。。。
+
+#### npm 包也更新一下试试
+
+npm publish 了一下，有些没用的文件也传上去了比如 .vscodeignore ,既然可以配 .vscodeignore,那应该 npm publish 也有可以配的那就是 .npmignore
+
+### 📢 总结
+
+#### 折腾来折腾去，发现自己频繁踩坑就是因为前置知识匮乏，前置知识补充：
+
+#### 有了前置知识，结合需求就会有正确的思路
+
+1. 在我的项目中，tools 下的代码实际上就像代码片段一样，是用来把 ts 源码原封不动拷贝出来的，不是插件运行时的逻辑。所以这些代码是完全不需要编译的，并且一定不能编译为 js
+2. tsconfig 中三个重要的配置项
+   <code>outDir</code>、<code>includes</code>、<code>excludes</code> 需要配合使用才能实现只编译 src 不编译 tool，但是又能访问到 tool
+3. 打包需要处理一下目录结构所以会有 yarn run move-src 这段
+4. 所以搞 babel、复制文件纯踩坑，是没必要的流程
+
+### 开发插件第二阶段 用上 AST
+
+每个文件固定格式，比如 xxx.ts
+
+```ts
+import aaa from 'aaa'  //也可以引用多个，或者没有依赖
+// 主体代码部分 start
+type TXxx {
+
 }
+function bbb (){
+
+}
+function xxx (){
+   bbb()
+}
+// 主体代码部分 end
+export default xxx //每个工具函数都有一个独立的文件，导出都用 export default
 ```
 
-3. 注册命令
+这样固定格式了之后，通过 npm 引用就是这样的，统一了就比较规范
 
-```JS
-vscode.commands.registerCommand('fariy-test-ext.helloWorld',handleHelloWord);//命令id与package.json中的一致
+```ts
+import xxx from "star-tools/【分类】/xxx";
 ```
 
-拿一个简单的 todo 插件来说，侧边栏显示插件，插件有自己的工作区，点某一个 todo 后自动打开 todo 所属文件并定位到具体位置。  
-![举例](./static/vscode-ext-q5.png)
+不过固定格式，更主要的是为了以插件形式使用的时候，ast 解析更容易
+用 ast 解析文件分成三部分，import 语句部分 importStr，export default 语句部分 exportStr，除了这两部分就是主体代码 bodyStr
+使用时把 importStr 插入到编辑器顶部，
+bodyStr 插入到编辑器焦点处
 
-## 感慨
+#### 用了 ast 之后，本地调试没问题，别人安装使用报：“命令找不到”
 
-一开始充满热情和好奇的看了看官方文档和别人的经验，感觉流程是 so easy，心里暗喜：just so so 呀。  
-不过，知道自己在使用和制作工具上都很菜，就想着还是从最简单的制作一个主题开始。然后就莫名奇妙地遇到了上面的第一个问题，无法调试。努力未果，灰心丧气，那就不做主题了，做个正经插件吧。又开始满怀期待了，然后就相同的病因，不同的表象。
+没办法在生产环境调试，所以只能改代码把打印都变成 vscode 的消息通知，（注意 消息通知不能是勿扰模式，否则看不到）
+发现 active 根本就没走到
+应该是 import 那里就有问题了
+ast 这个功能用到了 typescript 这个依赖，是在运行时有用到的，应该在 dependencies 下而不是 devDependencies。这样用户安装插件的时候就会自动安装 typescript 这个依赖
+把依赖位置改了之后好了
 
-Vscode 插件二次失败，我彻底 emo 了，开始陷入了沉思 😔
-我开始反思
+### 开发插件的第三阶段 打包优化
 
-- 是不是根本就不适合做个程序员？  
-  学习新技术的能力、使用工具的能力都很低下。年初 chatgpt 和各种 AI 爆火的时候，我不是自己发现的，是从其他同事那里知道的它，我的消息至少延迟了一个月。我意识到了自己不够敏锐，我就开始每天从刷微博变成刷 youtube，关注了一些技术博主，每天都听他们讲 AI 新的动态。但是坚持了两个月，我发现我并不快乐，我是再强迫自己吸收。
-- 我真的喜欢这个职业吗？  
-  接触前端是从一门专业课开始，当时还是学习的前端还是直接用文件协议打开 html 文件，最后的大作业也就是个人网站（一个页面的那种），用到的 js 很少，几乎都是 html 和 css。当时喜欢应该是因为那时候的前端内容只是纯纯的画页面，为了一次小作业熬个通宵研究 css 也觉得快乐，因为喜欢画页面。所以，我应该只是喜欢画页面而已吧。
-- 不干这个能干什么呢？  
-  活了二十多年，才发现好像并不了解自己，不知道自己擅长做什么，也没有找到不顾一切去追求的事业。所以，我想可用苟且偷生来形容了吧。暂时这样吧。。。
-- 又能坚持多久呢？  
-  马上也奔三了，失去了年龄的优势，技术又没有突出，到了要准备思考如何平衡家庭和事业的阶段，是个随时可以被取代的工具人。
-- 那如果真的失业了怎么办？
-  想到这，失业是必然，可是还有房贷要还，还有父母要养，还有自己的生活要维持。好像没有出路也没有退路了。
+针对两种使用方式自动改写 package.json。区别：
 
-## 参考
+- 名称 star-tools 、 @star/tools
+- 依赖 typescript 、 取决于工具函数的依赖比如 three
+- 贡献 用 ast 的方式生成命令面板中的命令选项 、 无
+
+### 开发插件第四阶段 自动生成文档
+
+- star-tools
+  - tools
+    - validators
+      - phoneNumber.ts
+      - chineseName.ts
+    - 3d
+      - control1.ts
+    - xxx
+      - x1.ts
+      - x2.ts
+  - src
+    - extension.ts
+  - package.json
+  - tsconfig.json
+  - .gitignore
+  - .vscodeignore
+  - ...
