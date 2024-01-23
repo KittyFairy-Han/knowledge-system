@@ -46,3 +46,8 @@ response.arrayBuffer(); //得到二进制 ArrayBuffer 对象。
 - response.blob()用于获取二进制文件。 比如拿到图片的二进制数据然后渲染到网页上。
 - response.arrayBuffer()主要用于获取流媒体文件。比如音频、视频
   > 数据流只能读取一次，一旦读取，数据流就空了。再次读取就不会得到结果。解决方法是在读取之前，先使用.clone()方法，
+
+### 有了 fetch 为啥还用 xhr
+- 兼容性
+- 进度事件
+- fetch 完全不支持同步，万一要同步请求呢 

@@ -139,6 +139,7 @@ module.exports = {
         ["/Vue/how-about-Vue3", "how-about-Vue3"],
       ],
       "/engineering/": [
+        
         {
           title: "模块化、组件化和设计模式",
           collapsable: false,
@@ -172,12 +173,15 @@ module.exports = {
         ["/broswer/render", "网页渲染"],
       ],
       "/scene/": [
+        ["/scene/optimistic", "前端性能优化"],
+        ["/scene/upload", "上传"],
         ["/scene/lottieUsage", "lottie的应用场景"],
         ["/scene/screenshoots", "前端截屏方案"],
         ["/scene/modelViewer", "modelViewer"],
         ["/scene/cli", "脚手架工具"],
         ["/scene/vscode-extension", "vscode插件"],
         ["/scene/pay", "支付"],
+        ["/scene/miniprogram", "小程序"],
       ],
       "/web3d/": [
         ["/web3d/demoStart/", "3d入门之空间与模型"],

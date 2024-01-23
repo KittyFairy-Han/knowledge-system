@@ -81,10 +81,12 @@ window.addEventListener(
 
 - try catch 代码块不能捕获 但是 promise 提供了 catch 方法可以捕获
 
-## 上报错误
+Promise.then 方法接受两个参数，第一个参数是处理 Promise 成功状态（fulfilled）的回调函数，第二个参数是处理 Promise 失败状态（rejected）的回调函数。而 Promise.catch 方法接受一个参数，这个参数是处理 Promise 失败状态的回调函数。
+
+## 上报错误or埋点
 
 - Ajax 通信方式上报
-- Image 对象上报
+- 统一基础设施去做 hubble 埋点、伏羲
 
 ```js
 new Image().src = "http://baidu.com/testjk?r=tksjk";

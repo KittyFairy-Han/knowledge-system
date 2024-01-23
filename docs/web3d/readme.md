@@ -43,3 +43,7 @@ translateZ 代表物体离屏幕的距离，当 translateZ 越大则说明离屏
 - 静态资源放在本地是不是快了
 - 不手动处理成 basic 是不是快
 - 绘儿乐资源更多，但是加载很流畅，它的资源形式不是 glft+bin+几个大图，是.json+大量的小图。所以是不是资源形式有问题。
+
+## 面试题
+### requestAnimation
+requestAnimationFrame 不是宏任务（macrotask）也不是微任务（microtask），它是浏览器提供的一个专门用于渲染动画的 API。它的执行时机是在每一帧的开始，也就是在所有的宏任务和微任务执行完毕，下一帧开始前。

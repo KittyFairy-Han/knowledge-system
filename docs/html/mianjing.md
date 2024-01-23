@@ -118,6 +118,7 @@ highlight: an-old-hope
 ```
 
 - 实现 curry 函数 。接受两个参数，第一个参数是一个函数，第二个参数是参数个数。达到以下效果。<br>
+> // 深拷贝复制所有层，浅拷贝只复制第一层
 [函数柯里化](#condingCurry)
 
 ```js
@@ -322,7 +323,7 @@ function getNow() {
 const myNew = function (constructor) {
   let o = Object.create(constructor.prototype);
   const k = constructor.call(o);
-  if (typeof k === "object") {
+  if (typeof k === "object") { // 如果是简单类型则还是 return o
     return k;
   } else {
     return o;

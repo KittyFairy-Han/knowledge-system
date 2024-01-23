@@ -71,9 +71,9 @@ number.toString(2);
 // "1000"
 ```
 
-### toFixed(num) 把数字转换为保留相应位数的小数 返回字符串
+### toFixed(num) 把数字转换为保留相应位数的小数 返回**字符串**
 
-> 参数为 0 ~ 20 之间,不传则为 0 ,转换法则是直接抹去非四舍五入
+> 参数为 0 ~ 20 之间,不传则为 0 ,转换法则是四舍五入。
 
 ## 考点
 
@@ -104,11 +104,23 @@ if (a + b - sum < delta) {
 
 ### 小数相加得到数学上的值
 ```js
-function add(a,b){
-  //转换为整数在计算
-  //在转换回去
-
+function add(a, b) {
+    var c, d, e;
+    try {
+        c = a.toString().split(".")[1].length;
+    } catch (f) {
+        c = 0;
+    }
+    try {
+        d = b.toString().split(".")[1].length;
+    } catch (f) {
+        d = 0;
+    }
+    e = Math.pow(10, Math.max(c, d));
+    return (a * e + b * e) / e;
 }
+
+console.log(add(0.1, 0.2));  // 输出：0.3
 ```
 
 ### 对称数

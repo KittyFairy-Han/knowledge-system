@@ -173,3 +173,11 @@ ele.addEventListener("test", () => {
 //触发test件
 ele.dispatchEvent(customEve);
 ```
+
+## 面试题
+- 获取页面上哪个元素最多
+``` js
+const elements = document.getElementsByTagName('*');
+// 2.遍历、计数
+// 3.找到最多的
+```

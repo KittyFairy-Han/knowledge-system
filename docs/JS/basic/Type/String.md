@@ -31,6 +31,10 @@
 
 #### fromCharCode()
 
+```js
+String.fromCharCode(97) //'a'
+```
+
 #### fromCodePoint()
 
 ```js
@@ -75,13 +79,19 @@ for (let i = 8000; i < 10000; i++) {
 
 ```js
 const str = "my name is yu xiao rou , you can call me xiao rou yu or xiao rou";
-const reg = /rou/
-str.search(reg) //19
-reg.test(str) //true
-str.match(reg);//["rou", index: 19, input: "my name is yu xiao rou , you can call me xiao rou yu or xiao rou", groups: undefined]
-reg.exec(str)//["rou", index: 19, input: "my name is yu xiao rou , you can call me xiao rou yu or xiao rou", groups: undefined]
-str.matchAll(reg); //返回一个迭代器
 
+str.search(/rou/) //19
+/rou/.test(str) //true
+
+str.match(/rou/) ;//["rou", index: 19, input: "my name is yu xiao rou , you can call me xiao rou yu or xiao rou", groups: undefined]
+str.match('rou')//同上 
+/rou/.exec(str)//["rou", index: 19, input: "my name is yu xiao rou , you can call me xiao rou yu or xiao rou", groups: undefined]
+
+const it = str.matchAll(/rou/g); //返回一个迭代器,it.next().value格式同上
+const it = str.matchAll('rou')  //同上
+/rou/.exec(str)//["rou", index: 19, input: "my name is yu xiao rou , you can call me xiao rou yu or xiao rou", groups: undefined]
+
+str.matchAll(/rou/) //报错
 str.match(/rou/g); // ['rou','rou','rou']
 ```
 

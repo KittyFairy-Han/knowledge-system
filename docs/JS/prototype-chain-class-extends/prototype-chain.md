@@ -8,6 +8,9 @@
 
 # 原型链
 
+
+![](./static/prototype-chain.jpg)
+
 ## 什么是原型链
 
 通过  prototype \_\_proto\_\_ constructor 的关系来看

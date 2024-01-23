@@ -68,3 +68,11 @@ export default {
   },
 };
 ```
+结合并发压缩等方案
+
+## 画图
+- 节点数量、图的大小
+- webworker
+- 服务端渲染
+- 预生成
+- loading
