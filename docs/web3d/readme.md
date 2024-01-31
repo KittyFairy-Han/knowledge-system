@@ -1,4 +1,3 @@
-
 # web3d
 
 ## 待补充
@@ -7,13 +6,12 @@
 
 <!-- https://www.cnblogs.com/yanggeng/p/11285856.html
 眼睛、视口、物体。与 css 属性 perspective、perspective-origin 的关系如图。
-以屏幕为 Z=0 的平面，从屏幕的 perspective-origin 位置为出发点，以 perspective 为长度，向屏幕的正前方做垂线， 垂线的另一端为视点所在位置。视点与屏幕四个顶点分别画射线，形成了一个透视空间，就像我们现实生活中眼睛看到的空间范围。  
-![关系](./static/web3d-1.png)  
+以屏幕为 Z=0 的平面，从屏幕的 perspective-origin 位置为出发点，以 perspective 为长度，向屏幕的正前方做垂线， 垂线的另一端为视点所在位置。视点与屏幕四个顶点分别画射线，形成了一个透视空间，就像我们现实生活中眼睛看到的空间范围。
+![关系](./static/web3d-1.png)
 改变 perspective-origin，会产生物体在移动的视觉效果，其实这是因为视点与物体产生了相对运动，物体没有动，但是看起来是动的。当视点向左移动时，物体相对向右运动，视点向右移动，物体反之。垂直方向也是同理的。
 改变 perspective，perspective 的值越小，离 Z 平面越近，透视效果更明显。
 translateZ 代表物体离屏幕的距离，当 translateZ 越大则说明离屏幕越近，离视点越近，所以物体会逐渐变大。当 translateZ>perspective 时，说明物体在视点的背后了，这个时候物体会消失，因为已经超出了视野范围。
 [体验](https://3dtransforms.desandro.com/perspective) -->
-
 
 加载时长主要就取决于模型资源加载时间较长，所以对于加载优化也是针对模型资源的加载时长。
 这个项目的模型资源是动态的，模型个数都是不一定的，分批加载肯定是必要的。就这个项目来说，每批加载 5 层模型（5m ～ 10m 左右），发现首次加载还是比较慢。那对于每一批数据还能做哪些优化尽量提高加载速度呢？
@@ -45,5 +43,38 @@ translateZ 代表物体离屏幕的距离，当 translateZ 越大则说明离屏
 - 绘儿乐资源更多，但是加载很流畅，它的资源形式不是 glft+bin+几个大图，是.json+大量的小图。所以是不是资源形式有问题。
 
 ## 面试题
+
 ### requestAnimation
+
 requestAnimationFrame 不是宏任务（macrotask）也不是微任务（microtask），它是浏览器提供的一个专门用于渲染动画的 API。它的执行时机是在每一帧的开始，也就是在所有的宏任务和微任务执行完毕，下一帧开始前。
+
+### three 项目基本要素
+
+```js
+this.canvas = document.getElementById("app-canvas");
+this.renderer = App3dScene.createRenderer(this.canvas);
+this.scene = App3dScene.createScene();
+this.camera = App3dScene.createCamera();
+this.lights = //
+```
+
+### Canvas 和 其他有啥不同  
+Canvas 是 HTML5 提供的一个元素,用来绘制图形  
+- 工作原理是基于像素的： 其他 element 是基于对象的，比如可以移动。canvas 需要重新绘制。element 有事件委托，canvas 没有。  
+- 游戏用Canvas，因为它基于像素性能好：  
+游戏通常需要频繁地更新图形和动画，这就需要大量的绘图和重绘操作。如果使用 DOM 来实现，每次更新都需要修改 DOM 元素，这会引发浏览器的重排和重绘，消耗大量的计算资源，导致性能下降。  
+主要是时间上节省
+
+### 常见概念
+- 法向量是垂直于平面的向量，通常用于计算光照和碰撞。
+
+### webgpu vs webgl
+- 设计理念：WebGL 是基于 OpenGL ES 的，它是一个已经存在了很长时间的、成熟的图形 API。WebGPU 则是一个全新的设计，它参考了现代的图形 API，如 Vulkan、Metal 和 Direct3D 12。
+
+- 性能：WebGL 的性能受到了一些限制，因为它的设计并不完全适应现代的图形硬件。WebGPU 则是为了充分利用现代图形硬件的性能而设计的，它提供了更低级别的、更直接的硬件访问。
+
+- 功能：WebGL 提供了一套相对简单的 API，它足够用于大多数的 3D 渲染需求。WebGPU 则提供了更多的功能，如计算着色器、多线程渲染和显存管理等。
+
+- 安全性：WebGPU 在设计时考虑了更多的安全性问题，例如，它提供了更强大的错误检查和处理机制。
+
+- 兼容性：目前，WebGL 的兼容性更好，因为它已经被广泛支持了很长时间。WebGPU 目前还在开发中，尚未被所有浏览器支持。

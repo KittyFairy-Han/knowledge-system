@@ -139,3 +139,6 @@ document.body.removeChild(aElement);
 - 及时清理定时器、dom 引用
 - 组织好逻辑避免死循环等
 
+## 考点
+- JS 能主动 GC 吗 ？no
+- JS 执行 var a = null 会立即释放内存吗？不会，JavaScript 的垃圾回收机制是周期性运行的，具体运行的时间点由 JavaScript 引擎决定，对开发者来说是不可预知的。

@@ -16,7 +16,10 @@
 
 ## let const 与 var
 
-> 查看作用域章节
+- 作用域，let const 块级，var 没有块级
+- 提升，let const 无，var 有。(function 也提升，function优先级更高)
+- 重复声明，let 不可，var 可
+- 全局对象属性，let 不挂在 window 下，var 挂
 
 ## 解构赋值
 

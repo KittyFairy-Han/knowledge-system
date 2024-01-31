@@ -85,13 +85,15 @@ arrPro.push(2);
 console.log(arr[1], arrPro[1]); // 2 2
 ```
 
-这么看用 Reflect 好像有点多此一举？<br/>
-下面这个例子不用 Reflect 就会出错了
+这么看用 Reflect 好像有点多此一举？<br/>  
+在某些情况下，Reflect 的方法可以提供更准确、更可靠的结果。 Reflect.get 可以接受一个额外的参数作为 this 的值。这在你需要在不同的上下文中获取属性值时非常有用。  
 
 ```js
 const arr = [];
 const arrPro = new Proxy(arr, {
   get: (target, prop, receiver) => {
+    // 当你尝试获取 arrProChild.number 时，receiver 就是 arrProChild 对象。
+    // receiver 的主要用途是在处理继承时保持正确的 this 绑定
     if (prop === "number") {
       return target.length;
     }

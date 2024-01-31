@@ -75,7 +75,8 @@ window.addEventListener(
 
 ### 跨域的 js 运行错误怎么捕获
 
-？？
+window.onerror，但要记得在 script 标签上加上 crossorigin 属性。  
+需要注意的是，window.onerror 无法捕获 Promise 中未处理的错误。如果需要捕获这类错误，可以使用 window.onunhandledrejection 事件。
 
 ### promise 异步的错误
 

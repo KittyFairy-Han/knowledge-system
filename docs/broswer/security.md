@@ -31,8 +31,12 @@
 - 向目标网站注入脚本即 script
 
 ### 防御措施
+- 校验
+- 转义
+- csp ：CSP 是通过设置 HTTP 响应头 Content-Security-Policy 来实现的。设置 HttpOnly 标志： 这可以防止通过 JavaScript 访问 Cookie，从而降低了 XSS 攻击的风险。
+- 设置 HttpOnly 标志： 这可以防止通过 JavaScript 访问 Cookie，从而降低了 XSS 攻击的风险。
 
-- csp ：CSP 通过定义白名单源和限制某些危险的HTML特性，来限制浏览器加载和执行来自非信任源的资源。例如，你可以指定只允许加载和执行来自特定源的脚本，或者禁止执行内联脚本和样式。
+
 
 ## 考点
 

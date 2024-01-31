@@ -139,3 +139,7 @@ function isN(number){
 //数字->字符串->数组
 //逐一比较
 ```
+
+
+### 大数处理
+bigint 数据类型 、 big.js、 字符串

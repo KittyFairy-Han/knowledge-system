@@ -44,7 +44,13 @@ window.history.popState
 
 
 ## 其他考点
-
+### 常用 API 干嘛用
+- location 跳转
+- navigator 判断环境
+- screen 屏幕旋转，3d项目用
+- setTimeout、setInterval
+- history 一般都是React Router封装过的
+- performance 性能监控，3d项目监测加载速度和内存
 ### 检测浏览器类型
 
 navigator.userAgent 属性
@@ -73,6 +79,19 @@ const isWeiXin = () => {
   }
 };
 ```
+### 全局对象
+Node.js：在 Node.js 中，全局对象是 global。你可以在任何地方使用 global 来访问全局作用域。
+
+Web Workers：在 Web Workers 中，全局对象是 self。Web Workers 是运行在后台的 JavaScript 线程，它们没有访问 DOM 的权限，所以没有 window 对象。
+
+### React和Vue的Router作用、原理
+React Router 和 Vue Router 都是用于在单页面应用（SPA）中实现路由功能的库。它们的主要作用是根据浏览器的 URL 来决定渲染哪个组件，从而实现页面的切换而无需重新加载整个页面。    
+路由有hash和history模式，基于浏览器的api（上面说过了）  
+- 基于 history 的需要服务端支持，美观
+- 基于 hash 的不需要服务端支持，兼容性更好，但不美观
+
+
+
 
 ## location 属性的应用
 
