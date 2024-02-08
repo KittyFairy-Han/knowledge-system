@@ -105,17 +105,35 @@ ele.getAttribute("title"); //null
 
 捕获阶段->目标阶段->冒泡阶段
 
-![流程](./static/mouseover-mouseenter.png)
-
-### 描述 dom 事件捕获流程
-
 - 捕获阶段
-  window->document->html->body->...
-  html = document.documentElement
-  body = document.body
+  window->document->html->body->...   
+  html = document.documentElement  
+  body = document.body  
 - 目标阶段
 - 冒泡阶段
   与捕获反向
+
+### 不冒泡的事件
+总的来说，不冒泡的事件提供了一种方式，让开发者能够更精确地控制事件的触发和处理，而不必担心事件会传播到不希望触发事件的元素。  
+基于不冒泡，有一些应用场景：  
+- focus blur   （form的input）
+- enter leave  （tooltip）
+- scroll
+
+这些事件只会在它们直接绑定的元素上触发，不会冒泡到父元素。如果你需要在父元素上监听这些事件，你可能需要使用事件捕获或者手动冒泡。
+
+
+### - 
+
+![流程](./static/mouseover-mouseenter.png)  
+       
+父over - 父enter - 父out - 子over - 子enter  - 子out   - 父over- 子leave - 父out  - 父leave  
+- enter leave 事件不冒泡，所以在子区域内的时候不会再次触发父的 enter
+- over out 冒泡，所以会对于父来说会触发多次
+> CSS 的 :hover 伪类的行为更像是 JavaScript 的 mouseover 事件，而不是 mouseenter 事件
+
+
+
 
 ### Event 对象的常见应用
 
@@ -157,9 +175,9 @@ $("#test").click((e) => {
 > 此时在页面上任意一处的点击事件， 都应关闭下拉框， 但是面板内点击不会关闭弹出面板， 我们会在 document 上注册一个 click 事件， 当这个事件被触发的时候， 关闭面板， 根据事件冒泡原则， 在面板上点击， 最终也会冒泡到 document 上， 同样会关闭面板，这是我们不想要的， 那么我们会在面板上也注册一个事件， 触发的时候调用 stopPropagation， 阻止冒泡， 那么点击面板的时候， 由于事件不会冒泡到 document， 则不会关闭面板， 这个结果是我们需要的。
 
 > 但是此时还有另外一个问题， 如果有其他元素也阻止了事件冒泡， 那么界面上会出现点击其他元素而下拉面板不关闭的情况， 此时， 我们可以将 document 的事件注册在捕获阶段， 这样其他元素是无法阻止事件传播到 document 上， 当然， 面板也无法阻止， 此时就需要判断 target 了， 如果 target 在面板内部， 不关闭， 否则关闭。 会显得比上一个方法要麻烦一点， 但是效果是最好的， 这里是一个取舍的问题。
-#### mouseover 和 mouseenter
-父子元素，子元素在父元素中间
-父over-父enter-父out-子over-子out-父over-父out-父leave
+
+             
+
 ### 自定义事件
 
 ```js

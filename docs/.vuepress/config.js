@@ -30,8 +30,7 @@ module.exports = {
         ["/CSS/selector", "选择器"],
         ["/CSS/size", "尺寸"],
         ["/CSS/props", "属性"],
-        ["/CSS/layout", "布局"],
-        ["/CSS/strange-style", "冷门样式"],
+        ["/CSS/tailwind", "tailwind"],
       ],
       "/JS/": [
         {
@@ -90,7 +89,8 @@ module.exports = {
             ["/JS/communication-AJAX-storage/storage", "存储"],
           ],
         },
-
+        
+        ["/JS/memory", "内存"],
         ["/JS/BOM/", "浏览器对象"],
         ["/JS/DOM/", "文档对象"],
         ["/JS/monitor-security/", "错误监控"],
@@ -150,7 +150,7 @@ module.exports = {
           ],
         },
 
-        ["/engineering/vdom/", "vdom"],
+        
         {
           title: "webpack",
           path: "/engineering/webpack/",
@@ -158,17 +158,16 @@ module.exports = {
           children: [
             ["/engineering/webpack/main-flow", "主流程（主线剧情）"],
             ["/engineering/webpack/chunk", "chunk"],
-            // ["/engineering/webpack/SPA-MPA-MB","SPA-MPA-MB"],
-            ["/engineering/webpack/optimization", "优化"],
+            ["/engineering/webpack/SPA-MPA-MB","SPA-MPA-MB"],
             ["/engineering/webpack/pluggable", "one-project-to-multiple-app"],
           ],
         },
+        ["/engineering/vite/", "vite"],
       ],
       "/broswer/": [
         ["/broswer/work", "浏览器的工作原理"],
         ["/broswer/http", "http"],
         ["/broswer/cache", "浏览器缓存"],
-        ["/broswer/memory", "内存"],
         ["/broswer/security", "安全"],
         ["/broswer/render", "网页渲染"],
       ],

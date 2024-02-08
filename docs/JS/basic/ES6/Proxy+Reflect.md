@@ -121,3 +121,9 @@ const arrProChild = Object.create(arrPro);
 arrProChild.push(1, 2, 3);
 console.log(arrProChild.number); //3
 ```
+
+## 考点
+### Reflect 价值？
+- 它提供了一种标准的方式来执行对象操作(更优雅)，  
+- 这些操作与 Proxy 陷阱的默认行为一一对应。
+(Proxy拦截后执行逻辑称为trap，在trap中需要执行默认行为时，我们可以使用 Reflect 的方法。)

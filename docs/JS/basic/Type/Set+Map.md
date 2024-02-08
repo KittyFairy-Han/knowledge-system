@@ -69,3 +69,7 @@ for (let [key, value] of map) {
 ## 应用
 
 > 利用 Set 为数组去重，章节：Array-考点-去重
+
+## 考点
+- Set 比 数组：不重复，不连续性能好
+- Map 比 Object：键可以是任意类型，有序，大量数据性能好
