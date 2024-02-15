@@ -8,16 +8,15 @@
 
 # 原型链
 
+## 为什么
+实现继承
 
-![](./static/prototype-chain.jpg)
+
 
 ## 什么是原型链
 
-通过  prototype \_\_proto\_\_ constructor 的关系来看
-
-
-
-
+![](./static/prototype-chain.jpg)  
+通过  prototype、 \_\_proto\_\_ 、constructor 的关系来看  
 
 - 非函数的对象没有 prototype 属性，只有\_\_proto\_\_属性
 - 函数既有 prototype 又有\_\_proto\_\_属性

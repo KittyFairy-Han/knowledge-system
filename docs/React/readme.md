@@ -12,10 +12,47 @@
 - useMemo 是用来返回一个 memoized 值，也就是说，它会记住你的函数的返回结果，只有当依赖项改变时，才会重新计算这个值。这对于避免在每次渲染时都进行高开销的计算非常有用。
 
 - useCallback 则是返回一个 memoized 回调函数。它的工作方式和 useMemo 类似，但它返回的是函数。只有当依赖项改变时，才会返回新的函数。
-
 - useEffect：这个 Hook 会在浏览器完成布局和绘制后，在一个延迟事件中被调用。因此，即使 effect 导致了额外的渲染，用户也不会感觉到。
 
 - useLayoutEffect：这个 Hook 会在浏览器完成布局和绘制，但在新的绘制被显示在屏幕之前被调用。如果你的 effect 进行了 DOM 变更，而你希望在用户看到新的渲染之前就完成这个变更，那么应该使用 useLayoutEffect。只有在需要同步修改 DOM，并且需要在用户看到新的渲染之前就完成这个修改的情况下，才应该使用。获取 dom 用**Ref**
+
+- useState：不必多言
+
+- useReducer：接受一个 reducer 函数和初始状态作为参数，返回一个包含两个元素的数组（当前状态和一个 dispatch 函数）。当需要自己写 Reducer 的时候，用 useReducer 比 useState 更合适
+
+- useImperativeHandle：这个 Hook 可以让你在父组件中通过 ref 访问到子组件中你想暴露出来的任何值。
+``` js
+import React, { useRef, useImperativeHandle, forwardRef } from 'react';
+
+const FancyInput = forwardRef((props, ref) => {
+  const inputRef = useRef();
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      inputRef.current.focus();
+    }
+  }));
+
+  return <input ref={inputRef} />;
+});
+
+function ParentComponent() {
+  const inputRef = useRef();
+
+  const handleClick = () => {
+    // 当按钮被点击时，触发 FancyInput 组件的 focus 方法
+    inputRef.current.focus();
+  };
+
+  return (
+    <>
+      <FancyInput ref={inputRef} />
+      <button onClick={handleClick}>Focus the input</button>
+    </>
+  );
+}
+
+export default ParentComponent;
+```
 
 ## Fiber
 
@@ -103,7 +140,9 @@ Diff 算法是 React 用来比较两个虚拟 DOM 树的差异的算法。
 
 并发模式（Concurrent Mode）是在 Fiber 架构基础上的一次重大升级。  
 Fiber 架构是 React 16 中引入的，它改变了 React 的调和（Reconciliation）算法，使得 React 可以将渲染工作分解成多个小任务，从而避免长时间的计算阻塞浏览器。  
-并发模式则进一步利用了 Fiber 架构的优势，使得 React 可以在处理一个更新的同时，开始处理另一个更新。这使得 React 可以在处理大的更新的同时，还能响应用户的交互，从而保持用户界面的流畅。
+并发模式则进一步利用了 Fiber 架构的优势，使得 React 可以在处理一个更新的同时，开始处理另一个更新。这使得 React 可以在处理大的更新的同时，还能响应用户的交互，从而保持用户界面的流畅。  
+虽然并发模式可以提高应用的响应性，但它也可能带来一些新的问题，如状态的不一致性。因此，使用并发模式需要更加小心地管理状态和副作用。  
+React 16.8 的 Fiber 架构确实已经具备了在渲染过程中被打断和恢复的能力，这是 Fiber 架构的一个重要特性。然而，这个特性在 React 16.8 中并没有被完全利用。直到 React 18，React 团队才引入了并发模式（Concurrent Mode），这是一种新的渲染模式，它充分利用了 Fiber 架构的这个特性，使得 React 可以在处理一个更新的同时，开始处理另一个更新。
 
 ## 对比 Vue
 
@@ -152,7 +191,40 @@ React 和 Vue 的 Router 作用、原理
 commit 阶段先渲染子组件，再渲染父组件
 
 ### requestIdleCallback 兼容性不好
-setTimeout 和 MessageChannel 来模拟一个类似的行为
+
+setTimeout 和 MessageChannel 来模拟一个类似的行为  
+这个示例中的 fallback 函数使用 MessageChannel 来模拟 requestIdleCallback 的行为。当你调用 fallback 函数时，它会创建一个新的 MessageChannel，并设置 port1.onmessage 为一个函数，这个函数会在消息被接收时被调用。然后，如果当前没有调度任务，它会通过 port.postMessage 来发送一个消息，这会导致 port1.onmessage 在下一个事件循环中被调用。
+
+```js
+let scheduled = false;
+
+function fallback(fn) {
+  const channel = new MessageChannel();
+  const port = channel.port2;
+  channel.port1.onmessage = () => {
+    scheduled = false;
+    const time = performance.now();
+    const timeout = 3000; // 你可以根据需要调整这个值
+    fn({
+      didTimeout: false,
+      timeRemaining: function () {
+        return Math.max(0, timeout - (performance.now() - time));
+      },
+    });
+  };
+  if (!scheduled) {
+    scheduled = true;
+    port.postMessage(undefined);
+  }
+}
+
+const requestIdleCallback = window.requestIdleCallback || fallback;
+const cancelIdleCallback = window.cancelIdleCallback || clearTimeout;
+
+// 使用方式
+requestIdleCallback(myCallback);
+cancelIdleCallback(myHandle);
+```
 
 ### portal 事件冒泡到父组件为什么
 

@@ -39,7 +39,7 @@ control1 拿到的就是 ts 源码
 
 #### 对于 npm 包引用的方式，目录结构：
 
-``` 
+```
 star-tools
 ├── validators、3d、... 目录不变
 ├── .gitignore
@@ -79,7 +79,7 @@ star-tools
 - 作为 vscode 插件时：代码片段作为源码直接插入，不需要把 ts 编译为 js。
 - 作为 npm 包引用时：~~ 同上 ~~~
 
-### 一些有用的 API 
+### 一些有用的 API
 
 - 同步读取文件用 fs.readFileSync
 
@@ -92,6 +92,7 @@ star-tools
 - .vscodeignore 用来过滤发布到 [marketplace](https://marketplace.visualstudio.com/) 的文件。
 
 - package.json 中的 scripts 脚本，& 是并行，&& 是串联进行
+- package.json 中的 dependencies 是运行时的依赖，对于 vscode 插件来说，安装插件时，自动安装。
 
 ### F5 调试插件时 干嘛了
 
@@ -105,12 +106,13 @@ star-tools
 yarn run remove-out && tsc && yarn run move-src && node ./build/genVscdPkg.js
 ```
 
-只看 tsc，它是负责把 ts 编译为 js 的，之后插件才能在 vscode 的环境中运行起来。编译之前会先读取 tsconfig.json 中的配置，然后开始编译并输出编译后的代码。  
+只看 tsc，它是负责把 ts 编译为 js 的，之后插件才能在 vscode 的环境中运行起来。编译之前会先读取 tsconfig.json 中的配置，然后开始编译并输出编译后的代码。
+
 > remove-out、move-src、node ./build/genVscdPkg.js 先不管，这些都属于对目录和文件内容的定制化处理。会在后面的优化中提到  
-![](./static/vscode-ext-3.png)
+> ![](./static/vscode-ext-3.png)
 
 - 一般情况下 rootDir 都等同于当前目录所以是 './'
-- 对于 star-tools 来说工具函数是不需要编译的，因为 star-tools 不参与运行，充当代码片段的作用。和插件相关的逻辑代码才需要编译，逻辑代码都在 src 下。所以配置了 includes
+- includes 是参与编译的部分
 - 编译后输出到 out 目录下，out 目录下的文件与 src 下的对应
 - 配置 mapSource 为 true 方便调试，所以可以看到 out 目录下都有对应 .map.js
 
@@ -128,7 +130,7 @@ yarn run remove-out && tsc && yarn run move-src && node ./build/genVscdPkg.js
 运行 vsce publish 命令后，经历了这样的过程：  
 ![ vsce publish 干嘛了 ](./static/vscode-ext-4.png)
 
-- 使用 yarn run esbuild-base 来编译，是因为 esbuild 在 tsc 的基础上有一些扩展功能比如压缩等，编译之前也读取了 tsconfig 的配置。我这里其实只是强迫症想合并到一个文件。
+- 使用 yarn run esbuild-base 来编译，是因为 esbuild 这个打包工具在 tsc 的基础上有一些扩展功能比如压缩合并等，编译之前也是读取了 tsconfig 的配置。（其他也是针对项目的定制化处理，暂且不说）
 - 编译打包之后输出到 out 文件夹
 
 ============= 发布准备结束！下面就到发布阶段了 ==============  
@@ -161,14 +163,12 @@ yarn run remove-out && tsc && yarn run move-src && node ./build/genVscdPkg.js
 过滤后安装的包结构：
 
 ```
-- star-tools
-  - tools
-    - ... 源码结构
-  - package.json
-  - readme.md
+根目录
+├── tools
+│   └── ... 源码结构
+├── package.json
+└── readme.md
 ```
-
-
 
 ## 插件开发插件第一阶段 基本功能
 
@@ -338,29 +338,115 @@ const whenCommand = (methodName: string, content: FileContent) => {
 };
 ```
 
-## 开发插件的第三阶段 架构优化（xxxxxx）
+## 开发插件的第三阶段 架构优化
+
+基于《目录结构制定》这一节，当前项目的结构是：
+
+```
+star-tools
+├── src
+│   └── extension.ts 插件的入口文件，主要是插件的逻辑代码
+├── tools
+│   └── 省略，就是把三个分类文件夹直接移动过来
+├── .gitignore
+├── package.json
+└── tsconfig.json
+```
+
+会有一些问题，我们接下来要解决：
+
+- npm 的使用方式和 vscode 插件的使用方式，发布时，package.json 不同。
+- vsce publish 之前，需要在 package.json 的 contribute.commands 中手动配置命令。
 
 ### 目录再次调整
 
 vscode 插件使用方式和 npm 使用方式的 package.json 不同，应该拆分，调整后的目录为：
 
-- star-tools
-  - plugin
-    - build
-    - src
-      - extension.ts 插件的入口文件，主要是插件的逻辑代码
-    - .vscodeignore
-    - tsconfig.json
-    - package.json
-    - ...
-  - npm
-    - package.json
-    - .npmignore
-  - tools
-    - 省略，就是把三个分类文件夹直接移动过来
-  - .gitignore
+```
+star-tools
+├── plugin
+│   ├── build
+│   ├── src
+│   │   └── extension.ts  // 插件的入口文件，主要是插件的逻辑代码
+│   ├── tools
+│   │   └── 省略，就是把三个分类文件夹直接移动过来
+│   ├── .vscodeignore
+│   ├── tsconfig.json
+│   ├── package.json
+│   └── ...
+├── npm
+│   ├── package.json
+│   ├── .npmignore
+│   └── README.md
+└── .gitignore
+```
 
-### vscode 插件使用时自动生成命令，插入 package.json
+```json
+// plugin/package.json
+{
+  "name": "star-tools",
+  "displayName": "star-tools",
+  "publisher": "star-fe-developer-club",
+  "description": "",
+  "version": "0.0.15",
+  "engines": {
+    "vscode": "^1.84.0"
+  },
+  "categories": ["Other"],
+  "activationEvents": [],
+  "main": "./out/main.js",
+  "contributes": {
+    "commands": [
+      // 省略，与tools下的文件一一对应
+    ]
+  },
+  "scripts": {
+    "dev": "yarn run remove-out && tsc && yarn run move-src && node ./build/genVscdPkg.js",
+    "prod:vs": "yarn run remove-out && yarn run esbuild-base && && node ./build/genVscdPkg.js",
+    "vscode:prepublish": "yarn run prod:vs",
+    "esbuild-base": "esbuild ./src/main.ts --bundle --outfile=out/main.js --external:vscode --external:typescript --format=cjs --platform=node",
+    "remove-out": "rm -rf out", //编译前先删掉已有的out
+    "move-src": "mv out/src/** out && rm -rf out/src" //开发环境编译后整理目录，out/src/extension.js 的 src 那层去掉（强迫症）
+  },
+  "devDependencies": {
+    // 省略
+  },
+  "dependencies": {
+    // 与tools下代码片段的依赖无关，取决于src下插件源码用到的依赖
+    "typescript": "^5.3.3"
+  }
+}
+```
+
+```json
+// npm/package.json
+{
+  "name": "tools_yxr",
+  "version": "0.0.4",
+  "description": "",
+  "main": "./index.js",
+  "scripts": {
+    "prepublish": "cp -r ../plugin/tools/utils ." //发布前把tools/utils拷贝过来
+  },
+  "devDependencies": {
+    // 省略
+  },
+  "dependencies": {
+    // 取决于 utils 的依赖
+  }
+}
+```
+
+1. npm 和 plugin 拆分，两个 package.json 不冲突，独自管理，差别直接看注释
+2. tools 放在 plugin 下面，因为 ① 只有 tools/utils 支持 npm 使用 ② 避免大量改动 extension 中的逻辑
+3. npm 发布前做一个拷贝操作。这样发布到 npm 的 utils 和 plugin 下的一样，不用维护两份。
+
+### 自动生成命令
+
+vscode 插件使用时自动生成命令，插入 package.json。
+
+- package.json 中，开发和生产都有这段脚本 “&& node ./build/genVscdPkg.js”
+- plugin/build/genVscdPkg.js 就是用来处理自动写入命令的
 
 ```js
 // ...
@@ -377,7 +463,6 @@ pkg.contributes.commands = methodFiles.map(({ subName, methodFileName, method })
     title: `star-tools: ${subTitle}/${title}`,
   };
 });
-pkg.version = updateVersion();
 
 fs.writeFileSync("./package.json", JSON.stringify(pkg, null, 4), "utf8");
 console.log("✅ package.json 写入完成 ⚙⚙⚙");
@@ -387,18 +472,35 @@ console.log("✅ package.json 写入完成 ⚙⚙⚙");
 
 ### 用 docusaurus
 
+在原有的架构上多一个 website 目录，与 plugin 和 npm 隔离
+
+```
 star-tools
-├── ...
+├── ... 不变
 └── website（新增）
-├── package.json
-├── docs 文档目录
-└── ... 参考 docusaurus [官方 demo](https://codesandbox.io/p/devbox/beautiful-archimedes-qdeo7)
+    ├── scripts
+    ├   ├── template.md
+    ├   └── genDocs.js
+    ├── package.json
+    ├── docs 文档目录
+    └── ... 其他结构参考 docusaurus
+```
+
+其他结构参考 docusaurus [官方 demo](https://codesandbox.io/p/devbox/beautiful-archimedes-qdeo7)
 
 ### 自动生成文档
 
 1. 预设文档模板 website/scripts/template.md
-   [template](./static/vscode-ext-8.png)
+
+![template](./static/vscode-ext-8.png)
+
 2. website/package.json 添加命令
+
+贡献者（开发者）在添加代码片段后需要用命令去生成文档，可以是一个目录，也可以是一个文件，也可以全量更新，会根据参数解析。
+
+```bash
+yarn run create-docs path=/3d/SpaceHelper.ts # 拿一个文件举例子
+```
 
 ```json
 // ...
@@ -409,74 +511,136 @@ star-tools
 ```
 
 3. website/scripts/genDocs.js 读取模板，替换占位符
+
 ```js
 // createAllDocs 较为简单，不放代码了
 // createCategory 较为简单，不放代码了
 // parseContent 再次用到 AST，分析出代码片段源文件中的 JSDoc，
 const createMethodDoc = ({ subName, methodName, method }) => {
-    const subTitle = getSubTitle(subName);  // 获取子标题
-    const mdPath = path.join(__dirname, `../docs/${subName}/${methodName}.md`);  // 构造 Markdown 文件路径
-    if (fs.existsSync(mdPath)) { fs.unlinkSync(mdPath); }  // 如果 Markdown 文件已存在，删除它
-    const { title, description, parameters, returns, properties } = parseContent(method, methodName)  // 解析方法内容，获取标题、描述、参数、返回值和属性
-    console.log('⭐️ 生成文档', mdPath, ":\n");  // 打印生成文档的信息
-    const template = fs.readFileSync(path.join(__dirname, './template.md'), 'utf8');  // 读取模板文件
-    let mdStr = template  // 替换模板中的占位符 start 
-        .replace(/@methodName/g, methodName)
-    // ...  省略
-    // 替换模板中的占位符 end
-    fs.writeFileSync(mdPath, mdStr);  // 写入生成的 Markdown 字符串到文件
-}
+  const subTitle = getSubTitle(subName); // 获取子标题
+  const mdPath = path.join(__dirname, `../docs/${subName}/${methodName}.md`); // 构造 Markdown 文件路径
+  if (fs.existsSync(mdPath)) {
+    fs.unlinkSync(mdPath);
+  } // 如果 Markdown 文件已存在，删除它
+  const { title, description, parameters, returns, properties } = parseContent(method, methodName); // 解析方法内容，获取标题、描述、参数、返回值和属性
+  console.log("⭐️ 生成文档", mdPath, ":\n"); // 打印生成文档的信息
+  const template = fs.readFileSync(path.join(__dirname, "./template.md"), "utf8"); // 读取模板文件
+  let mdStr = template // 替换模板中的占位符 start
+    .replace(/@methodName/g, methodName);
+  // ...  省略
+  // 替换模板中的占位符 end
+  fs.writeFileSync(mdPath, mdStr); // 写入生成的 Markdown 字符串到文件
+};
 const parseScript = () => {
-    // 打印命令行参数的第二个值
-    console.log('process.argv[2]:', process.argv[2]);
+  // 打印命令行参数的第二个值
+  console.log("process.argv[2]:", process.argv[2]);
 
-    // 如果没有提供命令行参数的第二个值，那么生成所有文档
-    if (!process.argv[2]) {
-        createAllDocs();
-        return;
-    }
+  // 如果没有提供命令行参数的第二个值，那么生成所有文档
+  if (!process.argv[2]) {
+    createAllDocs();
+    return;
+  }
 
-    // 从命令行参数的第二个值中获取路径字符串
-    const pathStr = process.argv[2].split('=')[1];
+  // 从命令行参数的第二个值中获取路径字符串
+  const pathStr = process.argv[2].split("=")[1];
 
-    // 构造源代码路径和 Markdown 文档路径
-    const sourceCodePath = path.join(__dirname, '../../plugin/tools' + pathStr);
-    const mdDocPath = path.join(__dirname, '../docs' + pathStr);
+  // 构造源代码路径和 Markdown 文档路径
+  const sourceCodePath = path.join(__dirname, "../../plugin/tools" + pathStr);
+  const mdDocPath = path.join(__dirname, "../docs" + pathStr);
 
-    // 获取源代码路径的文件或目录状态
-    const stats = fs.statSync(sourceCodePath);
+  // 获取源代码路径的文件或目录状态
+  const stats = fs.statSync(sourceCodePath);
 
-    // 检查 sourceCodePath 是文件夹还是文件
-    if (stats.isDirectory()) {
-        // 如果是目录，获取目录名作为子分类名，然后创建该子分类的文档
-        const subName = path.basename(sourceCodePath);
-        createCategory(subName);
-    } else if (stats.isFile()) {
-        // 如果是文件，获取文件名和其所在目录名，然后创建该方法的文档
-        const methodFileName = path.basename(sourceCodePath);
-        const subName = path.basename(path.dirname(sourceCodePath));
-        createMethodDoc({ subName, methodName: methodFileName.split('.')[0], method: sourceCodePath });
-    } else {
-        // 如果既不是文件也不是目录，打印错误信息
-        console.log('❌ 文件或目录路径不正确：', sourceCodePath);
-    }
-}
+  // 检查 sourceCodePath 是文件夹还是文件
+  if (stats.isDirectory()) {
+    // 如果是目录，获取目录名作为子分类名，然后创建该子分类的文档
+    const subName = path.basename(sourceCodePath);
+    createCategory(subName);
+  } else if (stats.isFile()) {
+    // 如果是文件，获取文件名和其所在目录名，然后创建该方法的文档
+    const methodFileName = path.basename(sourceCodePath);
+    const subName = path.basename(path.dirname(sourceCodePath));
+    createMethodDoc({ subName, methodName: methodFileName.split(".")[0], method: sourceCodePath });
+  } else {
+    // 如果既不是文件也不是目录，打印错误信息
+    console.log("❌ 文件或目录路径不正确：", sourceCodePath);
+  }
+};
 parseScript();
 ```
 
-## 心碎记录
+### 文档部署
 
-### 踩坑点（to myself）
+docusaurus 集成了打包的能力，package.json 中预置的命令就够用了。
+
+- npm run dev 本地启动
+- npm run build 生产环境打包部署用
+
+## 演示
+
+![](./static/vscode-ext-9.gif)
+
+## 展望
+
+### 在线搜索
+
+随着代码片段数量的增长，这种方式可能会带来一些问题。
+
+- 安装我们的 VS Code 插件时，所有的代码片段都会被下载到用户的本地空间，浪费资源。
+- 需要添加、删除或修改代码片段时，可能需要频繁地修改项目文件，频繁发版。
+
+因此，考虑将代码片段存储在后端数据库中，通过接口请求搜索代码片段。
+
+### AI 赋能
+
+从需求定位到代码片段会有个问题：有些用户可能清楚自己的需求，但是无法准确地提炼出能够定位到特定代码片段的关键词。  
+为了解决这个问题，计划利用大语言模型的能力来帮助用户定位到他们需要的代码片段。  
+目前是想要用 langchain。大致思路是：
+
+- 用 Langchain 的 Text Splitters 将命令描述信息分割成块，命令名称就不用分割了因为很短.
+
+```js
+import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
+const splitter = RecursiveCharacterTextSplitter.fromLanguage("js", {
+  chunkSize: 32,
+  chunkOverlap: 0,
+});
+const jsOutput = await splitter.createDocuments(["代码片段"]);
+```
+
+- 用 Langchain 的 FaissStore 和 OpenAIEmbeddings 来创建一个向量数据库。
+
+```js
+import { FaissStore } from "langchain/vectorstores/faiss";
+import { OpenAIEmbeddings } from "langchain/embeddings";
+const embedding = new OpenAIEmbeddings(); // 使用OpenAI的embedding模型
+const vectorStore = await FaissStore.fromTexts(jsOutput, metadata, embedding); //metadata 为和 doc 相关联的元信息（比如说对应原文第n行数据，相关联的对象等等）若不需要直接传output也可以。
+```
+
+- 用向量数据库的向量搜索能力（similarity Search WithStore）把用户需求文本作为入参，来匹配命令进而得到代码块
+
+```js
+const searchRes = await vectorStore.similaritySearchWithScore(prompt, topK); //prompt 是用户输入，topK控制匹配结果数
+```
+
+- 后续内容变多，需要结合 Langchain 的 APIChain 能力，在线搜索。
+
+```js
+import { OpenAI } from "langchain/llms/openai";
+import { APIChain } from "langchain/chains";
+const OPEN_METEO_DOCS = `BASE URL: 接口地址`;
+const model = new OpenAI();
+const chain = APIChain.fromLLMAndAPIDocs(model, OPEN_METEO_DOCS);
+const res = await chain.call({
+  question: "关键词",
+});
+console.log({ res });
+```
+
+## 心碎记录（to myself）
 
 - 没有这个意识：只有插件运行时的逻辑代码需要编译，代码片段不需要编译。并且不知道以文本形式读取代码片段应该用哪个 API。向 gpt 询问的时候，由于不明确这一点，导致误导越来越深。又是装 babel 又是配置的，浪费了三个小时。最后插入的代码是编译后的，才恍然大悟，自己一开始的意识是错的。
 - 由于 tsconfig 配置不熟悉，不知道 esbuild 这个打包工具。一开始输出的是 out/src/extension.js，最后调整为 out/main.js 的过程也很坎坷，做了一下无用功，比如写脚本还有通过 copyfiles 去整理 out 目录之类的。
 - 由于不知道.vscodeignore 配置文件（关键是 vsce publish 的时候过滤了所有 ts 文件），导致发布时没有 tools 文件夹，在生产环境使用插件时注册命令的逻辑就出错了
 - 由于不知道.npmignore，一开始发布的 npm 包，包含了很多无用代码
-
-#### 用了 ast 之后，本地调试没问题，别人安装使用报：“命令找不到”
-
-没办法在生产环境调试，所以只能改代码把打印都变成 vscode 的消息通知，（注意 消息通知不能是勿扰模式，否则看不到）
-发现 active 根本就没走到
-应该是 import 那里就有问题了
-ast 这个功能用到了 typescript 这个依赖，是在运行时有用到的，应该在 dependencies 下而不是 devDependencies。这样用户安装插件的时候就会自动安装 typescript 这个依赖
-把依赖位置改了之后好了
+- 由于忘记了 typescrpt 是在运行时也用到的， dependencies 没放这个依赖，而是放到 devDependencies，开发调试没问题，别人安装插件使用时就有问题

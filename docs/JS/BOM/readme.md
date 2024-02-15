@@ -91,6 +91,10 @@ React Router 和 Vue Router 都是用于在单页面应用（SPA）中实现路�
 - 基于 hash 的不需要服务端支持，兼容性更好，但不美观
 
 
+### 单页应用是前端控制路由，后端如何把所有路由都识别到index.html?
+无论 URL 是什么，用户都会得到同一个 HTML 文件，  
+因为 nginx 上设置了 try_files $uri /index.html  
+然后前端路由会根据 URL 来显示不同的内容。  
 
 
 ## location 属性的应用

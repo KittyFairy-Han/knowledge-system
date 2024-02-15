@@ -23,6 +23,8 @@ module.exports = {
       { text: "工程化", link: "/engineering/" },
       { text: "其他", link: "/scene/lottieUsage/" },
       { text: "web3d", link: "/web3d/" },
+      { text: "小程序", link: "/miniprogram/" },
+      { text: "hybrid", link: "/hybrid/" },
     ],
     sidebar: {
       "/html/": [["/html/mianjing", "面经"]],
@@ -30,6 +32,7 @@ module.exports = {
         ["/CSS/selector", "选择器"],
         ["/CSS/size", "尺寸"],
         ["/CSS/props", "属性"],
+        ["/CSS/bfc", "BFC"],
         ["/CSS/tailwind", "tailwind"],
       ],
       "/JS/": [
@@ -163,6 +166,8 @@ module.exports = {
           ],
         },
         ["/engineering/vite/", "vite"],
+        ["/engineering/optimistic", "性能优化"],
+        ["/engineering/git", "git"],
       ],
       "/broswer/": [
         ["/broswer/work", "浏览器的工作原理"],

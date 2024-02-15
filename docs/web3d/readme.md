@@ -51,12 +51,14 @@ requestAnimationFrame 不是宏任务（macrotask）也不是微任务（microta
 ### three 项目基本要素
 
 ```js
-this.canvas = document.getElementById("app-canvas");
-this.renderer = App3dScene.createRenderer(this.canvas);
-this.scene = App3dScene.createScene();
-this.camera = App3dScene.createCamera();
-this.lights = //
+this.canvas = document.getElementById("app-canvas");//舞台
+this.renderer = App3dScene.createRenderer(this.canvas);//导演
+this.scene = App3dScene.createScene();//演员
+this.camera = App3dScene.createCamera();//相机
+this.lights = //灯光
 ```
+
+> 不涉及到 DOM 的改变，因此不会引发回流（reflow）或重绘（repaint）。
 
 ### Canvas 和 其他有啥不同
 
@@ -64,7 +66,7 @@ Canvas 是 HTML5 提供的一个元素,用来绘制图形
 
 - 工作原理是基于像素的： 其他 element 是基于对象的，比如可以移动。canvas 需要重新绘制。element 有事件委托，canvas 没有。
 - 游戏用 Canvas，因为它基于像素性能好：  
-  游戏通常需要频繁地更新图形和动画，这就需要大量的绘图和重绘操作。如果使用 DOM 来实现，每次更新都需要修改 DOM 元素，这会引发浏览器的重排和重绘，消耗大量的计算资源，导致性能下降。  
+  游戏通常需要频繁地更新图形和动画，这就需要大量的绘图和重绘操作。如果使用 DOM 来实现，每次更新都需要修改 DOM 元素，这会引发浏览器的重排和重绘，消耗大量的计算资源，导致性能下降。而 canvas 上重新绘制不发生 reflow 和 repaint  
   主要是时间上节省
 
 ### 常见概念
@@ -110,6 +112,10 @@ Canvas 是 HTML5 提供的一个元素,用来绘制图形
 
 > 这两种测试都是在片元着色器（Fragment Shader）阶段进行的，它们都可以用于控制像素是否被绘制，但是使用的方法和目的不同。
 
-
 ### 为什么需要主动 GC
-这些资源在GPU中被创建和使用，而不是在JavaScript的运行环境中。因此，JavaScript的垃圾回收器无法自动管理这些资源。
+
+这些资源在 GPU 中被创建和使用，而不是在 JavaScript 的运行环境中。因此，JavaScript 的垃圾回收器无法自动管理这些资源。
+
+### three 渲染流程
+- 创建3d空间，5要素
+- requestAnimationFrame中renderer.render 在canvas上进行像素级绘制

@@ -73,6 +73,8 @@ window.addEventListener(
 );
 ```
 
+如果可以冒泡并且没有阻止，也会冒泡到 window.onerror
+
 ### 跨域的 js 运行错误怎么捕获
 
 window.onerror，但要记得在 script 标签上加上 crossorigin 属性。  

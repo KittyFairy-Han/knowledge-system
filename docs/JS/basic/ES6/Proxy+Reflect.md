@@ -59,7 +59,7 @@ console.log(arr[1], arrPro[1]); // 2 2
 ## Reflect
 ### Reflect 的理解
 
-- Reflect 能力与 Proxy 拦截一一对应
+- Reflect 能力与 Proxy 拦截一一对应：Proxy拦截后执行逻辑称为trap，在trap中需要执行默认行为时，我们可以使用 Reflect 的方法。
 - Reflect 是能够更加优雅的使用 Object 的相关方法
 
 ### Reflect 基本使用
