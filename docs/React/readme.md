@@ -167,6 +167,10 @@ useRef + ref + forwardRef 父组件调用子组件中的 dom
 
 React 的 Hook 底层是链表，每一个 Hook 的 next 是指向下一个 Hook 的，if 会导致顺序不正确，导致 React 无法正确地追踪 Hooks 的状态，状态错乱。
 
+### hook 为什么用链表
+- 节省内存（比数组、树等）
+- 高效插入和删除（比数组、树等）
+
 ### React 和 Vue3 都有 hook，有何不同
 
 Vue3 的逻辑复用是基于 compositionAPI 的，通常业务开发会封装成一个自己的 Hook。这些自定义 Hook 更像是一个没有 UI 的组件。它具备 Vue3 组件的特点，比如响应式、有生命周期等。  
