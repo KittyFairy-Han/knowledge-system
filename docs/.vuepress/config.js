@@ -15,16 +15,16 @@ module.exports = {
     sidebarDepth: 2, //提取到 h3
     nav: [
       { text: "Home", link: "/" },
-      { text: "CSS", link: "/CSS/layout/" },
+      { text: "CSS", link: "/CSS/" },
       { text: "JS", link: "/JS/" },
       { text: "React", link: "/React/" },
       { text: "Vue", link: "/Vue/" },
-      { text: "浏览器", link: "/broswer/work/" },
-      { text: "工程化", link: "/engineering/" },
-      { text: "其他", link: "/scene/lottieUsage/" },
       { text: "web3d", link: "/web3d/" },
       { text: "小程序", link: "/miniprogram/" },
       { text: "hybrid", link: "/hybrid/" },
+      { text: "工程化", link: "/engineering/" },
+      { text: "其他", link: "/broswer/work/" },
+      { text: "沉淀", link: "/scene/lottieUsage/" },
     ],
     sidebar: {
       "/html/": [["/html/mianjing", "面经"]],
@@ -171,13 +171,19 @@ module.exports = {
       ],
       "/broswer/": [
         ["/broswer/work", "浏览器的工作原理"],
+        ["/broswer/render", "网页渲染"],
         ["/broswer/http", "http"],
         ["/broswer/cache", "浏览器缓存"],
         ["/broswer/security", "安全"],
-        ["/broswer/render", "网页渲染"],
+      ],
+      "/miniprogram/": [
+        ["/miniprogram/", "小程序"],
+        
+      ],
+      "hybrid/": [
+        ["/hybrid/", "hybrid"],
       ],
       "/scene/": [
-        ["/scene/optimistic", "前端性能优化"],
         ["/scene/upload", "上传"],
         ["/scene/lottieUsage", "lottie的应用场景"],
         ["/scene/screenshoots", "前端截屏方案"],
@@ -185,7 +191,7 @@ module.exports = {
         ["/scene/cli", "脚手架工具"],
         ["/scene/vscode-extension", "vscode插件"],
         ["/scene/pay", "支付"],
-        ["/scene/miniprogram", "小程序"],
+        
       ],
       "/web3d/": [
         ["/web3d/demoStart/", "3d入门之空间与模型"],

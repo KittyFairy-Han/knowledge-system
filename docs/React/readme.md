@@ -256,3 +256,25 @@ React 的事件冒泡是基于它自己的事件系统，称为 SyntheticEvent�
 - React.memo - 比如一个订单倒计时页面，每秒都会更新，但是页面上的其他内容并不会变化，这时候就可以使用 React.memo 来避免不必要的渲染。
 - useCallback - 一些传递给子组件的事件会用 useCallback，避免触发不必要的子组件重新渲染。
 - useMemo - 一些计算量比较大的函数，可以用 useMemo 来缓存计算结果，避免重复计算。
+
+### 从 JSX 到渲染到屏幕上，是怎样的流程
+1. 转换：JSX 转换为 VDOm
+``` js
+const element = <h1 className="greeting">Hello, world!</h1>;
+// 转换后
+const element = React.createElement(
+  'h1',
+  {className: 'greeting'},
+  'Hello, world!'
+);
+```
+2. 挂载（首次）：从 VDOM 映射到真实 DOM
+```js
+ReactDOM.render(element, document.getElementById('root'));
+```
+3. 更新：状态改变，重新 VDOm，重新映射到真实 DOM    
+
+第2、3部的细节流程有：
+
+- 1. reconciliation （diff）
+- 2. commit

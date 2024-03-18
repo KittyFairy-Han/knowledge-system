@@ -14,9 +14,7 @@
   },
   "dependencies": {
     "@markspec/vuepress-plugin-image": "^1.1.3",
-    "@star/tools": "^0.0.5-alpha.0",
     "chai": "^5.0.0",
     "mocha": "^10.2.0"
   }
-  
 }
