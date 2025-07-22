@@ -20,6 +20,7 @@ module.exports = {
       { text: "React", link: "/React/" },
       { text: "Vue", link: "/Vue/" },
       { text: "web3d", link: "/web3d/" },
+      { text: "AI", link: "/AI/" },
       { text: "小程序", link: "/miniprogram/" },
       { text: "hybrid", link: "/hybrid/" },
       { text: "工程化", link: "/engineering/" },
@@ -199,6 +200,9 @@ module.exports = {
         ["/web3d/PORender/", "web3d性能优化-渲染"],
         ["/web3d/POLoad/", "web3d性能优化-加载"],
         ["/web3d/ARStart/", "入门AR"],
+      ],
+      "/AI/": [
+        ["/AI/","分享"]
       ],
     },
   },
