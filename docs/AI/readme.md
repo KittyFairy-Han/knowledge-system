@@ -1,17 +1,36 @@
-## 1.背景 
-如今，AI已经融入到各种应用中，比如在搜索中的插入AI生成内容：  
+## 1.背景
+介绍MUI之前，先简单了解一些概念    
+提到 AI 应用，以 chatgpt 为例介绍基础概念
+![基础概念](./static/1561753948353_pic.png)
+结合电商业务场景，通常一次消息需要渲染的内容会复杂的多，不会是纯文本，比如 AI 找一次消息
 ![回答内容示例](./static/image.png)
-传统请求与AI问答存在显著差异，带来了新的技术挑战：
-1. **流式数据特性**：模型生成内容是渐进式的，不像传统API一次性返回完整结果  
-2. **数据结构复杂**：模型生成的原始内容需进一步解析和补全才能被用户理解  
-3. **智能编排复用**：如何构建可复用的智能体能力，通过编排快速接入不同业务场景，实现开发提效 
-![简单的架构图](./static/Snipaste_2025-07-20_15-01-33.png)
-<!-- 高亮架构图中引擎部分，突出引擎的作用：解析转换、编排复用、多种接入方式 -->
+如果业务自己开发，直接对接模型返回的数据，需要消化的概念和需要处理的数据逻辑会很复杂，因为
+传统请求与 AI 问答存在显著差异：
+![回答内容示例chatgpt的conversation流式接口](./static/Snipaste_2025-07-31_16-02-13.png)
 
+1. **流式数据特性**：模型生成内容是渐进式的，不像传统 API 一次性返回完整结果
+2. **数据结构复杂**：原始内容直接拿来用就是 markdown，没办法渲染成丰富的 ui 形式
+3. **智能编排复用**：不同业务使用的 AI 底层能力很有可能一样，如何复用而不用 AI 工程每次适配业务
+4. **模型推 UI**：每个业务都想搞个类似 copilot，如何快速搭建出一个 bot，尽量复用已有的能力或者物料  
+   **为了让业务开发像日常写个 React 组件那样丝滑，让底层能力高度复用，通用能力可插拔，让就产生了 mui**
+   ![简单的架构图](./static/Snipaste_2025-08-16_18-30-40.png)
+   
+   业务接入有两种形式，
 
-## 2.demo演示
-1. [天梭后台](场景详情链接待补充)、![后台操作录屏](./static/Snipaste_2025-07-21_15-16-33.png)
-2. 业务前端实现（片段）
+- 高度定制时推荐使用 sdk 接入方式，mui 会处理好数据
+- 简单通用场景可以走 0 代码搭建出一个 bot
+
+## 2.demo 演示
+
+目前三个落地的场景都是高度定制，通过 sdk 接入的  
+以 AI 找为例，简单介绍一下使用流程
+
+1. 平台上进行一系列配置，[跳转到天梭后台](场景详情链接待补充)
+<!-- ![后台操作录屏](./static/Snipaste_2025-07-21_15-16-33.png) -->
+2. [演示前台 demo 页面](链接待补充)，关注网络面板中的流式过程
+<!-- 、![demo录屏]()、![浏览器中的网络录屏]() -->
+3. 业务前端实现（片段）
+
 ```tsx
 export default function IndexPage() {
   /* step1 常规开发的本地状态 */
@@ -20,12 +39,12 @@ export default function IndexPage() {
   const [stepItems, setStepItems] = useState<any[]>([]);
   const [staticConfig, setStaticConfig] = useState<any>(null);
   /* step2 AI问答能力的实例 */
-  const { current: stream } = useRef(new Stream({sceneCode: "SC_1f1445b21",bizType: "plugin_search_ai_find"}));
+  const { current: stream } = useRef(new Stream({ sceneCode: "SC_1f1445b21", bizType: "plugin_search_ai_find" }));
 
   const init = async () => {
     /* step2 调用实例方法发起问答 */
     stream
-      .createStream({bizParams: {query: "适合夏天汉服的轻盈头饰" }})
+      .createStream({ bizParams: { query: "适合夏天汉服的轻盈头饰" } })
       .onLayout((layout) => {
         setStatus("process");
         setStaticConfig(layout?.[0]?.staticConfig);
@@ -43,161 +62,191 @@ export default function IndexPage() {
       });
   };
 
-
   useEffect(() => {
     init();
   }, []);
 
- 
   const firstCategoryOffers = itemList[0]?.subItemList || [];
   return (
     <div className="test-page">
       <div className="contentContainer">
         {status !== "wait" && (
           <>
-            <GuideHeader data={staticConfig}/>
+            <GuideHeader data={staticConfig} />
             <h3>分析步骤</h3>
             <SimpleSteps steps={stepItems} />
           </>
         )}
-        {status === "finish"  && (
+        {status === "finish" && (
           <>
             <h3>AI找商机结果</h3>
             <Result categories={itemList} />
           </>
         )}
-        {status === "error" && (
-          <Error/>
-        )}
+        {status === "error" && <Error />}
       </div>
     </div>
   );
 }
 ```
-3. [前台demo页面](链接待补充)、![demo录屏]()、![浏览器中的网络录屏]()
-4. 修改天梭后台的配置，前台demo页面刷新生效
 
+4. 修改天梭后台的配置，前台 demo 页面刷新生效
 
 ## 3.实现方案
-接下来深入解析MUI的核心技术设计，了解如何实现高效AI交互开发
 
-### 3.1 基础概念
-![基础概念](./static/Snipaste_2025-07-20_17-16-00.png)
+从前端 sdk 切入（部分核心），来分享一下 mui 中的核心设计思想和能力
 
-### 3.2 分层流式数据协议 
-在流式请求的生命周期中，我们设计了分层数据协议，确保业务开发只需关注数据更新：
-<!-- 与AI对话的一问一答是消息级别，一次问答对应一次流式请求，从刚才的demo可以看出业务开发不需要感知”流式“，只需要不断地update本地状态就行了，这就依赖于
-天梭引擎的能力。
-从刚刚demo中看到流式请求是一个长连接，浏览器的网络中是一帧一帧在不断返回数据的 -->
-![分层数据协议和流式的生命周期](./static/Snipaste_2025-07-20_15-31-56.png)
-![时序图](./static/Snipaste_2025-07-21_21-18-50.png)
+- 实例属性
+  | 名称 | 含义 |
+  |---------|---------|
+  | messageInfo | 消息详情包含 id 和状态等 |
+  | componentsInfo | 包含布局信息和渲染数据 |
 
+- 实例方法
+  | API 名称 | 使用场景 | 返回值 |
+  |---------|---------|---------|-------|
+  | createStream | 创建新的消息 | 当前 stream 实例 |
+  | replayStream | 重放消息（恢复中断的流、显示流完的历史消息） | 当前 stream 实例 |
+  | abortStream | 中断当前消息 | void |
 
-### 3.3 技术细节
-1.抛几个问题
-2.API 表格
+- 监听事件/生命周期 hook  
+  调用示例（伪代码）：new Stream().createStream().onStart(callback)
 
-#### 3.3.1 createStream
-1. layout 时，初始化UI框架和读取静态配置
-2. update 时，更新数据，驱动UI更新
-![映射关系](./static/Snipaste_2025-07-21_15-16-33.png)
-<!-- 天梭引擎将AI返回的字段（如x.xx.xxx）映射到propCode（如common_cot）
-业务组件通过compsInfo[0].streamData.common_cot获取实时数据 -->
-3. finish或error时，标记一次问答到达最终态
+  | Event 名称 | 触发时机                     |
+  | ---------- | ---------------------------- |
+  | onStart    | 开始响应                     |
+  | onLayout   | 响应了布局信息               |
+  | onUpdate   | 数据更新事件（后续每帧数据） |
+  | onFinish   | 消息正常结束                 |
+  | onFail     | 消息失败                     |
 
+### 3.1 createStream & 分层流式数据协议
 
-#### 3.3.2 replayStream 断点续流&历史重放
-用户查看历史记录时，无论记录是否完整，都能获得一致体验
-<!-- 场景	处理方式	用户感知
-新请求	建立新连接	实时流式体验
-中断历史继续流	从断点恢复	无缝接续
-已完成历史	直接渲染完整结果	即时展示 -->
-<!-- ![智能流式](./static/Snipaste_2025-07-21_21-25-28.png) -->
-<!-- 刚刚的例子是伴生式的使用方式，用户实际使用的时候，可能希望是有历史记录的，点击历史某一条可以重放结果。这里会有比较复杂的情况，可能正在流的过程中用户刷新页面或者什么操作使得请求中断了，当他查看历史的时候，点击这一条也希望可以重放结果。基于我们的SDK，业务不需要感知是没流完的回放，还是完整结果的回放，调用实例方法 replayStream 都可以渲染完整的结果。 -->
+分层的数据协议，简单理解就是对于 onLayout、 onUpdate、onFinish（结合时序图和 demo，createStream 触发流式请求，然后触发生命周期中几个重要的事件）
 
-2. 业务前端代码（片段）
-```tsx
-export default function IndexPage() {
-  /* step1 常规开发的本地状态、step2 AI问答能力的实例 */
-  // 同上个demo
-  const init = async () => {
-    /* step3 调用实例方法重放问答 */
-    stream
-      .replayStream({msgId: "点击的那一条的消息id"})
-      .on// 同上个demo
-  };
-  useEffect(() => {
-    init();
-  }, []);
-  const firstCategoryOffers = itemList[0]?.subItemList || [];
-  return (
-   //  同上个demo
-  );
-}
+> ![时序图](./static/Snipaste_2025-08-03_19-27-40.png)
+
+**这样设计的原因：**
+
+- 动态 UI 架构 - 我们采用模型驱动的动态 UI 架构，AI 会实时输出结构化的 UI 描述，决定展示哪些组件、怎样排列。而前端这边，我们用了一套基于微模块的组件体系，可以按需加载不同的组件，实现灵活组合和渲染。
+<!-- layout:是因为我们的目标 model 动态判断 ui，比如在 AI 找的场景中，你让它找商机，它就返回一个比较复杂的布局，有 tab 类目，每个类目下有商品卡片等；比如你让它在这些中就选中最好的一个商品，那它可能就返回一个文案和表格，罗列优缺点等等。 -->
+- 抹平流式复杂度 - 拆解数据和 UI，产生最小数据单元（AI chunk）和最小渲染单元（UI chunk）。通过 chunk 映射的机制，mui 这一层把对数据输分发到对应的组件，业务开发无需感知数据分帧到达过程。经过拆解就更加原子化，有利于复用和编排。
+  <!-- 如果不拆解，就很难复用，AI每次都要配合业务开发。如果没有前端sdk这一层，那每个业务前端都得写if（xxx）渲染某一小块ui，就是sdk里面进行数据组装的代码，每个业务都得写一遍 -->
+  [详细解释](./static/Snipaste_2025-08-02_18-30-54.png)
+  [映射关系](./static/Snipaste_2025-07-21_15-16-33.png)
+
+**对比传统优势**
+|传统方式 | MUI 方式 |
+| ---------- | ---------------------------- |
+|业务需手动解析每帧数据 |SDK 自动完成数据聚合|
+|每个业务重复实现流式逻辑 |通用逻辑一次封装多次复用|
+|强耦合 AI 返回数据结构 | AI 与 UI 解耦|
+
+<!-- | 时间线 | 原始数据                     | sdk 内 stream.componentsInfo                                                                                                                  | 业务组件代码                                                                                               |
+| ------ | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| n-1    | `"为您精选了如下top3的商品"` | `[{ summaryText: "为您精选了如下top3的商品", offerList: [] }]`                                                                                | ` 如下代码片段无需感知流式......................... ` |
+| n      | `"商品 id 有 1"`             | `[{ summaryText: "为您精选了如下top3的商品", offerList: [ {id: 1, imgUrl: "xxx.png"} ]}]`                                                     | `同上`                                                                                                     |
+| n+1    | `"2，3"`                     | `[{ summaryText: "为您精选了如下top3的商品", offerList: [ {id:1, imgUrl: "xxx.png"}, {id:2,imgUrl: "xxx.png"}, {id:3, imgUrl: "xxx.png"} ]}]` | `同上`                                                                                                     |
+
+```jsx
+const ResultList = ({ streamData }) => (
+  <ul>
+    {streamData.offerList.map((item) => (
+      <OfferItem data={item} />
+    ))}
+  </ul>
+);
+``` -->
+
+### 3.2 replayStream & 断点续流的能力
+
+#### 为啥有 replayStream
+
+更复杂的 AI 应用场景可能还需要更多能力比如：
+
+- AI 回答时可以暂停和恢复，类似播放歌曲那样
+- 查看历史消息记录
+- AI 回答太慢了，我关了页面（网络波动、意外刷新、多端同步），但希望下次进入能看到完整结果。
+
+`replayStream`方法正是为解决这类问题设计
+
+#### demo
+
+1. [演示前台 demo 页面](链接待补充)，
+2. 调用示例，和 createStream 一样，调用后也进入流式生命周期
+
+```js
+stream.replayStream({ msgId: "点击的那一条的消息id" }).on; // 同上个demo
 ```
-[前台demo页面](链接待补充)、![断点续流demo录屏](待补充)、
 
-#### 3.3.3 token
-- 准入控制能力
-- 失效可以自动获取
-#### 3.3.2 防抖更新
-1. **防抖更新**
-高频数据更新可以采用防抖机制
-<!-- 有时候流太快了，巴拉巴拉 -->
-```tsx
-// 创建流实例时配置
-new Stream({
-  throttleUpdate: 300 // 300ms内只触发一次更新
-})
+#### 怎么续流的
 
-```
-#### 3.3.3 错误分层
-2. **错误分层**：
-   ```mermaid
-   pie
-       title 错误处理分层
-       "网络层" ： 35
-       "协议层" ： 25
-       "业务层" ： 25
-       "渲染层" ： 15
-   ```
-   - 每层独立错误处理和上报
-   - 错误边界隔离，避免级联故障
+它通过以下机制实现断点续流：
+![deepseek输出的流程图](./static/Snipaste_2025-08-02_22-47-17.png)
 
-   
-## 展望
-### 未来演进方向
-1. **动态UI组合**：
-   - AI驱动UI组件动态编排
+- 本地持久化 + 结构化缓存机制  
+  在流式传输过程中， mui 后端实时缓存数据帧，发生意外中断（刷新、stream 实例销毁等）前端 SDK 自动将结构化后的渲染数据存入 localStorage。当调用 replayStream 时自动恢复已渲染内容并从新的帧开始续流,精确保存最后有效 chunkId 位置,智能续接仅缺失部分数据（节省 40%流量）
+
+- 统一封装 replayStream API，抽象复杂逻辑  
+  提供唯一的 replayStream()方法对接前端展示，无论是完整历史消息显示还是流到一半接着流，业务方调用方式完全一致。业务开发只需关注"重放"意图，无需处理状态分支判断（如是否中断、数据是否完整等）
+
+#### 有什么价值
+
+- 开发提效：业务方不需要维护复杂的「中断判断 + 重建 UI」逻辑，无论记录是否完整，开发者都只需要和 createStream 一样 onUpdate 就行；
+- 用户体验提升：刷新 / 崩溃 / 切端场景依然保证「能看到完整回答」；
+
+### 3.3 sdk 中的其他 API 和能力
+
+- 准入控制  
+  通过`getAccessToken` 支持实验和切流，自动刷新失效凭证，有效控制 AI 功能开放范围。
+
+- 防抖更新  
+  可配置的节流机制`new Stream({throttleUpdate: 300})`，合并高频数据帧更新，减轻业务 update 压力，减少性能损耗。
+
+- 错误分层  
+  ![错误处理图](./static/Snipaste_2025-08-03_16-52-41.png)
+  五级精细化错误处理（网络/MTop网关/布局/数据/渲染），通过完整的错误传播链管理体系，覆盖12种核心异常场景。基于精准定位技术（错误层级+位置溯源）与自愈式处理机制，实现差异化恢复策略，确保业务流畅度。
+  
+
+<!-- // 指数退避 + 随机抖动算法
+private calculateRetryDelay(): number {
+  const baseInterval = 1000; // 基础间隔1秒
+  const maxInterval = 30000; // 最大间隔30秒
+  const retryCount = this.retryHelper.getRetryCount();
+
+  // 指数增长：2^retryCount * baseInterval
+  const exponential = Math.pow(2, retryCount) * baseInterval;
+
+  // 随机抖动：±30% 随机波动
+  const jitter = exponential * 0.3 * (Math.random() > 0.5 ? 1 : -1);
+
+  // 最终延迟 = 指数值 + 抖动值
+  const delay = Math.min(exponential + jitter, maxInterval);
+
+  debugConsole.info(`第${retryCount+1}次重试，延迟${delay}ms`);
+  return delay;
+} -->
+
+- 监控体系
+
+**通过分层抽象将复杂流式交互标准化，使业务开发聚焦核心逻辑，将稳定性、性能、体验保障下沉至 SDK 层实现。**
+
+## 4.规划
+
+1. **动态 UI 组合**：
+   - AI 驱动 UI 组件动态编排
    - 基于场景的自动布局优化
-   - 个性化UI生成
+   - 个性化 UI 生成
 2. **自然语言搭建**：
    - "创建商品推荐页，包含分类过滤和热销排序"
    - 对话式界面配置
-   - AI辅助设计建议
-3. **生产级AI UI**：
-   - 端到端测试覆盖率 > 90%
-   - 99.99%的流式可靠性
-   - 亚秒级响应体验
-### 愿景
-> "让AI交互如常规开发般可靠，让复杂业务如对话般简单"
-通过MUI平台，我们将实现：
-- 业务迭代速度提升10倍
-- AI交互开发门槛降低90%
-- 用户体验一致性达100%
-## Q&A
-### 典型问题准备
-1. **与传统UI开发的对比优势？**
-   - 数据驱动 vs 手动编码
-   - 实时响应 vs 请求/响应模式
-   - 动态组合 vs 静态组件
-2. **如何处理大数据量场景？**
-   - 分块加载技术
-   - 虚拟滚动支持
-   - 增量渲染优化
-3. **如何保证数据一致性？**
-   - 全量更新策略
-   - 版本化数据快照
-   - 最终一致性保证
-注意：以上内容即为1.0版本的技术分享文稿，以Markdown源码格式输出。
+   - AI 辅助设计建议
 
+## 总结
+
+| 传统 AI 开发痛点              | mui 的解决思路                                   |
+| ----------------------------- | ------------------------------------------------ |
+| 流式数据难处理（渐进式返回）  | 分层数据协议 + 生命周期钩子（onLayout/onUpdate） |
+| 数据结构复杂（原始 Markdown） | 结构化 UI 描述 → 动态渲染组件                    |
+| 能力复用成本高                | 微模块组件体系 + 智能编排引擎                    |
+| 快速搭建 Copilot 困难         | 支持 SDK 接入 + 0 代码搭建双模式                 |
